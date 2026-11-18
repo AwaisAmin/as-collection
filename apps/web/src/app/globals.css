@@ -1,0 +1,15 @@
+@import 'tailwindcss';
+
+/* Design tokens are introduced in step 3. */
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: #faf1ea;
+    color: #1a1a1a;
+  }
+}
