@@ -12,8 +12,12 @@ export const siteConfig = {
   currency: 'PKR',
   freeShippingThreshold: 2500,
   contact: {
-    phone: '0300-1234567',
-    phoneHref: 'tel:+923001234567',
+    phone: '0328-9485741',
+    /** E.164 for tel: links and structured data. */
+    phoneE164: '+923289485741',
+    phoneHref: 'tel:+923289485741',
+    email: 'collectionhubas@gmail.com',
+    emailHref: 'mailto:collectionhubas@gmail.com',
   },
   copyrightYear: 2025,
 } as const;

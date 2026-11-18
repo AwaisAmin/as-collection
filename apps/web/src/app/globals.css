@@ -86,7 +86,7 @@
   body {
     @apply bg-cream font-body font-medium text-text;
     text-rendering: optimizeLegibility;
-    /* Cormorant defaults to old-style figures; the design uses lining numerals (0300-1234567, 2500). */
+    /* Cormorant defaults to old-style figures; the design uses lining numerals (phone numbers, 2500). */
     font-variant-numeric: lining-nums;
   }
 

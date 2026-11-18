@@ -8,8 +8,8 @@ export interface SocialLink {
 }
 
 export const socialLinks: readonly SocialLink[] = [
-  { platform: 'facebook', label: 'Facebook', href: 'https://facebook.com/' },
-  { platform: 'instagram', label: 'Instagram', href: 'https://instagram.com/' },
-  { platform: 'tiktok', label: 'TikTok', href: 'https://tiktok.com/' },
-  { platform: 'youtube', label: 'YouTube', href: 'https://youtube.com/' },
+  { platform: 'facebook', label: 'Facebook', href: 'https://www.facebook.com/share/1E9KNLqtSp/' },
+  { platform: 'instagram', label: 'Instagram', href: 'https://www.instagram.com/as_collection60/' },
+  { platform: 'tiktok', label: 'TikTok', href: 'https://www.tiktok.com/@ascollection16' },
+  { platform: 'youtube', label: 'YouTube', href: 'https://www.youtube.com/@ASCollectionHub' },
 ];

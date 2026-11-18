@@ -6,15 +6,29 @@ import { VerticalDivider } from '@/components/ui/vertical-divider';
 
 import { type TrustFeature, trustFeatures } from '../../content/trust-features';
 
-function TrustItem({ icon: Icon, lines }: TrustFeature) {
-  return (
-    <div className="flex flex-col items-center gap-2 text-center sm:flex-row sm:gap-4 sm:text-left lg:gap-5">
+const itemClasses =
+  'flex flex-col items-center gap-2 text-center sm:flex-row sm:gap-4 sm:text-left lg:gap-5';
+
+function TrustItem({ icon: Icon, lines, href }: TrustFeature) {
+  const content = (
+    <>
       <Icon aria-hidden className="size-9 shrink-0 text-ink lg:size-11" />
       <p className="font-body text-[16px]/[1.2] text-text sm:text-[17px]/[1.2] lg:text-[19px]/[1.2]">
         <span className="block">{lines[0]}</span>
         <span className="block">{lines[1]}</span>
       </p>
-    </div>
+    </>
+  );
+
+  return href ? (
+    <a
+      href={href}
+      className={`${itemClasses} rounded-sm transition-opacity duration-200 hover:opacity-75`}
+    >
+      {content}
+    </a>
+  ) : (
+    <div className={itemClasses}>{content}</div>
   );
 }
 
