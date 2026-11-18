@@ -1,7 +1,18 @@
 {
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "editor.codeActionsOnSave": { "source.fixAll.eslint": "explicit" },
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
   "typescript.tsdk": "node_modules/typescript/lib",
-  "eslint.workingDirectories": [{ "pattern": "apps/*" }, { "pattern": "packages/*" }]
+  "eslint.workingDirectories": [
+    {
+      "pattern": "apps/*"
+    },
+    {
+      "pattern": "packages/*"
+    }
+  ],
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "js/ts.tsdk.path": "node_modules/typescript/lib"
 }
