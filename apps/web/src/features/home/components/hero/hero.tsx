@@ -51,22 +51,15 @@ export function Hero({ content = heroContent }: HeroProps) {
         />
       </div>
 
-      {/* Decorative florals */}
-      <Image
-        src={images.flowersLeft.src}
-        alt=""
-        aria-hidden
-        width={360}
-        height={520}
-        className={`${decorClass} bottom-6 -left-6 hidden w-[150px] lg:block xl:w-[170px]`}
-      />
+      {/* Decorative florals over the open background (desktop only — on mobile the photo is full width).
+          The left vase of flowers is part of the hero photo itself. */}
       <Image
         src={images.flowersRight.src}
         alt=""
         aria-hidden
         width={420}
         height={380}
-        className={`${decorClass} -top-4 -right-6 w-[130px] sm:w-[170px] lg:w-[210px]`}
+        className={`${decorClass} -top-4 -right-6 hidden w-[190px] lg:block xl:w-[210px]`}
       />
       <Image
         src={images.palmLeaf.src}
@@ -74,7 +67,7 @@ export function Hero({ content = heroContent }: HeroProps) {
         aria-hidden
         width={300}
         height={300}
-        className={`${decorClass} -right-4 -bottom-4 hidden w-[120px] sm:block lg:w-[135px]`}
+        className={`${decorClass} -right-4 -bottom-4 hidden w-[120px] lg:block xl:w-[135px]`}
       />
 
       {/* Copy */}
@@ -91,12 +84,12 @@ export function Hero({ content = heroContent }: HeroProps) {
 
         <h1
           id="hero-title"
-          className="mt-3 animate-fade-up font-display text-[40px]/[1.05] tracking-[-0.02em] whitespace-nowrap text-ink [animation-delay:80ms] sm:text-[60px]/[1.05] lg:text-[66px]/[1.05] xl:text-[80px]/[1.05]"
+          className="mt-3 animate-fade-up font-display text-[clamp(30px,10.6vw,40px)]/[1.05] tracking-[-0.02em] whitespace-nowrap text-ink [animation-delay:80ms] sm:text-[60px]/[1.05] lg:text-[66px]/[1.05] xl:text-[80px]/[1.05]"
         >
           {content.title}
         </h1>
 
-        <p className="mt-3 flex animate-fade-up items-center gap-[1.1em] font-caps text-[13px] tracking-[0.35em] text-ink uppercase [animation-delay:160ms] sm:text-[18px] lg:text-[19px] xl:text-[22px]">
+        <p className="mt-3 flex animate-fade-up items-center gap-[1.1em] font-caps text-[clamp(10px,3.4vw,13px)] tracking-[0.35em] whitespace-nowrap text-ink uppercase [animation-delay:160ms] sm:text-[18px] lg:text-[19px] xl:text-[22px]">
           <span className="-mr-[0.35em]">{taglineA}</span>
           <span aria-hidden className="size-[0.32em] rounded-full bg-ink" />
           <span className="sr-only">,</span>
@@ -105,7 +98,7 @@ export function Hero({ content = heroContent }: HeroProps) {
 
         <ScriptTagline
           text={content.script}
-          className="mt-3 animate-fade-up text-[27px] leading-[1.2] whitespace-nowrap [animation-delay:240ms] sm:text-[40px] lg:text-[40px] xl:text-[46px]"
+          className="mt-3 animate-fade-up text-[clamp(21px,7.2vw,27px)] leading-[1.2] whitespace-nowrap [animation-delay:240ms] sm:text-[40px] lg:text-[40px] xl:text-[46px]"
         />
 
         <ButtonLink

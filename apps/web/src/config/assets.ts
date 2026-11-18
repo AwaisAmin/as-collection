@@ -4,7 +4,7 @@
  */
 export const images = {
   heroModel: {
-    src: '/images/hero-model.png',
+    src: '/images/hero-model.jpg',
     alt: 'Model wearing a black outfit with gold embroidery and statement gold earrings',
   },
   unstitched: {
