@@ -2,6 +2,7 @@ import './globals.css';
 
 import type { Metadata, Viewport } from 'next';
 
+import { Toaster } from '@/components/ui/toaster';
 import { siteConfig } from '@/config/site';
 import { fontVariables } from '@/lib/fonts';
 import { cn } from '@/lib/utils/cn';
@@ -40,7 +41,10 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (
     <html lang="en" className={cn(fontVariables, 'h-full antialiased')}>
-      <body className="flex min-h-full flex-col">{children}</body>
+      <body className="flex min-h-full flex-col">
+        {children}
+        <Toaster />
+      </body>
     </html>
   );
 }

@@ -15,7 +15,7 @@ export const inputVariants = cva(
     'disabled:cursor-not-allowed disabled:opacity-60',
     // hide the native "x" on type="search" so it doesn't fight with our icon button
     '[&::-webkit-search-cancel-button]:hidden',
-    'aria-invalid:shadow-[0_0_0_2px_rgba(185,28,28,0.55)]',
+    'aria-invalid:shadow-[0_0_0_2px_var(--color-gold-light)]',
   ],
   {
     variants: {
