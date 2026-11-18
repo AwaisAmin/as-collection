@@ -8,15 +8,15 @@ export const images = {
     alt: 'Model wearing a black outfit with gold embroidery and statement gold earrings',
   },
   unstitched: {
-    src: '/images/unstitched.png',
+    src: '/images/unstitched.jpg',
     alt: 'Stack of folded black and beige unstitched fabrics with gold embroidery',
   },
   stitched: {
-    src: '/images/stitched.png',
+    src: '/images/stitched.jpg',
     alt: 'Maroon embroidered stitched kurta on a hanger',
   },
   makeup: {
-    src: '/images/makeup.png',
+    src: '/images/makeup.jpg',
     alt: 'Red lipstick, foundation bottle, compact powder and makeup brush on a marble pedestal',
   },
   flowersLeft: { src: '/images/flowers-left.png', alt: '' },
