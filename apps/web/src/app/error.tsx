@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 
+import { Button } from '@/components/ui/button';
 import { reportError } from '@/lib/errors/report-error';
 
 export default function ErrorBoundary({ error, retry }: { error: unknown; retry: () => void }) {
@@ -14,17 +15,11 @@ export default function ErrorBoundary({ error, retry }: { error: unknown; retry:
       role="alert"
       className="flex flex-1 flex-col items-center justify-center gap-6 px-4 py-24 text-center"
     >
-      <h1 className="text-3xl">Something went wrong</h1>
-      <p className="max-w-md opacity-80">
+      <h1 className="font-display text-[40px] leading-tight">Something went wrong</h1>
+      <p className="max-w-md text-[19px] text-muted">
         We couldn&apos;t load this page. Please try again in a moment.
       </p>
-      <button
-        type="button"
-        onClick={() => retry()}
-        className="rounded-full border border-[#c9a35e] bg-[#111010] px-8 py-3 text-white transition-opacity hover:opacity-90"
-      >
-        Try again
-      </button>
+      <Button onClick={() => retry()}>Try again</Button>
     </main>
   );
 }

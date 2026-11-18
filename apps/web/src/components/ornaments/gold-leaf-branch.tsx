@@ -2,8 +2,8 @@ import { useId } from 'react';
 
 import { cn } from '@/lib/utils/cn';
 
-/** A single leaf, pointing right from its origin, length 26. */
-const LEAF = 'M0 0 C 7 -7.5, 19 -7.5, 26 0 C 19 7.5, 7 7.5, 0 0 Z';
+/** A single leaf, pointing right from its origin, length 28. */
+const LEAF = 'M0 0 C 5 -10, 20 -11, 28 0 C 20 11, 5 10, 0 0 Z';
 
 /** [x, y, rotationDeg, scale] for leaves placed along the stem curve. */
 const LEAVES: ReadonlyArray<readonly [number, number, number, number]> = [
@@ -49,7 +49,7 @@ export function GoldLeafBranch({ className, flip = false, title }: GoldLeafBranc
         d="M10 94 Q 50 70 108 12"
         fill="none"
         stroke={fill}
-        strokeWidth="2.2"
+        strokeWidth="2.8"
         strokeLinecap="round"
       />
       <g fill={fill}>
