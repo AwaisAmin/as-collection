@@ -20,8 +20,10 @@ export const inputVariants = cva(
   {
     variants: {
       variant: {
-        outline: 'border border-gold bg-transparent focus:shadow-gold-glow',
-        filled: 'border border-transparent bg-ivory focus:shadow-gold-glow',
+        outline:
+          'border border-gold bg-transparent focus-visible:shadow-[0_0_0_2px_var(--color-gold-dark)]',
+        filled:
+          'border border-transparent bg-ivory focus-visible:shadow-[0_0_0_2px_var(--color-gold-dark)]',
       },
       size: {
         md: 'h-[42px] px-5 text-[17px]',

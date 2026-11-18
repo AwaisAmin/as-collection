@@ -1,7 +1,6 @@
 import Link from 'next/link';
 
 import { GoldLeafBranch } from '@/components/ornaments/gold-leaf-branch';
-import { siteConfig } from '@/config/site';
 import { cn } from '@/lib/utils/cn';
 
 const sizes = {
@@ -31,19 +30,15 @@ export function Logo({ size = 'md', className, onClick }: LogoProps) {
     <Link
       href="/"
       onClick={onClick}
-      aria-label={`${siteConfig.name} — Home`}
       className={cn('inline-flex shrink-0 flex-col items-center text-ink', className)}
     >
-      <span
-        aria-hidden
-        className={cn('relative -translate-x-[6%] font-display tracking-[-0.045em]', s.mark)}
-      >
+      {/* Accessible name comes from the visible text ("AS Collection Hub"); the space
+          between the stacked spans is ignored by flex layout but kept in the name. */}
+      <span className={cn('relative -translate-x-[6%] font-display tracking-[-0.045em]', s.mark)}>
         AS
         <GoldLeafBranch className={cn('absolute left-full ml-[2px]', s.leaf)} />
-      </span>
-      <span aria-hidden className={cn('font-display whitespace-nowrap', s.word)}>
-        Collection Hub
-      </span>
+      </span>{' '}
+      <span className={cn('font-display whitespace-nowrap', s.word)}>Collection Hub</span>
     </Link>
   );
 }

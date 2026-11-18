@@ -41,6 +41,12 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (
     <html lang="en" className={cn(fontVariables, 'h-full antialiased')}>
+      <head>
+        {/* Without JS, scroll-reveal content must stay visible. */}
+        <noscript>
+          <style>{'[data-reveal]{opacity:1!important;transform:none!important}'}</style>
+        </noscript>
+      </head>
       <body className="flex min-h-full flex-col">
         {children}
         <Toaster />

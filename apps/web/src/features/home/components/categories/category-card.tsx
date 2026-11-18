@@ -23,7 +23,6 @@ export function CategoryCard({ category, className }: CategoryCardProps) {
   return (
     <Link
       href={category.href}
-      aria-label={`Shop ${category.name}`}
       className={cn(
         'group relative flex h-[240px] overflow-hidden rounded-card border border-gold bg-ivory shadow-soft sm:h-[280px]',
         'transition-all duration-300 ease-elegant hover:-translate-y-1 hover:shadow-card-hover',
@@ -34,7 +33,8 @@ export function CategoryCard({ category, className }: CategoryCardProps) {
       <div className="relative w-1/2 shrink-0 overflow-hidden sm:w-[55%]">
         <Image
           src={image.src}
-          alt={image.alt}
+          // Decorative inside the link: the card title already names it.
+          alt=""
           fill
           sizes="(min-width: 1024px) 230px, (min-width: 768px) 30vw, 50vw"
           className="mask-r-from-80% object-cover transition-transform duration-500 ease-elegant group-hover:scale-105"

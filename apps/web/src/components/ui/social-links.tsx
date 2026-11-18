@@ -33,7 +33,7 @@ export function SocialLinks({
               href={href}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label={`Follow us on ${label}`}
+              aria-label={`Follow us on ${label} (opens in a new tab)`}
               className={cn(
                 'inline-flex items-center justify-center transition-all duration-300',
                 variant === 'plain'

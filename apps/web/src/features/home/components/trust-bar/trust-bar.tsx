@@ -1,5 +1,6 @@
 import { Fragment } from 'react';
 
+import { Reveal } from '@/components/motion/reveal';
 import { Container } from '@/components/ui/container';
 import { VerticalDivider } from '@/components/ui/vertical-divider';
 
@@ -37,9 +38,9 @@ export function TrustBar({ features = trustFeatures }: TrustBarProps) {
                   <VerticalDivider tone="dark" />
                 </li>
               ) : null}
-              <li className="flex justify-center lg:block">
+              <Reveal as="li" delay={i * 90} className="flex justify-center lg:block">
                 <TrustItem {...feature} />
-              </li>
+              </Reveal>
             </Fragment>
           ))}
         </ul>

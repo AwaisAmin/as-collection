@@ -1,3 +1,4 @@
+import { Reveal } from '@/components/motion/reveal';
 import { Container } from '@/components/ui/container';
 import { categories as allCategories, type Category } from '@/config/catalog';
 
@@ -15,14 +16,16 @@ export function CategorySection({ categories = allCategories }: CategorySectionP
         Shop by category
       </h2>
       <Container className="px-4 sm:px-5">
-        <ul className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {categories.map((category) => (
-            <li
+        <ul className="mx-auto grid max-w-xl grid-cols-1 gap-4 md:max-w-none md:grid-cols-2 lg:grid-cols-3">
+          {categories.map((category, i) => (
+            <Reveal
+              as="li"
+              delay={i * 120}
               key={category.slug}
               className="md:last:odd:col-span-2 md:last:odd:mx-auto md:last:odd:w-[calc(50%-8px)] lg:last:odd:col-span-1 lg:last:odd:w-full"
             >
               <CategoryCard category={category} />
-            </li>
+            </Reveal>
           ))}
         </ul>
       </Container>

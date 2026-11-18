@@ -18,7 +18,10 @@ function AnnouncementItem({ icon: Icon, text, className }: Announcement & { clas
 /** Black announcement bar. Static row on desktop, auto-scrolling marquee below `lg`. */
 export function TopBar() {
   return (
-    <div className="bg-ink font-body text-[15px] font-semibold text-white">
+    <aside
+      aria-label="Store announcements"
+      className="bg-ink font-body text-[15px] font-semibold text-white"
+    >
       {/* Desktop */}
       <Container className="hidden h-11 items-center justify-between lg:flex">
         <ul className="contents">
@@ -51,6 +54,6 @@ export function TopBar() {
           ))}
         </div>
       </div>
-    </div>
+    </aside>
   );
 }

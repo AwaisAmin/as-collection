@@ -11,6 +11,7 @@ import { SocialLinks } from '@/components/ui/social-links';
 import { isActivePath, mainNav } from '@/config/navigation';
 import { useDisclosure } from '@/hooks/use-disclosure';
 import { useEscapeKey } from '@/hooks/use-escape-key';
+import { useFocusTrap } from '@/hooks/use-focus-trap';
 import { useLockBodyScroll } from '@/hooks/use-lock-body-scroll';
 import { cn } from '@/lib/utils/cn';
 
@@ -24,10 +25,12 @@ export function MobileNav() {
   const drawerId = useId();
   const triggerRef = useRef<HTMLButtonElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
+  const drawerRef = useRef<HTMLDivElement>(null);
   const wasOpen = useRef(false);
 
   useLockBodyScroll(isOpen);
   useEscapeKey(close, isOpen);
+  useFocusTrap(drawerRef, isOpen);
 
   // Move focus into the drawer on open, and back to the trigger on close.
   useEffect(() => {
@@ -61,6 +64,7 @@ export function MobileNav() {
 
       {/* Drawer */}
       <div
+        ref={drawerRef}
         id={drawerId}
         role="dialog"
         aria-modal="true"
