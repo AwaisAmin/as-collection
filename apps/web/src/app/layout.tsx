@@ -3,6 +3,8 @@ import './globals.css';
 import type { Metadata, Viewport } from 'next';
 
 import { siteConfig } from '@/config/site';
+import { fontVariables } from '@/lib/fonts';
+import { cn } from '@/lib/utils/cn';
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
@@ -37,7 +39,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (
-    <html lang="en" className="h-full antialiased">
+    <html lang="en" className={cn(fontVariables, 'h-full antialiased')}>
       <body className="flex min-h-full flex-col">{children}</body>
     </html>
   );

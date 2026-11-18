@@ -1,7 +1,82 @@
 @import 'tailwindcss';
 
-/* Design tokens are introduced in step 3. */
+/* ------------------------------------------------------------------ */
+/*  Design tokens — AS Collection Hub (black · cream · gold)          */
+/* ------------------------------------------------------------------ */
+@theme {
+  /* Colors */
+  --color-ink: #111010; /* bars, buttons, footer */
+  --color-cream: #faf1ea; /* page background */
+  --color-ivory: #fdf7f2; /* cards, header */
+  --color-sand: #f6ece3; /* features band */
+  --color-gold: #c9a35e; /* borders, dividers, ornaments */
+  --color-gold-dark: #a9792f;
+  --color-gold-light: #d9b46e;
+  --color-gold-deep: #b8893e;
+  --color-text: #1a1a1a;
+  --color-muted: #4a4a4a;
 
+  /* Radius */
+  --radius-card: 16px;
+
+  /* Shadows */
+  --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.06);
+  --shadow-card-hover: 0 10px 30px rgba(0, 0, 0, 0.1);
+  --shadow-gold-glow: 0 8px 26px rgba(201, 163, 94, 0.45);
+
+  /* Layout */
+  --container-site: 1200px;
+
+  /* Motion */
+  --ease-elegant: cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-marquee: marquee 28s linear infinite;
+  --animate-fade-up: fade-up 700ms var(--ease-elegant) both;
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+/* Font families resolve the CSS variables injected by next/font. */
+@theme inline {
+  --font-display: var(--font-marcellus), 'Times New Roman', serif;
+  --font-body: var(--font-cormorant), Georgia, serif;
+  --font-script: var(--font-great-vibes), cursive;
+  --font-caps: var(--font-cinzel), var(--font-marcellus), serif;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Custom utilities                                                  */
+/* ------------------------------------------------------------------ */
+@utility bg-gold-gradient {
+  background-image: linear-gradient(135deg, #a9792f 0%, #d9b46e 50%, #b8893e 100%);
+}
+
+@utility text-gold-gradient {
+  background-image: linear-gradient(135deg, #a9792f 0%, #d9b46e 50%, #b8893e 100%);
+  background-clip: text;
+  color: transparent;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Base                                                              */
+/* ------------------------------------------------------------------ */
 @layer base {
   html {
     scroll-behavior: smooth;
@@ -9,7 +84,37 @@
   }
 
   body {
-    background-color: #faf1ea;
-    color: #1a1a1a;
+    @apply bg-cream font-body font-medium text-text;
+    text-rendering: optimizeLegibility;
+    /* Cormorant defaults to old-style figures; the design uses lining numerals (0300-1234567, 2500). */
+    font-variant-numeric: lining-nums;
+  }
+
+  ::selection {
+    @apply bg-gold text-ink;
+  }
+
+  /* Gold keyboard-focus ring everywhere */
+  :focus-visible {
+    @apply rounded-sm outline-2 outline-offset-2 outline-gold;
+  }
+
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
