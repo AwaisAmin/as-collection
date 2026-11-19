@@ -1,6 +1,7 @@
 import { createHash, createHmac, randomBytes, randomInt, timingSafeEqual } from 'node:crypto';
 
-export const sha256Hex = (value: string) => createHash('sha256').update(value).digest('hex');
+export const sha256Hex = (value: string | Buffer) =>
+  createHash('sha256').update(value).digest('hex');
 
 /** Keyed hash: unlike a plain SHA-256, it cannot be brute-forced without the server secret. */
 export const hmacHex = (secret: string, value: string) =>

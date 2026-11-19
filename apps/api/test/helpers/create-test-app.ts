@@ -53,6 +53,10 @@ export async function createTestApp(
   const env = parseEnv({
     DATABASE_URL: process.env.DATABASE_URL,
     REDIS_URL: process.env.REDIS_URL,
+    S3_ENDPOINT: process.env.S3_ENDPOINT,
+    S3_ACCESS_KEY_ID: process.env.S3_ACCESS_KEY_ID,
+    S3_SECRET_ACCESS_KEY: process.env.S3_SECRET_ACCESS_KEY,
+    S3_FORCE_PATH_STYLE: process.env.S3_FORCE_PATH_STYLE,
     NODE_ENV: 'test',
     LOG_LEVEL: 'fatal',
     CORS_ORIGINS: TRUSTED_ORIGIN,

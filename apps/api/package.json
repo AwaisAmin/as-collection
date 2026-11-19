@@ -31,6 +31,7 @@
     "clean": "rimraf dist coverage .turbo"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "3.1162.0",
     "@nestjs/common": "^12.5.1",
     "@nestjs/config": "^12.1.1",
     "@nestjs/core": "^12.5.1",

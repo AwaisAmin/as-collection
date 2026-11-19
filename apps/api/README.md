@@ -26,6 +26,8 @@ docker build -f apps/api/Dockerfile -t as-collection-api .   # from the repo roo
 | `/api/v1/catalog/*` | Public catalog: categories, collections, products (search, `f.<code>` filters, sort, pagination), facets, product page, related, variant lookup |
 
 | `/api/v1/auth/*` | Customer sign-in: phone OTP (`otp`, `otp/verify`), Google (`google`), `session`, `logout` |
+| `/api/v1/checkout/quote`, `/api/v1/orders/*` | Checkout quote, place order (Idempotency-Key), order view (access key or session), track, cancel, payment proof |
+| `/api/v1/account/orders` | Signed-in order history (incl. guest orders linked by verified phone) |
 | `/api/v1/account/*` | Signed-in customer: profile, verified phone, address book, signed-in devices |
 
 ## Structure
@@ -104,6 +106,35 @@ Rules:
   - **Addresses:** up to 20; there's always exactly one default, enforced by a partial unique index.
 - **Rate limits:** the global and `@StrictRateLimit()` limits (`AUTH_RATE_LIMIT_MAX` per minute) are counted in Redis and shared by all instances. If Redis is down they fall back to per-process memory.
 - **To do in B7:** a cleanup job for expired codes and sessions.
+
+## Checkout & orders
+
+- **Prices come only from the database.** The client sends variant ids, quantities and the total it showed. If the server's total differs, the order isn't placed: the API returns 409 `PRICE_CHANGED` with a fresh `quote` the storefront can sync from. Stock problems return 409 `OUT_OF_STOCK`, coupon problems 409 `DISCOUNT_INVALID`, both with the same `quote`.
+- **Placing an order is one transaction:**
+  1. Re-price every line.
+  2. Reserve stock with conditional updates (`on_hand - reserved >= qty`, taken in variant-id order so checkouts can't deadlock).
+  3. Claim one coupon use atomically.
+  4. Write the order, snapshotting names, prices, images and the address.
+
+  Concurrent checkouts can't oversell (tested with 6 parallel buyers for 1 unit).
+
+- **Stock:** `reserved` holds units for open orders. Cancelling releases them. Shipping, an admin step in B7, must move them from `reserved` to an `on_hand` decrease (a `SALE` movement).
+- **Idempotency:** the `Idempotency-Key` header (16–64 chars) is required.
+  - The same key and body returns the original order with 200.
+  - The same key with a different body returns 422 `IDEMPOTENCY_KEY_REUSED`.
+- **Access:** guests use `X-Order-Access-Key`, a 32-hex key derived by HMAC from `AUTH_SECRET` and the order number. Only its SHA-256 is stored. Owners use their bearer token.
+  - A wrong key, unknown number or someone else's order all give the same 404.
+  - Orders are linked to the signed-in customer, or to the customer who verified that phone.
+- **Tracking** (`POST /orders/track`, number + phone) is strictly rate-limited and shows no name, phone, email or street address.
+- **Payment proofs:**
+  - **Upload:** multipart `file`, at most 5 MB, one file.
+  - **Validation:** the file type is checked from its bytes (JPG, PNG or WEBP), never from its name or Content-Type.
+  - **Storage:** files go to the private S3 bucket under a random key, as `attachment`. If recording fails, the object is deleted again.
+- **Shipping fee:** comes from the `shipping` setting (cached, `StoreSettingsService.invalidate()`). If it's missing, checkout returns 503 rather than guessing a fee.
+- **To do in B7:**
+  - Staff order workflow: confirm, ship (stock movement), deliver, refunds.
+  - Payment-proof review with signed URLs.
+  - A job to auto-cancel unpaid transfer orders.
 
 ## Conventions
 

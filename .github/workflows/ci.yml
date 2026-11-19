@@ -36,9 +36,22 @@ jobs:
         options: >-
           --health-cmd "redis-cli ping"
           --health-interval 5s --health-timeout 3s --health-retries 10
+      storage:
+        image: rustfs/rustfs:1.0.6
+        env:
+          RUSTFS_ACCESS_KEY: as_ci_storage
+          RUSTFS_SECRET_KEY: as_ci_storage_secret
+        ports: ['9000:9000']
+        options: >-
+          --health-cmd "curl -fsS http://127.0.0.1:9000/health"
+          --health-interval 5s --health-timeout 3s --health-retries 20
     env:
       DATABASE_URL: postgresql://as_ci:as_ci_password@localhost:5432/as_collection?schema=public
       REDIS_URL: redis://localhost:6379/0
+      S3_ENDPOINT: http://localhost:9000
+      S3_ACCESS_KEY_ID: as_ci_storage
+      S3_SECRET_ACCESS_KEY: as_ci_storage_secret
+      S3_FORCE_PATH_STYLE: 'true'
       PRISMA_HIDE_UPDATE_MESSAGE: '1'
     steps:
       - uses: actions/checkout@v5

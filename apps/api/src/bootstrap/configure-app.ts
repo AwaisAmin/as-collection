@@ -33,7 +33,13 @@ export function configureApp(app: NestNodeApplication, env: Env): NestNodeApplic
     origin: env.CORS_ORIGINS,
     credentials: true,
     methods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Idempotency-Key', REQUEST_ID_HEADER],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'Idempotency-Key',
+      'X-Order-Access-Key',
+      REQUEST_ID_HEADER,
+    ],
     exposedHeaders: [REQUEST_ID_HEADER, 'Retry-After'],
     maxAge: 600,
   });

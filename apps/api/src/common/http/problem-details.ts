@@ -36,8 +36,11 @@ export class ValidationFailedException extends HttpException {
   }
 }
 
+export type JsonValue =
+  string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
+
 /** Extra machine-readable members of a problem (RFC 9457 §3.2), e.g. `{ attemptsLeft: 2 }`. */
-export type ProblemExtensions = Record<string, string | number | boolean | null>;
+export type ProblemExtensions = Record<string, JsonValue>;
 
 /** Problem members that extensions may never overwrite. */
 const RESERVED_MEMBERS = new Set([

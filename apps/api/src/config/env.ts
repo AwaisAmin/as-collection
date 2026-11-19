@@ -72,6 +72,21 @@ export const envSchema = z
       .transform((url) => url.replace(/\/+$/, '')),
 
     /**
+     * S3-compatible object storage (RustFS locally; S3, R2 or Spaces in production). Without keys the
+     * SDK's default chain is used (IAM role, env, profile). Path-style for RustFS/MinIO.
+     */
+    S3_ENDPOINT: z.url({ protocol: /^https?$/ }).optional(),
+    S3_REGION: z.string().min(1).default('us-east-1'),
+    S3_ACCESS_KEY_ID: optionalString,
+    S3_SECRET_ACCESS_KEY: optionalString,
+    S3_FORCE_PATH_STYLE: booleanFlag.default(false),
+    /** Bucket for private files (payment screenshots). Never public; staff read via signed URLs. */
+    S3_PRIVATE_BUCKET: z
+      .string()
+      .regex(/^[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$/)
+      .default('as-private'),
+
+    /**
      * Server secret (≥ 32 chars) keying the OTP and IP hashes. Rotating it invalidates pending login
      * codes only. Generate with `openssl rand -base64 48`. Required in production.
      */

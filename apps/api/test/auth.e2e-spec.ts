@@ -6,6 +6,7 @@ import request from 'supertest';
 
 import { PrismaService } from '../src/database/prisma.service.js';
 import { GOOGLE_JWKS } from '../src/modules/auth/google-id-token.verifier.js';
+import { generateOrderNumber } from '../src/modules/orders/order-number.js';
 import { RedisThrottlerStorage } from '../src/redis/redis-throttler.storage.js';
 import { createTestApp } from './helpers/create-test-app.js';
 
@@ -184,8 +185,9 @@ describe('customer auth & account (e2e)', () => {
       const phone = newPhone();
       const order = await prisma.order.create({
         data: {
-          number: `E2E-${randomUUID().slice(0, 8)}`,
+          number: generateOrderNumber(),
           accessKeyHash: 'a'.repeat(64),
+          requestHash: 'b'.repeat(64),
           paymentMethod: 'COD',
           customerName: 'Guest',
           phone,

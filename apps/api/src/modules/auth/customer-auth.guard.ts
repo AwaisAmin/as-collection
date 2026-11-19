@@ -39,6 +39,28 @@ export class CustomerAuthGuard implements CanActivate {
   }
 }
 
+/**
+ * Attaches the session when a valid bearer token is sent, and lets the request through as a guest
+ * otherwise (a stale cookie must not break guest checkout). Read it with `@OptionalSession()`.
+ */
+@Injectable()
+export class OptionalCustomerAuthGuard implements CanActivate {
+  constructor(private readonly sessions: SessionService) {}
+
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const req = context.switchToHttp().getRequest<AuthenticatedRequest>();
+    const token = bearerToken(req.headers.authorization);
+    const session = token ? await this.sessions.resolve(token) : null;
+    if (session) req.auth = session;
+    return true;
+  }
+}
+
+export const OptionalSession = createParamDecorator(
+  (_data: unknown, context: ExecutionContext): AuthSession | null =>
+    context.switchToHttp().getRequest<AuthenticatedRequest>().auth ?? null,
+);
+
 /** The session `CustomerAuthGuard` attached. Only valid on guarded routes. */
 export const CurrentSession = createParamDecorator(
   (_data: unknown, context: ExecutionContext): AuthSession => {

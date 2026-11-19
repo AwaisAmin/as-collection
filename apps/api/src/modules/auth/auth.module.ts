@@ -4,7 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import type { AppConfig } from '../../app.module.js';
 import { AuthController } from './auth.controller.js';
 import { AuthService } from './auth.service.js';
-import { CustomerAuthGuard } from './customer-auth.guard.js';
+import { CustomerAuthGuard, OptionalCustomerAuthGuard } from './customer-auth.guard.js';
 import {
   createGoogleJwks,
   GOOGLE_JWKS,
@@ -64,9 +64,10 @@ function createOtpSenders(config: AppConfig): OtpSender[] {
     SessionService,
     GoogleIdTokenVerifier,
     CustomerAuthGuard,
+    OptionalCustomerAuthGuard,
     { provide: OTP_SENDERS, inject: [ConfigService], useFactory: createOtpSenders },
     { provide: GOOGLE_JWKS, useFactory: createGoogleJwks },
   ],
-  exports: [SessionService, OtpService, CustomerAuthGuard],
+  exports: [SessionService, OtpService, CustomerAuthGuard, OptionalCustomerAuthGuard],
 })
 export class AuthModule {}

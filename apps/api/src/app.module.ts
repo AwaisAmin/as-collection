@@ -16,8 +16,10 @@ import { AccountModule } from './modules/account/account.module.js';
 import { AuthModule } from './modules/auth/auth.module.js';
 import { CatalogModule } from './modules/catalog/catalog.module.js';
 import { HealthModule } from './modules/health/health.module.js';
+import { OrdersModule } from './modules/orders/orders.module.js';
 import { RedisModule } from './redis/redis.module.js';
 import { RedisThrottlerStorage } from './redis/redis-throttler.storage.js';
+import { StorageModule } from './storage/storage.module.js';
 
 /** Typed access to the validated environment: `config.get('PORT', { infer: true })`. */
 export type AppConfig = ConfigService<Env, true>;
@@ -40,6 +42,7 @@ export class AppModule implements NestModule {
         }),
         DatabaseModule,
         RedisModule,
+        StorageModule,
         // Per client IP, counted in Redis so the limit holds across every API instance.
         ThrottlerModule.forRootAsync({
           inject: [RedisThrottlerStorage],
@@ -60,6 +63,7 @@ export class AppModule implements NestModule {
         CatalogModule,
         AuthModule,
         AccountModule,
+        OrdersModule,
       ],
       providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
     };

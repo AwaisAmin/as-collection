@@ -68,6 +68,8 @@ model Order {
   discountCode       String?       @map("discount_code") @db.VarChar(40)
   /// Client-generated key: retries of the same checkout never create a second order.
   idempotencyKey     String        @unique @map("idempotency_key") @db.VarChar(64)
+  /// SHA-256 of the normalized checkout request: a reused key with a different body is rejected.
+  requestHash        String        @map("request_hash") @db.Char(64)
   courier            String?       @db.VarChar(60)
   trackingNumber     String?       @map("tracking_number") @db.VarChar(64)
   placedAt           DateTime      @default(now()) @map("placed_at") @db.Timestamptz(3)
@@ -88,6 +90,8 @@ model Order {
   @@index([status, placedAt(sort: Desc)])
   @@index([phone])
   @@index([placedAt(sort: Desc)])
+  /// Per-customer coupon limits (counted by phone, so guests are limited too).
+  @@index([discountId, phone])
   @@map("orders")
 }
 
