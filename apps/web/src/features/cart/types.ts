@@ -12,11 +12,13 @@ export interface CartItem {
   price: number;
   compareAtPrice?: number;
   quantity: number;
-  /** Stock available when added (capped server-side again at checkout). */
+  /** Stock available at last check (re-validated on the cart page and at checkout). */
   maxQuantity: number;
+  /** Set when the variant was discontinued or sold out at the last check. */
+  unavailable?: boolean;
 }
 
-export type NewCartItem = Omit<CartItem, 'quantity'>;
+export type NewCartItem = Omit<CartItem, 'quantity' | 'unavailable'>;
 
 export interface AddToCartResult {
   /** Units actually added (may be less than requested when stock-capped). */
@@ -24,3 +26,10 @@ export interface AddToCartResult {
   /** True when the request hit the stock limit. */
   capped: boolean;
 }
+
+export type { VariantSnapshot } from '@/features/catalog/types';
+
+export type CartChange =
+  | { kind: 'price'; name: string; from: number; to: number }
+  | { kind: 'quantity'; name: string; to: number }
+  | { kind: 'unavailable'; name: string };

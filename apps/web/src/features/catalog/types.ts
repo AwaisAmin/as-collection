@@ -122,3 +122,11 @@ export interface CatalogFacets {
   priceRange: { min: Money; max: Money };
   options: readonly { name: string; values: readonly FacetValue[] }[];
 }
+
+/** Current server-side price/stock for a variant (cart re-validation, checkout). */
+export interface VariantSnapshot {
+  variantId: string;
+  price: Money;
+  compareAtPrice?: Money;
+  stock: number;
+}

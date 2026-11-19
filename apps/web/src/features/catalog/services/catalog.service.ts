@@ -12,7 +12,7 @@ import {
   sortProducts,
 } from '../lib/query-products';
 import { type CatalogQuery, PAGE_SIZE } from '../schemas';
-import type { CatalogFacets, Paginated, Product, ProductSummary } from '../types';
+import type { CatalogFacets, Paginated, Product, ProductSummary, VariantSnapshot } from '../types';
 
 /** Cache tag for all catalog reads — the admin calls `revalidateTag(CATALOG_TAG)` after edits. */
 export const CATALOG_TAG = 'catalog';
@@ -26,6 +26,8 @@ export interface CatalogService {
   getRelatedProducts(product: Product, limit?: number): Promise<ProductSummary[]>;
   getFeaturedProducts(limit?: number): Promise<ProductSummary[]>;
   listProductSlugs(): Promise<string[]>;
+  /** Fresh (uncached) price/stock per variant — for cart re-validation and checkout. */
+  getVariantSnapshots(variantIds: readonly string[]): Promise<VariantSnapshot[]>;
 }
 
 /*
@@ -109,7 +111,23 @@ async function listProductSlugs(): Promise<string[]> {
   return mockProducts.map((p) => p.slug);
 }
 
+/** Deliberately NOT cached: stock must be current when the shopper reviews the cart. */
+async function getVariantSnapshots(variantIds: readonly string[]): Promise<VariantSnapshot[]> {
+  const wanted = new Set(variantIds);
+  return mockProducts.flatMap((p) =>
+    p.variants
+      .filter((v) => wanted.has(v.id))
+      .map((v) => ({
+        variantId: v.id,
+        price: v.price,
+        compareAtPrice: v.compareAtPrice,
+        stock: v.stock,
+      })),
+  );
+}
+
 export const catalogService: CatalogService = {
+  getVariantSnapshots,
   listProducts,
   getFacets,
   getProductBySlug,

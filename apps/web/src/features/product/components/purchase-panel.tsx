@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { QuantityStepper } from '@/components/ui/quantity-stepper';
-import { MAX_PER_LINE, useCartStore } from '@/features/cart/store/cart-store';
+import { MAX_PER_LINE, useCartStore, useCartUi } from '@/features/cart/store/cart-store';
 import { Price } from '@/features/catalog/components/price';
 import { compareAtFor, findVariant, minPrice } from '@/features/catalog/lib/product-helpers';
 import type { Product, ProductVariant } from '@/features/catalog/types';
@@ -32,6 +32,7 @@ interface PurchasePanelProps {
 export function PurchasePanel({ product, onAdded }: PurchasePanelProps) {
   const router = useRouter();
   const addItem = useCartStore((s) => s.addItem);
+  const openCartDrawer = useCartUi((s) => s.open);
   const [selected, setSelected] = useState<Selection>(() => initialSelection(product));
   const [quantity, setQuantity] = useState(1);
   const [error, setError] = useState<string | null>(null);
@@ -51,14 +52,13 @@ export function PurchasePanel({ product, onAdded }: PurchasePanelProps) {
   }
 
   /** Returns true when the item is in the cart. */
-  function add(): boolean {
+  function add({ openCart = true }: { openCart?: boolean } = {}): boolean {
     const missing = missingOptions(product, selected);
     if (missing.length > 0 || !variant) {
       setError(`Please select a ${missing[0]?.toLowerCase() ?? 'option'}.`);
       optionsRef.current?.querySelector<HTMLButtonElement>('button:not(:disabled)')?.focus();
       return false;
     }
-    const optionText = Object.values(variant.options).join(' · ');
     const result = addItem(
       {
         variantId: variant.id,
@@ -81,17 +81,17 @@ export function PurchasePanel({ product, onAdded }: PurchasePanelProps) {
       });
       return true;
     }
-    toast.success(`Added to cart${result.capped ? ` (limited to available stock)` : ''}`, {
-      description: optionText ? `${product.name} — ${optionText}` : product.name,
-      action: { label: 'View cart', onClick: () => router.push('/cart') },
-    });
+    if (result.capped) {
+      toast('Quantity limited to available stock', { description: product.name });
+    }
     onAdded?.();
+    // The mini cart is the confirmation (shows the line, totals and checkout).
+    if (openCart) openCartDrawer();
     return true;
   }
 
   function buyNow() {
-    // Checkout is built in F7; until then Buy Now goes to the cart.
-    if (add()) router.push('/cart');
+    if (add({ openCart: false })) router.push('/checkout');
   }
 
   return (
