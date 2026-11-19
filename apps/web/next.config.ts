@@ -16,6 +16,12 @@ const nextConfig: NextConfig = {
   typedRoutes: true,
   cacheComponents: true,
   partialPrefetching: true,
+  experimental: {
+    serverActions: {
+      // Payment screenshots are capped at 5 MB in validation; leave headroom for multipart overhead.
+      bodySizeLimit: '6mb',
+    },
+  },
   images: {
     formats: ['image/avif', 'image/webp'],
     qualities: [75, 90],

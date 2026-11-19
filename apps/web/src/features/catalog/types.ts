@@ -130,3 +130,13 @@ export interface VariantSnapshot {
   compareAtPrice?: Money;
   stock: number;
 }
+
+/** Variant snapshot + display data needed to build an order line. */
+export interface VariantDetail extends VariantSnapshot {
+  productId: string;
+  slug: string;
+  name: string;
+  sku: string;
+  options: Readonly<Record<string, string>>;
+  image: ProductImage;
+}

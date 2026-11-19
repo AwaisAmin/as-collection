@@ -1,12 +1,25 @@
 import type { Metadata } from 'next';
 
-import { PagePlaceholder } from '@/components/shared/page-placeholder';
+import { PageHeader } from '@/components/layout/page-header';
+import { Container } from '@/components/ui/container';
+import { CheckoutView } from '@/features/checkout/components/checkout-view';
 
 export const metadata: Metadata = { title: 'Checkout', robots: { index: false, follow: false } };
 
-// Temporary — delivery details, payment (COD / bank transfer) and order confirmation arrive in F7.
 export default function CheckoutPage() {
   return (
-    <PagePlaceholder title="Checkout" description="Secure checkout is coming in the next step." />
+    <main id="main-content" className="flex-1">
+      <PageHeader
+        title="Checkout"
+        breadcrumbs={[
+          { label: 'Home', href: '/' },
+          { label: 'Cart', href: '/cart' },
+          { label: 'Checkout' },
+        ]}
+      />
+      <Container className="py-10">
+        <CheckoutView />
+      </Container>
+    </main>
   );
 }

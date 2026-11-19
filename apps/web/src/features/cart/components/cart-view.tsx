@@ -85,7 +85,7 @@ export function CartView({ suggestions }: CartViewProps) {
   }
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[1fr_380px] lg:items-start xl:gap-12">
+    <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_380px] lg:items-start xl:gap-12">
       <div className="flex flex-col gap-5">
         {changes.length > 0 ? (
           <div role="status" className="flex gap-3 rounded-xl border border-gold bg-sand px-4 py-3">

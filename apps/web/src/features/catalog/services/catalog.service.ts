@@ -12,7 +12,14 @@ import {
   sortProducts,
 } from '../lib/query-products';
 import { type CatalogQuery, PAGE_SIZE } from '../schemas';
-import type { CatalogFacets, Paginated, Product, ProductSummary, VariantSnapshot } from '../types';
+import type {
+  CatalogFacets,
+  Paginated,
+  Product,
+  ProductSummary,
+  VariantDetail,
+  VariantSnapshot,
+} from '../types';
 
 /** Cache tag for all catalog reads — the admin calls `revalidateTag(CATALOG_TAG)` after edits. */
 export const CATALOG_TAG = 'catalog';
@@ -28,6 +35,8 @@ export interface CatalogService {
   listProductSlugs(): Promise<string[]>;
   /** Fresh (uncached) price/stock per variant — for cart re-validation and checkout. */
   getVariantSnapshots(variantIds: readonly string[]): Promise<VariantSnapshot[]>;
+  /** Fresh (uncached) snapshot + display data — used to build orders server-side. */
+  getVariantDetails(variantIds: readonly string[]): Promise<VariantDetail[]>;
 }
 
 /*
@@ -112,7 +121,7 @@ async function listProductSlugs(): Promise<string[]> {
 }
 
 /** Deliberately NOT cached: stock must be current when the shopper reviews the cart. */
-async function getVariantSnapshots(variantIds: readonly string[]): Promise<VariantSnapshot[]> {
+async function getVariantDetails(variantIds: readonly string[]): Promise<VariantDetail[]> {
   const wanted = new Set(variantIds);
   return mockProducts.flatMap((p) =>
     p.variants
@@ -122,12 +131,25 @@ async function getVariantSnapshots(variantIds: readonly string[]): Promise<Varia
         price: v.price,
         compareAtPrice: v.compareAtPrice,
         stock: v.stock,
+        productId: p.id,
+        slug: p.slug,
+        name: p.name,
+        sku: v.sku,
+        options: v.options,
+        image: p.images[0] ?? { src: '/images/hero-model.jpg', alt: p.name },
       })),
+  );
+}
+
+async function getVariantSnapshots(variantIds: readonly string[]): Promise<VariantSnapshot[]> {
+  return (await getVariantDetails(variantIds)).map(
+    ({ variantId, price, compareAtPrice, stock }) => ({ variantId, price, compareAtPrice, stock }),
   );
 }
 
 export const catalogService: CatalogService = {
   getVariantSnapshots,
+  getVariantDetails,
   listProducts,
   getFacets,
   getProductBySlug,
