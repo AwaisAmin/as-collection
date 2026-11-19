@@ -27,6 +27,7 @@
     "db:seed": "prisma db seed",
     "db:reset": "prisma migrate reset",
     "db:studio": "prisma studio",
+    "staff:create": "tsx src/cli/create-staff.ts",
     "postinstall": "prisma generate",
     "clean": "rimraf dist coverage .turbo"
   },
@@ -39,6 +40,7 @@
     "@nestjs/swagger": "^12.1.2",
     "@nestjs/terminus": "^12.2.0",
     "@nestjs/throttler": "^6.8.0",
+    "@node-rs/argon2": "2.2.2",
     "@prisma/adapter-pg": "7.10.1",
     "@prisma/client": "7.10.1",
     "ioredis": "^6.0.0",

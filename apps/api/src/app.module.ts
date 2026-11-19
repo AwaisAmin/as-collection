@@ -21,6 +21,7 @@ import { HealthModule } from './modules/health/health.module.js';
 import { NewsletterModule } from './modules/newsletter/newsletter.module.js';
 import { OrdersModule } from './modules/orders/orders.module.js';
 import { ReviewsModule } from './modules/reviews/reviews.module.js';
+import { StaffModule } from './modules/staff/staff.module.js';
 import { RedisModule } from './redis/redis.module.js';
 import { RedisThrottlerStorage } from './redis/redis-throttler.storage.js';
 import { StorageModule } from './storage/storage.module.js';
@@ -72,6 +73,7 @@ export class AppModule implements NestModule {
         NewsletterModule,
         ContactModule,
         ContentModule,
+        StaffModule,
       ],
       providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
     };

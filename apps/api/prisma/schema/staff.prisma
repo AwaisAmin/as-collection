@@ -14,11 +14,15 @@ model StaffUser {
   /// TOTP secret, encrypted at rest by the API (AES-256-GCM); never stored in plain text.
   totpSecretEncrypted String?     @map("totp_secret_encrypted") @db.VarChar(512)
   totpEnabledAt       DateTime?   @map("totp_enabled_at") @db.Timestamptz(3)
+  /// Last accepted TOTP time step: a code can never be used twice (replay protection).
+  totpLastStep        Int?        @map("totp_last_step")
   status              StaffStatus @default(ACTIVE)
   failedLoginCount    Int         @default(0) @map("failed_login_count")
   lockedUntil         DateTime?   @map("locked_until") @db.Timestamptz(3)
   lastLoginAt         DateTime?   @map("last_login_at") @db.Timestamptz(3)
   passwordChangedAt   DateTime?   @map("password_changed_at") @db.Timestamptz(3)
+  /// Set when an admin created the account or reset the password: change it at next sign-in.
+  mustChangePassword  Boolean     @default(false) @map("must_change_password")
   createdAt           DateTime    @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt           DateTime    @updatedAt @map("updated_at") @db.Timestamptz(3)
 

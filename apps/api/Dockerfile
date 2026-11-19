@@ -24,8 +24,14 @@ RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
 
 COPY packages/typescript-config packages/typescript-config
 COPY apps/api apps/api
+# --no-optional keeps optional peers (the Prisma CLI, Studio, TypeScript) out of the image, but it
+# also drops native platform bindings, so argon2's binding for this platform is copied back and
+# the build fails right here if it cannot be loaded.
 RUN pnpm --filter @as/api build \
- && pnpm --filter @as/api deploy --prod --legacy --no-optional /out
+ && pnpm --filter @as/api deploy --prod --legacy --no-optional /out \
+ && mkdir -p /out/node_modules/@node-rs \
+ && cp -rL /repo/node_modules/.pnpm/@node-rs+argon2-linux-*/node_modules/@node-rs/argon2-linux-* /out/node_modules/@node-rs/ \
+ && cd /out && node -e "import('@node-rs/argon2').then((a) => a.hash('check'))"
 
 # ---- migrator: applies pending Prisma migrations, then exits ----
 FROM build AS migrator

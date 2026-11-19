@@ -32,6 +32,8 @@ docker build -f apps/api/Dockerfile -t as-collection-api .   # from the repo roo
 | `/api/v1/checkout/quote`, `/api/v1/orders/*`                          | Checkout quote, place order (Idempotency-Key), order view (access key or session), track, cancel, payment proof                                 |
 | `/api/v1/account/orders`                                              | Signed-in order history (incl. guest orders linked by verified phone)                                                                           |
 | `/api/v1/account/*`                                                   | Signed-in customer: profile, verified phone, address book, signed-in devices                                                                    |
+| `/api/v1/admin/auth/*`                                                | Staff sign-in: `login` → `totp/enrol` / `totp/verify` → session; `session`, `logout`, `password`, `permissions`                                 |
+| `/api/v1/admin/staff`, `/admin/roles`, `/admin/audit-logs`            | Staff accounts (create, roles, disable, reset password/2FA, unlock, sign out), roles, audit trail                                               |
 
 ## Structure
 
@@ -164,6 +166,37 @@ Rules:
   - Moderation and inbox screens (call `ReviewsService.invalidate()`).
   - Staff notifications for new contact messages.
   - Admin content writes validated with the same schemas.
+
+## Staff auth, roles & audit log
+
+- **First administrator:** created from the command line (everyone else is added in the admin panel). The password is read from stdin and 2FA is set up at first sign-in:
+  - Locally: `STAFF_EMAIL=owner@… STAFF_NAME="Owner" pnpm staff:create`
+  - In production: `docker run -i --env-file … <image> node dist/cli/create-staff.js`
+- **Sign-in:**
+  - Password (argon2id, OWASP parameters; 12–128 characters) → a 6-digit authenticator code (TOTP, RFC 6238) → an opaque session token.
+  - The first sign-in enrols the authenticator: `otpauth://` URI for a QR code.
+  - TOTP secrets are encrypted with AES-256-GCM (`STAFF_TOTP_KEY`), bound to their row.
+  - Each code works only once (the last used time step is stored).
+- **Lockout:**
+  - 5 consecutive failures, from the password or the code, lock the account for 15 minutes; each further failure doubles the lock, up to 24 h.
+  - Errors never reveal whether an email exists or an account is locked; unknown emails take the same hashing time.
+- **Sessions:**
+  - Only the token's SHA-256 is stored.
+  - Sessions end at logout, after `STAFF_SESSION_IDLE_MINUTES` idle, `STAFF_SESSION_MAX_HOURS` after sign-in, on disable, password reset or 2FA reset.
+  - At most 5 per person. Sessions are resolved without a cache, so revocation and role changes apply immediately.
+- **Permissions:**
+  - Codes are defined in `src/modules/staff/permissions.ts`; roles are sets of codes and `*` is everything.
+  - Routes declare `@Staff('orders.write')` (or `@StaffAnyOf(...)`); a guarded route without a declaration is refused.
+  - Temporary passwords set by an admin must be changed before any other admin route works (`PASSWORD_CHANGE_REQUIRED`).
+- **Safety rules:**
+  - Nobody can grant, or act on an account holding, permissions they don't have (`PRIVILEGE_ESCALATION`).
+  - Nobody can change their own status or roles.
+  - Built-in roles are fixed.
+  - At least one active full administrator always remains; access changes are serialised.
+- **Audit log:**
+  - `AuditService.record(actor, entry, tx)` writes inside the change's transaction. Secret-looking fields are redacted, and IP, user agent and request id are kept.
+  - The table is append-only, enforced by a database trigger. Retention purges must run `SET LOCAL app.audit_purge = 'on'` in their transaction.
+- **Docker:** argon2's native binding for the image platform is copied into the production bundle, and the build fails if it doesn't load.
 
 ## Conventions
 

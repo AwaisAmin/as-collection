@@ -632,19 +632,66 @@ async function seedMenus(content: ContentSnapshot): Promise<void> {
   }
 }
 
-/** Built-in roles. Fine-grained permissions arrive with the staff module; "*" = everything. */
+/**
+ * Built-in roles. "super-admin" ("*") is a system role (cannot be edited or deleted); the others
+ * are editable starting points for the role editor. Permission codes: src/modules/staff/permissions.ts.
+ */
 async function seedRoles(): Promise<void> {
-  await prisma.role.upsert({
-    where: { key: 'super-admin' },
-    update: {},
-    create: {
+  const roles = [
+    {
       key: 'super-admin',
       name: 'Super admin',
       description: 'Full access to every part of the admin panel.',
       isSystem: true,
-      permissions: { create: [{ permission: '*' }] },
+      permissions: ['*'],
     },
-  });
+    {
+      key: 'order-manager',
+      name: 'Order manager',
+      description: 'Processes orders, payments and customer messages.',
+      isSystem: false,
+      permissions: [
+        'dashboard.read',
+        'orders.read',
+        'orders.write',
+        'payments.review',
+        'customers.read',
+        'inbox.read',
+        'catalog.read',
+      ],
+    },
+    {
+      key: 'catalog-manager',
+      name: 'Catalog manager',
+      description: 'Manages products, stock, images and discounts.',
+      isSystem: false,
+      permissions: [
+        'dashboard.read',
+        'catalog.read',
+        'catalog.write',
+        'inventory.write',
+        'media.write',
+        'discounts.write',
+      ],
+    },
+    {
+      key: 'content-editor',
+      name: 'Content editor',
+      description: 'Edits the storefront: pages, menus, images and reviews.',
+      isSystem: false,
+      permissions: ['catalog.read', 'content.write', 'media.write', 'reviews.moderate'],
+    },
+  ];
+  for (const { permissions, ...role } of roles) {
+    await prisma.role.upsert({
+      where: { key: role.key },
+      update: {},
+      create: {
+        ...role,
+        permissions: { create: permissions.map((permission) => ({ permission })) },
+      },
+    });
+  }
 }
 
 async function main(): Promise<void> {

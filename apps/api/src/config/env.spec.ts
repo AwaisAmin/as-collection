@@ -13,6 +13,7 @@ const PROD = {
   TWILIO_ACCOUNT_SID: 'AC123',
   TWILIO_AUTH_TOKEN: 'secret',
   TWILIO_FROM: '+15005550006',
+  STAFF_TOTP_KEY: Buffer.alloc(32, 7).toString('base64'),
 };
 
 describe('parseEnv', () => {
@@ -98,6 +99,25 @@ describe('parseEnv', () => {
     expect(issuesOf({ ...PROD, OTP_CHANNELS: 'log' })[0]).toMatch(/^OTP_CHANNELS: "log"/);
     expect(issuesOf({ ...PROD, OTP_DEV_ECHO: 'true' })[0]).toMatch(/^OTP_DEV_ECHO/);
     expect(issuesOf({ ...PROD, AUTH_SECRET: 'short' })[0]).toMatch(/^AUTH_SECRET/);
+  });
+
+  it('enforces production staff security settings', () => {
+    const issuesOf = (raw: Record<string, string | undefined>) => {
+      try {
+        parseEnv(raw);
+        return [];
+      } catch (error) {
+        return (error as InvalidEnvironmentError).issues;
+      }
+    };
+    expect(issuesOf({ ...PROD, STAFF_TOTP_KEY: undefined })).toEqual([
+      'STAFF_TOTP_KEY: is required in production',
+    ]);
+    expect(issuesOf({ ...PROD, STAFF_TOTP_KEY: 'c2hvcnQ=' })[0]).toMatch(/32 bytes/);
+    expect(issuesOf({ ...PROD, STAFF_REQUIRE_2FA: 'false' })).toEqual([
+      'STAFF_REQUIRE_2FA: cannot be disabled in production',
+    ]);
+    expect(parseEnv({ DATABASE_URL, REDIS_URL }).STAFF_REQUIRE_2FA).toBe(true);
   });
 
   it('requires provider credentials for each OTP channel', () => {

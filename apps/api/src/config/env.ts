@@ -28,6 +28,8 @@ export const otpChannels = ['whatsapp', 'sms', 'log'] as const;
 
 /** Development-only secret; production must set its own (enforced below). */
 const DEV_AUTH_SECRET = 'dev-only-auth-secret-never-use-in-production';
+/** Development-only TOTP encryption key (32 zero-ish bytes would also work; this is explicit). */
+const DEV_STAFF_TOTP_KEY = Buffer.from('dev-only-totp-key-never-in-prod!').toString('base64');
 
 const optionalString = z.string().trim().min(1).optional();
 
@@ -121,6 +123,21 @@ export const envSchema = z
 
     /** Google OAuth client ids whose ID tokens are accepted (web, later mobile). Empty = disabled. */
     GOOGLE_CLIENT_IDS: csv,
+
+    /**
+     * AES-256-GCM key (base64 of exactly 32 bytes) encrypting staff TOTP secrets at rest. Keep it
+     * apart from the database backups. Generate with `openssl rand -base64 32`. Required in production.
+     */
+    STAFF_TOTP_KEY: z
+      .string()
+      .refine((v) => Buffer.from(v, 'base64').length === 32, 'must be base64 of 32 bytes')
+      .optional(),
+    /** Staff must enrol and use an authenticator app. Cannot be turned off in production. */
+    STAFF_REQUIRE_2FA: booleanFlag.default(true),
+    /** Staff sessions end after this much inactivity… */
+    STAFF_SESSION_IDLE_MINUTES: z.coerce.number().int().min(5).max(1440).default(120),
+    /** …and in any case this long after sign-in. */
+    STAFF_SESSION_MAX_HOURS: z.coerce.number().int().min(1).max(72).default(12),
   })
   .superRefine((env, ctx) => {
     if (env.NODE_ENV === 'production' && env.CORS_ORIGINS.length === 0) {
@@ -142,6 +159,13 @@ export const envSchema = z
       issue('OTP_CHANNELS', '"log" is not allowed in production (codes would only be logged)');
     }
     if (production && env.OTP_DEV_ECHO) issue('OTP_DEV_ECHO', 'must be false in production');
+    if (production && !env.STAFF_TOTP_KEY) issue('STAFF_TOTP_KEY', 'is required in production');
+    if (production && env.STAFF_TOTP_KEY === DEV_STAFF_TOTP_KEY) {
+      issue('STAFF_TOTP_KEY', 'must not be the development key');
+    }
+    if (production && !env.STAFF_REQUIRE_2FA) {
+      issue('STAFF_REQUIRE_2FA', 'cannot be disabled in production');
+    }
     if (
       env.OTP_CHANNELS.includes('whatsapp') &&
       !(env.WHATSAPP_PHONE_NUMBER_ID && env.WHATSAPP_ACCESS_TOKEN)
@@ -159,6 +183,7 @@ export const envSchema = z
     ...env,
     SWAGGER_ENABLED: env.SWAGGER_ENABLED ?? env.NODE_ENV !== 'production',
     AUTH_SECRET: env.AUTH_SECRET ?? DEV_AUTH_SECRET,
+    STAFF_TOTP_KEY: env.STAFF_TOTP_KEY ?? DEV_STAFF_TOTP_KEY,
   }));
 
 export type Env = z.output<typeof envSchema>;

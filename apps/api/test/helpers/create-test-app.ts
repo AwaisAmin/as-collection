@@ -18,6 +18,7 @@ export const PRODUCTION_ENV = {
   TWILIO_ACCOUNT_SID: 'AC-e2e',
   TWILIO_AUTH_TOKEN: 'e2e-token',
   TWILIO_FROM: '+15005550006',
+  STAFF_TOTP_KEY: 'ZTJlLXByb2R1Y3Rpb24tdG90cC1rZXktMzJieXRlcyE=',
 } as const;
 
 const probeSchema = z.strictObject({
