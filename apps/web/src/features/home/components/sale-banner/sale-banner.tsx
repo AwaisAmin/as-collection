@@ -24,7 +24,7 @@ export function SaleBanner({ promotion = activePromotion }: SaleBannerProps) {
         {/* Soft gold glow behind the copy. */}
         <div
           aria-hidden
-          className="pointer-events-none absolute -top-1/3 right-0 size-[520px] rounded-full bg-gold/10 blur-3xl"
+          className="pointer-events-none absolute -top-1/3 right-0 size-[300px] rounded-full bg-gold/10 blur-3xl sm:size-[520px]"
         />
         <Container className="relative grid items-center gap-10 py-14 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16 lg:py-16">
           <Reveal className="relative mx-auto aspect-square w-full max-w-[320px] overflow-hidden rounded-card border border-gold/70 shadow-gold-glow md:aspect-[4/5] md:max-w-none">
@@ -47,7 +47,7 @@ export function SaleBanner({ promotion = activePromotion }: SaleBannerProps) {
             <h2 id="promo-title" className="flex flex-col gap-1">
               <span className="font-display text-[42px]/[1.05] sm:text-[56px]/[1.05]">
                 {promotion.title}
-              </span>
+              </span>{' '}
               <span className="font-script text-[40px]/[1.1] text-gold-light sm:text-[50px]/[1.1]">
                 {promotion.highlight}
               </span>

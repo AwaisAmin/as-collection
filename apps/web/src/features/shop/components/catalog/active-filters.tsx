@@ -13,17 +13,27 @@ interface ActiveFiltersProps {
   query: CatalogQuery;
   basePath: string;
   includeCategory?: boolean;
+  /** Show the search term as a removable chip (shop / category pages; the search page has a box). */
+  showQuery?: boolean;
 }
 
 /** Removable chips for each applied filter + "Clear all". */
-export function ActiveFilters({ query, basePath, includeCategory }: ActiveFiltersProps) {
+export function ActiveFilters({
+  query,
+  basePath,
+  includeCategory,
+  showQuery = false,
+}: ActiveFiltersProps) {
   const { navigate } = useCatalogNavigation();
-  if (countActiveFilters(query) === 0) return null;
+  const hasQuery = showQuery && Boolean(query.q);
+  if (countActiveFilters(query) === 0 && !hasQuery) return null;
 
   const go = (patch: Partial<CatalogQuery>) =>
     navigate(catalogHref(basePath, query, patch, { includeCategory }));
 
   const chips: { key: string; label: string; remove: Partial<CatalogQuery> }[] = [];
+
+  if (hasQuery) chips.push({ key: 'q', label: `“${query.q}”`, remove: { q: undefined } });
 
   if (query.min !== undefined || query.max !== undefined) {
     const label =
@@ -76,7 +86,7 @@ export function ActiveFilters({ query, basePath, includeCategory }: ActiveFilter
       <li>
         <button
           type="button"
-          onClick={() => go(clearFilters(query))}
+          onClick={() => go({ ...clearFilters(query), ...(hasQuery ? { q: undefined } : {}) })}
           className="px-2 font-body text-[15px] font-semibold text-gold-dark underline-offset-4 hover:underline"
         >
           Clear all

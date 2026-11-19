@@ -6,7 +6,7 @@ import { WithPathname } from '@/components/routing/with-pathname';
 import { isActivePath, mainNav } from '@/config/navigation';
 
 import { navLinkClasses } from './nav-link-classes';
-import { ShopDropdown } from './shop-dropdown';
+import { ShopMegaMenu } from './shop-mega-menu';
 
 export function MainNav({ className }: { className?: string }) {
   return (
@@ -19,7 +19,7 @@ export function MainNav({ className }: { className?: string }) {
               return (
                 <li key={item.label}>
                   {item.children ? (
-                    <ShopDropdown item={{ ...item, children: item.children }} active={active} />
+                    <ShopMegaMenu label={item.label} active={active} />
                   ) : (
                     <Link
                       href={item.href}

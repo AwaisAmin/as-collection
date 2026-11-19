@@ -29,10 +29,10 @@ pnpm --filter @as/web build    # production build
 src/
   app/                 # routes, layouts, error/not-found boundaries, metadata routes, icons, OG image
   proxy.ts             # optimistic auth gate for /account/* (Next 16 "proxy", formerly middleware)
-  config/              # env (zod-validated), site constants, navigation, catalog, payments
+  config/              # env, site, navigation + mega menu, catalog, occasions, promotions, looks, instagram, payments
   components/
     ui/                # design-system primitives (Button, Input, Dialog, Drawer, Tabs, OtpInput…)
-    layout/            # TopBar, Header, Footer, PageHeader
+    layout/            # TopBar, Header (Shop mega menu), Footer, PageHeader, WhatsApp button
     shared/ seo/ routing/ ornaments/ motion/ brand/
   features/<feature>/  # components, hooks, services, actions, schemas per domain
   hooks/               # shared hooks (modal behaviour, focus trap, in-view, hydration…)

@@ -68,7 +68,12 @@ export async function CatalogBrowser({
           </div>
 
           <div className="mb-5">
-            <ActiveFilters query={query} basePath={basePath} includeCategory={includeCategory} />
+            <ActiveFilters
+              query={query}
+              basePath={basePath}
+              includeCategory={includeCategory}
+              showQuery={!includeCategory}
+            />
           </div>
 
           <h2 className="sr-only">Products</h2>

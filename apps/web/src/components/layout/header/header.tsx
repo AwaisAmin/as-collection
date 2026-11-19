@@ -8,8 +8,9 @@ import { MobileNav } from './mobile-nav';
 import { SearchForm } from './search-form';
 
 export function Header() {
+  // `relative`: the desktop Shop mega menu is positioned against the header.
   return (
-    <header className="border-b border-gold bg-ivory">
+    <header className="relative border-b border-gold bg-ivory">
       {/* Desktop (lg+) */}
       <Container className="hidden h-[110px] items-center lg:flex">
         <Logo />

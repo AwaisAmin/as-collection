@@ -9,7 +9,7 @@ import { WithPathname } from '@/components/routing/with-pathname';
 import { Drawer } from '@/components/ui/drawer';
 import { IconButton } from '@/components/ui/icon-button';
 import { SocialLinks } from '@/components/ui/social-links';
-import { isActivePath, mainNav } from '@/config/navigation';
+import { isActivePath, mainNav, shopMegaMenu } from '@/config/navigation';
 import { useDisclosure } from '@/hooks/use-disclosure';
 
 import { navLinkClasses } from './nav-link-classes';
@@ -67,7 +67,7 @@ export function MobileNav() {
                         </Link>
                         {item.children ? (
                           <ul className="mt-1 mb-2 ml-5 flex flex-col border-l border-gold/60 pl-4">
-                            {item.children
+                            {[...item.children, ...shopMegaMenu.highlights]
                               .filter((child) => child.href !== item.href)
                               .map((child) => (
                                 <li key={child.label}>
