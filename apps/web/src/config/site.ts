@@ -11,6 +11,9 @@ export const siteConfig = {
   locale: 'en_PK',
   currency: 'PKR',
   freeShippingThreshold: 2500,
+  /** Flat delivery fee (PKR) below the free-shipping threshold. */
+  shippingFee: 250,
+  returnWindowDays: 7,
   contact: {
     phone: '0328-9485741',
     /** E.164 for tel: links and structured data. */

@@ -47,7 +47,7 @@ interface ButtonContentProps {
 function ButtonContent({ children, withArrow, size }: ButtonContentProps) {
   return (
     <>
-      <span>{children}</span>
+      <span className="inline-flex items-center gap-2">{children}</span>
       {withArrow ? <ArrowRight aria-hidden size={arrowSize[size ?? 'md']} strokeWidth={2} /> : null}
     </>
   );

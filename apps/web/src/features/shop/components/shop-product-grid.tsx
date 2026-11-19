@@ -4,6 +4,7 @@ import { ButtonLink } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
 import { ProductGrid } from '@/features/catalog/components/product-grid';
 import type { ProductSummary } from '@/features/catalog/types';
+import { QuickViewButton } from '@/features/product/components/quick-view';
 import { WishlistButton } from '@/features/wishlist/components/wishlist-button';
 
 interface ShopProductGridProps {
@@ -23,7 +24,10 @@ export function ShopProductGrid({ products, preloadCount = 4, className }: ShopP
       preloadCount={preloadCount}
       className={className}
       renderActions={(product) => (
-        <WishlistButton productId={product.id} productName={product.name} />
+        <>
+          <WishlistButton productId={product.id} productName={product.name} />
+          <QuickViewButton slug={product.slug} productName={product.name} />
+        </>
       )}
       empty={
         <EmptyState

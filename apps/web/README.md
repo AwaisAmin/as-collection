@@ -28,7 +28,7 @@ public/images/         # swappable image assets
 Rules of thumb:
 
 - Features are layered and may only import **downward**:
-  `catalog` → `wishlist` / `cart` → `checkout` → `account`, with `shop` / `home` composing them at the top.
+  `catalog` → `wishlist` / `cart` → `product` → `checkout` → `account`, with `shop` / `home` composing them at the top.
   Lower features expose slots (e.g. `ProductCard` `actions`) instead of importing upward.
 - Data access goes through `features/*/services/*.service.ts` (a port + adapter). Today the adapters are
   mocks; the NestJS API adapters replace them without touching pages.

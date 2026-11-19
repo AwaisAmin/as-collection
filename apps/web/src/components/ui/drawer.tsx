@@ -1,11 +1,11 @@
 'use client';
 
 import { X } from 'lucide-react';
-import { type ReactNode, useEffect, useId, useRef } from 'react';
+import { type ReactNode, useId, useRef } from 'react';
+import { createPortal } from 'react-dom';
 
-import { useEscapeKey } from '@/hooks/use-escape-key';
-import { useFocusTrap } from '@/hooks/use-focus-trap';
-import { useLockBodyScroll } from '@/hooks/use-lock-body-scroll';
+import { useHydrated } from '@/hooks/use-hydrated';
+import { useModalBehavior } from '@/hooks/use-modal-behavior';
 import { cn } from '@/lib/utils/cn';
 
 import { IconButton } from './icon-button';
@@ -42,24 +42,16 @@ export function Drawer({
 }: DrawerProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
-  const returnFocusRef = useRef<HTMLElement | null>(null);
   const titleId = useId();
 
-  useLockBodyScroll(open);
-  useEscapeKey(onClose, open);
-  useFocusTrap(panelRef, open);
+  const hydrated = useHydrated();
 
-  useEffect(() => {
-    if (open) {
-      returnFocusRef.current = document.activeElement as HTMLElement | null;
-      closeRef.current?.focus();
-    } else if (returnFocusRef.current) {
-      returnFocusRef.current.focus();
-      returnFocusRef.current = null;
-    }
-  }, [open]);
+  useModalBehavior({ open, onClose, containerRef: panelRef, initialFocusRef: closeRef });
 
-  return (
+  // Portal to <body> (escapes ancestor stacking contexts); needs the DOM, so only after hydration.
+  if (!hydrated) return null;
+
+  return createPortal(
     <>
       <div
         aria-hidden
@@ -105,6 +97,7 @@ export function Drawer({
 
         {footer ? <div className="shrink-0">{footer}</div> : null}
       </div>
-    </>
+    </>,
+    document.body,
   );
 }
