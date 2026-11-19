@@ -102,6 +102,11 @@ export interface Review {
   helpfulCount: number;
 }
 
+/** A review plus the product it belongs to (testimonials outside the product page). */
+export interface FeaturedReview extends Review {
+  product: { name: string; slug: string };
+}
+
 export interface ReviewSummary extends RatingSummary {
   /** Count per star, index 0 = 1★ … index 4 = 5★. */
   distribution: readonly [number, number, number, number, number];

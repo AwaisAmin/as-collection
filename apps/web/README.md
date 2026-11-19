@@ -13,15 +13,15 @@ pnpm --filter @as/web build    # production build
 
 ## Pages
 
-| Route                                                     | What                                                                             |
-| --------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| `/`                                                       | Home: hero, categories, trust bar, new arrivals, best sellers, sale, occasions   |
-| `/shop`, `/shop/[category]`, `/search`                    | Catalog with URL-driven filters, sort, pagination                                |
-| `/products/[slug]`                                        | Product page: gallery, variants, add to cart, size guide, tabs, reviews, related |
-| `/cart`, `/checkout`, `/order-confirmation/[orderNumber]` | Cart (stock re-validation), COD / bank transfer checkout, private confirmation   |
-| `/login`, `/account/*`                                    | Phone OTP + Google sign-in; overview, orders, addresses, profile                 |
-| `/wishlist`, `/track-order`                               | Saved products; order status by order number + phone                             |
-| `/about`, `/contact`, `/privacy-policy`, `/terms`         | Content pages (contact form + FAQ)                                               |
+| Route                                                     | What                                                                                 |
+| --------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `/`                                                       | Home: hero, categories, trust bar, product carousels, sale, occasions, look, reviews |
+| `/shop`, `/shop/[category]`, `/search`                    | Catalog with URL-driven filters, sort, pagination                                    |
+| `/products/[slug]`                                        | Product page: gallery, variants, add to cart, size guide, tabs, reviews, related     |
+| `/cart`, `/checkout`, `/order-confirmation/[orderNumber]` | Cart (stock re-validation), COD / bank transfer checkout, private confirmation       |
+| `/login`, `/account/*`                                    | Phone OTP + Google sign-in; overview, orders, addresses, profile                     |
+| `/wishlist`, `/track-order`                               | Saved products; order status by order number + phone                                 |
+| `/about`, `/contact`, `/privacy-policy`, `/terms`         | Content pages (contact form + FAQ)                                                   |
 
 ## Structure
 

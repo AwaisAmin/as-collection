@@ -1,4 +1,3 @@
-import { Gem, HandHeart, ShieldCheck, Truck } from 'lucide-react';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 
@@ -9,6 +8,7 @@ import { OrnamentDivider } from '@/components/ui/ornament-divider';
 import { SectionHeading } from '@/components/ui/section-heading';
 import { images } from '@/config/assets';
 import { siteConfig } from '@/config/site';
+import { brandStory, brandValues } from '@/features/home/content/brand-story';
 
 export const metadata: Metadata = {
   title: 'About Us',
@@ -16,29 +16,6 @@ export const metadata: Metadata = {
     'AS Collection Hub brings you elegant unstitched & stitched dresses and premium makeup — curated for every occasion, delivered across Pakistan.',
   alternates: { canonical: '/about' },
 };
-
-const values = [
-  {
-    icon: Gem,
-    title: 'Curated quality',
-    text: 'Every suit is chosen for fabric, finish and embroidery — nothing that we wouldn’t wear ourselves.',
-  },
-  {
-    icon: HandHeart,
-    title: 'Made for you',
-    text: 'From everyday lawn to festive chiffon, pieces for dawats, weddings, Eid and every day in between.',
-  },
-  {
-    icon: ShieldCheck,
-    title: 'Shop with confidence',
-    text: `Cash on Delivery nationwide and easy ${siteConfig.returnWindowDays}-day returns & exchange.`,
-  },
-  {
-    icon: Truck,
-    title: 'Delivered to your door',
-    text: 'Carefully packed and delivered across Pakistan — free on orders above Rs 2,500.',
-  },
-] as const;
 
 export default function AboutPage() {
   return (
@@ -49,18 +26,13 @@ export default function AboutPage() {
           <div className="flex flex-col items-center gap-5 text-center lg:items-start lg:text-left">
             <LotusEmblem className="h-[64px] w-[80px]" />
             <h1 id="about-title" className="font-display text-[40px]/[1.1] sm:text-[52px]/[1.1]">
-              Our Story
+              {brandStory.title}
             </h1>
             <p className="font-caps text-[14px] tracking-[0.35em] uppercase">
               {siteConfig.tagline}
             </p>
-            <p className="font-script text-[34px] leading-tight">Because You Deserve the Best</p>
-            <p className="max-w-xl text-[19px] leading-relaxed text-text">
-              {siteConfig.name} began with a simple idea: every woman deserves to feel elegant
-              without compromise. We bring together beautifully embroidered unstitched and stitched
-              dresses and premium makeup — curated with love, priced fairly, and delivered with care
-              across Pakistan.
-            </p>
+            <p className="font-script text-[34px] leading-tight">{brandStory.script}</p>
+            <p className="max-w-xl text-[19px] leading-relaxed text-text">{brandStory.intro}</p>
           </div>
           <div className="relative mx-auto aspect-[4/5] w-full max-w-md overflow-hidden rounded-card border border-gold shadow-soft">
             <Image
@@ -82,7 +54,7 @@ export default function AboutPage() {
             <SectionHeading title="What we stand for" />
           </div>
           <ul className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {values.map(({ icon: Icon, title, text }) => (
+            {brandValues.map(({ icon: Icon, title, text }) => (
               <li
                 key={title}
                 className="flex flex-col items-center gap-3 rounded-card border border-gold/60 bg-ivory p-6 text-center"

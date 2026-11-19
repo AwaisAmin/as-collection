@@ -32,6 +32,8 @@ export interface CatalogService {
   getFacets(query: Pick<CatalogQuery, 'category' | 'q'>): Promise<CatalogFacets>;
   getProductBySlug(slug: string): Promise<Product | null>;
   getProductSummaries(ids: readonly string[]): Promise<ProductSummary[]>;
+  /** Summaries in the given slug order; unknown slugs are skipped (curated content). */
+  getProductSummariesBySlug(slugs: readonly string[]): Promise<ProductSummary[]>;
   getRelatedProducts(product: Product, limit?: number): Promise<ProductSummary[]>;
   getFeaturedProducts(limit?: number): Promise<ProductSummary[]>;
   /** Newest in-stock products first (home "New Arrivals"). */
@@ -86,6 +88,17 @@ async function getProductSummaries(ids: readonly string[]): Promise<ProductSumma
   const byId = new Map(mockProducts.map((p) => [p.id, p]));
   return ids.flatMap((id) => {
     const product = byId.get(id);
+    return product ? [toSummary(product)] : [];
+  });
+}
+
+async function getProductSummariesBySlug(slugs: readonly string[]): Promise<ProductSummary[]> {
+  'use cache';
+  cacheLife('hours');
+  cacheTag(CATALOG_TAG);
+  const bySlug = new Map(mockProducts.map((p) => [p.slug, p]));
+  return slugs.flatMap((slug) => {
+    const product = bySlug.get(slug);
     return product ? [toSummary(product)] : [];
   });
 }
@@ -188,6 +201,7 @@ export const catalogService: CatalogService = {
   getFacets,
   getProductBySlug,
   getProductSummaries,
+  getProductSummariesBySlug,
   getRelatedProducts,
   getFeaturedProducts,
   getNewArrivals,
