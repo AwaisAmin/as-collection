@@ -11,7 +11,7 @@ export function OrganizationJsonLd() {
     '@type': 'OnlineStore',
     name: siteConfig.name,
     url: siteConfig.url,
-    logo: new URL('/images/gold-leaf.svg', siteConfig.url).toString(),
+    logo: new URL('/images/brand/logo-512.png', siteConfig.url).toString(),
     description: siteConfig.description,
     email: siteConfig.contact.email,
     telephone: siteConfig.contact.phoneE164,

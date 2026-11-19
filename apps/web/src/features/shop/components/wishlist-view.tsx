@@ -118,7 +118,9 @@ export function WishlistView({ suggestions }: { suggestions?: ReactNode }) {
 
   return (
     <div className="flex flex-col gap-6">
-      <p className="text-[17px] text-muted">{pluralize(visible.length, 'saved item')}</p>
+      <h2 className="font-body text-[17px] font-medium text-muted">
+        {pluralize(visible.length, 'saved item')}
+      </h2>
       <ProductGrid
         products={visible}
         renderActions={(p) => <WishlistButton productId={p.id} productName={p.name} />}

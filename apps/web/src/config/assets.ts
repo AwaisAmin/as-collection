@@ -19,10 +19,8 @@ export const images = {
     src: '/images/makeup.jpg',
     alt: 'Red lipstick, foundation bottle, compact powder and makeup brush on a marble pedestal',
   },
-  flowersLeft: { src: '/images/flowers-left.png', alt: '' },
   flowersRight: { src: '/images/flowers-right.png', alt: '' },
   palmLeaf: { src: '/images/palm-leaf.png', alt: '' },
-  goldLeaf: { src: '/images/gold-leaf.svg', alt: '' },
 } as const satisfies Record<string, { src: string; alt: string }>;
 
 export type ImageKey = keyof typeof images;

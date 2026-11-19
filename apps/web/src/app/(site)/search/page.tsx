@@ -49,7 +49,13 @@ async function SearchResults({ searchParams }: Pick<PageProps<'/search'>, 'searc
   return (
     <>
       <div className="mx-auto mb-10 flex max-w-xl flex-col items-center gap-3 text-center">
-        <SearchForm inputId="search-page-input" defaultValue={q} size="lg" className="w-full" />
+        <SearchForm
+          inputId="search-page-input"
+          label="Search products"
+          defaultValue={q}
+          size="lg"
+          className="w-full"
+        />
         {q ? (
           <p className="text-[18px] text-muted">
             Results for <span className="font-semibold text-ink">“{q}”</span>

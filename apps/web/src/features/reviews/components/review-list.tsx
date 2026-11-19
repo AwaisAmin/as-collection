@@ -56,6 +56,7 @@ export function ReviewList({ productId, initial }: ReviewListProps) {
               value={sort}
               disabled={isPending}
               onChange={(e) => fetchPage(e.target.value as ReviewSort, 1)}
+              aria-label="Sort reviews"
               className="h-10 cursor-pointer appearance-none rounded-full border border-gold bg-ivory pr-10 pl-4 font-body text-[15px] font-semibold text-text focus:outline-none focus-visible:shadow-[0_0_0_2px_var(--color-gold-dark)]"
             >
               {reviewSortOptions.map((o) => (

@@ -10,7 +10,8 @@
   --color-ivory: #fdf7f2; /* cards, header */
   --color-sand: #f6ece3; /* features band */
   --color-gold: #c9a35e; /* borders, dividers, ornaments */
-  --color-gold-dark: #a9792f;
+  /* Text-safe gold: 5.05:1 on cream, 4.8:1 on sand (WCAG AA). Gradients keep #a9792f. */
+  --color-gold-dark: #8a5f22;
   --color-gold-light: #d9b46e;
   --color-gold-deep: #b8893e;
   --color-text: #1a1a1a;

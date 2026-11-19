@@ -71,6 +71,7 @@ export async function CatalogBrowser({
             <ActiveFilters query={query} basePath={basePath} includeCategory={includeCategory} />
           </div>
 
+          <h2 className="sr-only">Products</h2>
           <PendingRegion>
             <ShopProductGrid products={results.items} />
           </PendingRegion>

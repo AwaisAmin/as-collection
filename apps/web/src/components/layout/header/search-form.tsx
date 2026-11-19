@@ -11,13 +11,21 @@ interface SearchFormProps {
   inputId: string;
   /** Prefill (search results page). */
   defaultValue?: string;
+  /** Distinct accessible name when several search forms are on a page. */
+  label?: string;
   size?: 'md' | 'lg';
 }
 
 /** GET search → /search?q=… (progressively enhanced with client navigation by next/form). */
-export function SearchForm({ className, inputId, defaultValue, size = 'md' }: SearchFormProps) {
+export function SearchForm({
+  className,
+  inputId,
+  defaultValue,
+  size = 'md',
+  label = 'Site search',
+}: SearchFormProps) {
   return (
-    <Form action="/search" role="search" className={cn('relative', className)}>
+    <Form action="/search" role="search" aria-label={label} className={cn('relative', className)}>
       <label htmlFor={inputId} className="sr-only">
         Search products
       </label>
