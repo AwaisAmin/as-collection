@@ -1,7 +1,7 @@
 {
   "name": "as-collection",
   "private": true,
-  "description": "AS Collection Hub — e-commerce monorepo (Next.js web + NestJS api)",
+  "description": "AS Collection Hub \u2014 e-commerce monorepo (Next.js web + NestJS api)",
   "packageManager": "pnpm@10.33.2",
   "engines": {
     "node": ">=20.18.0",
@@ -18,7 +18,10 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "clean": "turbo run clean && rimraf node_modules .turbo",
-    "prepare": "husky"
+    "prepare": "husky",
+    "test:e2e": "turbo run test:e2e",
+    "services:up": "docker compose up -d --wait",
+    "services:down": "docker compose down"
   },
   "devDependencies": {
     "@commitlint/cli": "^21.2.4",

@@ -24,7 +24,7 @@ export default function AboutPage() {
       <section aria-labelledby="about-title" className="border-b border-gold/50 bg-sand">
         <Container className="grid grid-cols-1 items-center gap-10 py-14 lg:grid-cols-2 lg:gap-16">
           <div className="flex flex-col items-center gap-5 text-center lg:items-start lg:text-left">
-            <LotusEmblem className="h-[64px] w-[80px]" />
+            <LotusEmblem className="h-16 w-20" />
             <h1 id="about-title" className="font-display text-[40px]/[1.1] sm:text-[52px]/[1.1]">
               {brandStory.title}
             </h1>
@@ -34,7 +34,7 @@ export default function AboutPage() {
             <p className="font-script text-[34px] leading-tight">{brandStory.script}</p>
             <p className="max-w-xl text-[19px] leading-relaxed text-text">{brandStory.intro}</p>
           </div>
-          <div className="relative mx-auto aspect-[4/5] w-full max-w-md overflow-hidden rounded-card border border-gold shadow-soft">
+          <div className="relative mx-auto aspect-4/5 w-full max-w-md overflow-hidden rounded-card border border-gold shadow-soft">
             <Image
               src={images.heroModel.src}
               alt={images.heroModel.alt}
@@ -93,7 +93,7 @@ export default function AboutPage() {
             {[images.unstitched, images.stitched, images.makeup].map((img) => (
               <div
                 key={img.src}
-                className="relative aspect-[3/4] overflow-hidden rounded-xl border border-gold/60"
+                className="relative aspect-3/4 overflow-hidden rounded-xl border border-gold/60"
               >
                 <Image
                   src={img.src}

@@ -1,0 +1,16 @@
+# Keep the build context small and secret-free.
+**/node_modules
+**/.next
+**/dist
+**/coverage
+**/.turbo
+**/*.log
+**/.env
+**/.env.*
+!**/.env.example
+.git
+.github
+.husky
+.vscode
+.claude
+apps/web/public/__axe.min.js
