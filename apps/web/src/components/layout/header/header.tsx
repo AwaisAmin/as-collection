@@ -12,10 +12,10 @@ export function Header() {
   return (
     <header className="relative border-b border-gold bg-ivory">
       {/* Desktop (lg+) */}
-      <Container className="hidden h-[110px] items-center lg:flex">
+      <Container className="hidden h-27.5 items-center lg:flex">
         <Logo />
         <MainNav className="mr-6 ml-auto xl:mr-10" />
-        <SearchForm inputId="header-search" className="w-[190px] xl:w-[220px]" />
+        <SearchForm inputId="header-search" className="w-47.5 xl:w-55" />
         <div className="ml-6 flex items-center gap-4 xl:ml-9 xl:gap-5">
           <AccountLink />
           <CartLink />
@@ -23,7 +23,7 @@ export function Header() {
       </Container>
 
       {/* Mobile / tablet (< lg): hamburger · centered logo · cart */}
-      <Container className="grid h-[84px] grid-cols-[1fr_auto_1fr] items-center lg:hidden">
+      <Container className="grid h-21 grid-cols-[1fr_auto_1fr] items-center lg:hidden">
         <div className="justify-self-start">
           <MobileNav />
         </div>

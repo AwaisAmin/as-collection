@@ -164,7 +164,7 @@ export function LoginFlow({ next }: { next: Route }) {
               type="submit"
               size="lg"
               disabled={isPending}
-              className="h-[52px] w-full text-[20px]"
+              className="h-13 w-full text-[20px]"
             >
               <MessageCircle aria-hidden size={19} />
               {isPending ? 'Sending code…' : 'Send code'}
@@ -181,7 +181,7 @@ export function LoginFlow({ next }: { next: Route }) {
             type="button"
             onClick={google}
             disabled={isPending}
-            className="inline-flex h-[52px] w-full items-center justify-center gap-3 rounded-full border-[1.5px] border-gold bg-white font-display text-[18px] text-ink transition-colors hover:bg-cream disabled:opacity-60"
+            className="inline-flex h-13 w-full items-center justify-center gap-3 rounded-full border-[1.5px] border-gold bg-white font-display text-[18px] text-ink transition-colors hover:bg-cream disabled:opacity-60"
           >
             <GoogleIcon />
             Continue with Google
@@ -231,7 +231,7 @@ export function LoginFlow({ next }: { next: Route }) {
             onClick={() => verify(code)}
             disabled={isPending || code.length !== 6}
             size="lg"
-            className="h-[52px] w-full text-[20px]"
+            className="h-13 w-full text-[20px]"
           >
             {isPending ? 'Verifying…' : 'Verify & continue'}
           </Button>
@@ -265,12 +265,7 @@ export function LoginFlow({ next }: { next: Route }) {
               <Input {...a11y} name="name" autoComplete="name" maxLength={80} autoFocus size="lg" />
             )}
           </FormField>
-          <Button
-            type="submit"
-            size="lg"
-            disabled={isPending}
-            className="h-[52px] w-full text-[20px]"
-          >
+          <Button type="submit" size="lg" disabled={isPending} className="h-13 w-full text-[20px]">
             {isPending ? 'Saving…' : 'Continue'}
           </Button>
         </form>

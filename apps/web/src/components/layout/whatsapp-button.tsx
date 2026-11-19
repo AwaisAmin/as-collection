@@ -31,9 +31,9 @@ export function WhatsAppButton() {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Chat with us on WhatsApp (opens in a new tab)"
-            className="group fixed right-4 bottom-[max(1rem,env(safe-area-inset-bottom))] z-40 flex h-14 animate-fade-in items-center rounded-full border-[1.5px] border-gold bg-ink pr-[15px] pl-[15px] text-white shadow-gold-glow transition-all duration-300 ease-elegant hover:-translate-y-0.5 sm:right-6 sm:bottom-6 print:hidden"
+            className="group fixed right-4 bottom-[max(1rem,env(safe-area-inset-bottom))] z-40 flex h-14 animate-fade-in items-center rounded-full border-[1.5px] border-gold bg-ink pr-3.75 pl-3.75 text-white shadow-gold-glow transition-all duration-300 ease-elegant hover:-translate-y-0.5 sm:right-6 sm:bottom-6 print:hidden"
           >
-            <FaWhatsapp aria-hidden className="size-[25px] shrink-0 text-[#25D366]" />
+            <FaWhatsapp aria-hidden className="size-6.25 shrink-0 text-[#25D366]" />
             <span
               aria-hidden
               className="max-w-0 overflow-hidden font-display text-[16px] whitespace-nowrap transition-all duration-300 ease-elegant group-hover:ml-2.5 group-hover:max-w-40 group-focus-visible:ml-2.5 group-focus-visible:max-w-40"

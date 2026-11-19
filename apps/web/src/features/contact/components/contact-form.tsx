@@ -94,7 +94,7 @@ export function ContactForm() {
               {...a11y}
               name="topic"
               defaultValue=""
-              className="h-[42px] w-full appearance-none rounded-full border border-gold bg-transparent pr-10 pl-5 font-body text-[17px] text-text focus:outline-none focus-visible:shadow-[0_0_0_2px_var(--color-gold-dark)] aria-invalid:shadow-[0_0_0_2px_var(--color-gold-light)]"
+              className="h-10.5 w-full appearance-none rounded-full border border-gold bg-transparent pr-10 pl-5 font-body text-[17px] text-text focus:outline-none focus-visible:shadow-[0_0_0_2px_var(--color-gold-dark)] aria-invalid:shadow-[0_0_0_2px_var(--color-gold-light)]"
             >
               <option value="" disabled>
                 Choose a topic
@@ -128,7 +128,7 @@ export function ContactForm() {
         {(a11y) => <Textarea {...a11y} name="message" rows={5} maxLength={2000} />}
       </FormField>
 
-      <div aria-hidden className="absolute -left-[9999px] h-px w-px overflow-hidden">
+      <div aria-hidden className="absolute left-[-9999px] h-px w-px overflow-hidden">
         <label htmlFor={`${base}-hp`}>Company website</label>
         <input id={`${base}-hp`} name={CONTACT_HONEYPOT} tabIndex={-1} autoComplete="off" />
       </div>

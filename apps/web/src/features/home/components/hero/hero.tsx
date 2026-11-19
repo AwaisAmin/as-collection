@@ -17,8 +17,8 @@ function GoldRule({ direction }: { direction: 'left' | 'right' }) {
       aria-hidden
       className={
         direction === 'left'
-          ? 'block h-px w-16 bg-linear-to-r from-transparent to-gold sm:w-[150px] lg:w-[120px] xl:w-[165px]'
-          : 'block h-px w-16 bg-linear-to-l from-transparent to-gold sm:w-[150px] lg:w-[120px] xl:w-[165px]'
+          ? 'block h-px w-16 bg-linear-to-r from-transparent to-gold sm:w-37.5 lg:w-30 xl:w-41.25'
+          : 'block h-px w-16 bg-linear-to-l from-transparent to-gold sm:w-37.5 lg:w-30 xl:w-41.25'
       }
     />
   );
@@ -35,12 +35,12 @@ export function Hero({ content = heroContent }: HeroProps) {
   return (
     <section
       aria-labelledby="hero-title"
-      className="relative isolate overflow-hidden lg:h-[484px] xl:h-[500px]"
+      className="relative isolate overflow-hidden lg:h-121 xl:h-125"
     >
       <HeroBackdrop />
 
       {/* Model — top on mobile, left half on desktop */}
-      <div className="relative h-[380px] sm:h-[460px] lg:absolute lg:inset-y-0 lg:left-0 lg:h-auto lg:w-[53%]">
+      <div className="relative h-95 sm:h-115 lg:absolute lg:inset-y-0 lg:left-0 lg:h-auto lg:w-[53%]">
         <Image
           src={model.src}
           alt={model.alt}
@@ -59,7 +59,7 @@ export function Hero({ content = heroContent }: HeroProps) {
         aria-hidden
         width={420}
         height={380}
-        className={`${decorClass} -top-4 -right-6 hidden w-[190px] lg:block xl:w-[210px]`}
+        className={`${decorClass} -top-4 -right-6 hidden w-47.5 lg:block xl:w-52.5`}
       />
       <Image
         src={images.palmLeaf.src}
@@ -67,17 +67,17 @@ export function Hero({ content = heroContent }: HeroProps) {
         aria-hidden
         width={300}
         height={300}
-        className={`${decorClass} -right-4 -bottom-4 hidden w-[120px] lg:block xl:w-[135px]`}
+        className={`${decorClass} -right-4 -bottom-4 hidden w-30 lg:block xl:w-33.75`}
       />
 
       {/* Copy */}
       <div className="relative z-10 flex flex-col items-center px-4 pt-8 pb-12 text-center lg:absolute lg:inset-y-0 lg:right-0 lg:w-[56%] lg:justify-center lg:pt-0 lg:pb-6 xl:w-[60%]">
         <div className="flex animate-fade-up items-end gap-3 sm:gap-4">
-          <span className="mb-[30px] lg:mb-[34px]">
+          <span className="mb-7.5 lg:mb-8.5">
             <GoldRule direction="left" />
           </span>
-          <LotusEmblem className="h-[72px] w-[90px] lg:h-[92px] lg:w-[112px]" />
-          <span className="mb-[30px] lg:mb-[34px]">
+          <LotusEmblem className="h-18 w-22.5 lg:h-23 lg:w-28" />
+          <span className="mb-7.5 lg:mb-8.5">
             <GoldRule direction="right" />
           </span>
         </div>
@@ -90,10 +90,10 @@ export function Hero({ content = heroContent }: HeroProps) {
         </h1>
 
         <p className="mt-3 flex animate-fade-up items-center gap-[1.1em] font-caps text-[clamp(10px,3.4vw,13px)] tracking-[0.35em] whitespace-nowrap text-ink uppercase [animation-delay:160ms] sm:text-[18px] lg:text-[19px] xl:text-[22px]">
-          <span className="-mr-[0.35em]">{taglineA}</span>
+          <span className="mr-[-0.35em]">{taglineA}</span>
           <span aria-hidden className="size-[0.32em] rounded-full bg-ink" />
           <span className="sr-only">,</span>
-          <span className="-mr-[0.35em]">{taglineB}</span>
+          <span className="mr-[-0.35em]">{taglineB}</span>
         </p>
 
         <ScriptTagline

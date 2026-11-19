@@ -55,7 +55,7 @@ export function TopBar() {
               <li>
                 <AnnouncementItem {...item} />
               </li>
-              <li aria-hidden className="flex h-[26px]">
+              <li aria-hidden className="flex h-6.5">
                 <VerticalDivider />
               </li>
             </Fragment>

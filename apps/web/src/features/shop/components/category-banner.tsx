@@ -7,7 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import type { Category } from '@/config/catalog';
 
 const frame = 'relative isolate overflow-hidden border-b border-gold/60 bg-ink';
-const height = 'min-h-[260px] sm:min-h-[300px] lg:min-h-[340px]';
+const height = 'min-h-65 sm:min-h-75 lg:min-h-85';
 
 /**
  * Category page hero: copy on black at the left, the category photo fading in from the right.
@@ -31,7 +31,7 @@ export function CategoryBanner({ category }: { category: Category }) {
         {/* Phones: even overlay. md+: fade from solid black into the photo. */}
         <div
           aria-hidden
-          className="absolute inset-0 bg-ink/70 md:bg-transparent md:bg-gradient-to-r md:from-ink md:via-ink/55 md:to-ink/5"
+          className="absolute inset-0 bg-ink/70 md:bg-transparent md:bg-linear-to-r md:from-ink md:via-ink/55 md:to-ink/5"
         />
       </div>
 

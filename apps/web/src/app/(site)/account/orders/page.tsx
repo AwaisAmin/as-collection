@@ -46,7 +46,7 @@ export default async function AccountOrdersPage() {
                 {o.lines.slice(0, 3).map((line) => (
                   <span
                     key={line.variantId}
-                    className="relative aspect-[3/4] w-14 overflow-hidden rounded-lg border-2 border-ivory bg-sand shadow-soft"
+                    className="relative aspect-3/4 w-14 overflow-hidden rounded-lg border-2 border-ivory bg-sand shadow-soft"
                   >
                     <Image src={line.image.src} alt="" fill sizes="56px" className="object-cover" />
                   </span>

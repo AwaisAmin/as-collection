@@ -85,7 +85,7 @@ export function ProductGallery({ images, productName, compact = false }: Product
           onKeyDown={onKeyDown}
           tabIndex={0}
           aria-label="Use left and right arrow keys to browse images"
-          className="scrollbar-none flex aspect-[3/4] snap-x snap-mandatory overflow-x-auto overscroll-x-contain focus-visible:outline-offset-[-4px]"
+          className="scrollbar-none flex aspect-3/4 snap-x snap-mandatory overflow-x-auto overscroll-x-contain focus-visible:-outline-offset-4"
         >
           {images.map((image, i) => (
             <div
@@ -164,7 +164,7 @@ export function ProductGallery({ images, productName, compact = false }: Product
                 aria-label={`Show image ${i + 1} of ${count}`}
                 aria-current={i === active ? 'true' : undefined}
                 className={cn(
-                  'relative block aspect-[3/4] w-[72px] overflow-hidden rounded-lg border-2 transition-all lg:w-[84px]',
+                  'relative block aspect-3/4 w-18 overflow-hidden rounded-lg border-2 transition-all lg:w-21',
                   i === active
                     ? 'border-ink'
                     : 'border-gold/40 opacity-75 hover:border-gold hover:opacity-100',

@@ -183,7 +183,7 @@ function ReviewForm({ productId, onDone }: { productId: string; onDone: () => vo
       </div>
 
       {/* Honeypot — hidden from people and assistive tech */}
-      <div aria-hidden className="absolute -left-[9999px] h-px w-px overflow-hidden">
+      <div aria-hidden className="absolute left-[-9999px] h-px w-px overflow-hidden">
         <label htmlFor={`${base}-hp`}>Website</label>
         <input id={`${base}-hp`} name={REVIEW_HONEYPOT} tabIndex={-1} autoComplete="off" />
       </div>

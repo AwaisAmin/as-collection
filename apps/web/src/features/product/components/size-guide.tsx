@@ -31,7 +31,7 @@ export function SizeGuide() {
       >
         <div className="px-5 py-5 sm:px-7 sm:py-6">
           <div className="overflow-x-auto rounded-xl border border-gold/60">
-            <table className="w-full min-w-[420px] border-collapse font-body text-[16px]">
+            <table className="w-full min-w-105 border-collapse font-body text-[16px]">
               <caption className="sr-only">Stitched garment size chart (inches)</caption>
               <thead className="bg-ink text-white">
                 <tr>

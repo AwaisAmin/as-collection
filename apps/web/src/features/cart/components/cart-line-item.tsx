@@ -40,7 +40,7 @@ export function CartLineItem({ item, compact = false, onNavigate }: CartLineItem
         tabIndex={-1}
         aria-hidden
         className={cn(
-          'relative aspect-[3/4] shrink-0 overflow-hidden rounded-lg border border-gold/50 bg-sand',
+          'relative aspect-3/4 shrink-0 overflow-hidden rounded-lg border border-gold/50 bg-sand',
           compact ? 'w-20' : 'w-24 sm:w-28',
         )}
       >

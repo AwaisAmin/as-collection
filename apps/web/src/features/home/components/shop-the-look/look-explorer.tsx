@@ -40,7 +40,7 @@ export function LookExplorer({ title, description, image, items }: LookExplorerP
 
   return (
     <div className="grid items-center gap-8 lg:grid-cols-[minmax(0,6fr)_minmax(0,5fr)] lg:gap-14">
-      <div className="relative mx-auto aspect-[3/4] w-full max-w-[520px] overflow-hidden rounded-card border border-gold/70 bg-sand shadow-soft">
+      <div className="relative mx-auto aspect-3/4 w-full max-w-130 overflow-hidden rounded-card border border-gold/70 bg-sand shadow-soft">
         <Image
           src={image.src}
           alt={image.alt}
@@ -99,10 +99,10 @@ export function LookExplorer({ title, description, image, items }: LookExplorerP
             }
             className={cn(
               'absolute inset-x-3 bottom-3 z-20 flex animate-fade-in gap-3 rounded-xl border border-gold/70 bg-ivory p-2.5 shadow-card-hover',
-              'sm:top-(--pop-top) sm:right-(--pop-right) sm:bottom-auto sm:left-(--pop-left) sm:w-[220px] sm:-translate-y-1/2',
+              'sm:top-(--pop-top) sm:right-(--pop-right) sm:bottom-auto sm:left-(--pop-left) sm:w-55 sm:-translate-y-1/2',
             )}
           >
-            <div className="relative aspect-[3/4] w-14 shrink-0 overflow-hidden rounded-lg bg-sand">
+            <div className="relative aspect-3/4 w-14 shrink-0 overflow-hidden rounded-lg bg-sand">
               <Image
                 src={activeItem.product.image.src}
                 alt=""
@@ -167,7 +167,7 @@ export function LookExplorer({ title, description, image, items }: LookExplorerP
               >
                 {i + 1}
               </span>
-              <div className="relative aspect-[3/4] w-16 shrink-0 overflow-hidden rounded-lg bg-sand">
+              <div className="relative aspect-3/4 w-16 shrink-0 overflow-hidden rounded-lg bg-sand">
                 <Image src={product.image.src} alt="" fill sizes="64px" className="object-cover" />
               </div>
               <div className="flex min-w-0 flex-1 flex-col gap-1">

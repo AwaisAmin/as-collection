@@ -23,7 +23,7 @@ export default function LoginPage({ searchParams }: PageProps<'/login'>) {
           title="My Account"
           subtitle="Track orders, save addresses and check out faster."
         />
-        <Suspense fallback={<Skeleton className="h-[480px] w-full max-w-md rounded-card" />}>
+        <Suspense fallback={<Skeleton className="h-120 w-full max-w-md rounded-card" />}>
           <LoginGate searchParams={searchParams} />
         </Suspense>
       </Container>

@@ -69,7 +69,7 @@ function FeatureCard({ onNavigate }: { onNavigate: () => void }) {
     <Link
       href={card.href}
       onClick={onNavigate}
-      className="group relative flex min-h-[260px] overflow-hidden rounded-card border border-gold/70 bg-ink"
+      className="group relative flex min-h-65 overflow-hidden rounded-card border border-gold/70 bg-ink"
     >
       <Image
         src={card.image.src}
@@ -80,7 +80,7 @@ function FeatureCard({ onNavigate }: { onNavigate: () => void }) {
       />
       <span
         aria-hidden
-        className="absolute inset-0 bg-gradient-to-t from-ink via-ink/50 to-transparent"
+        className="absolute inset-0 bg-linear-to-t from-ink via-ink/50 to-transparent"
       />
       <span className="relative mt-auto flex flex-col gap-1 p-5 text-white">
         <span className="font-caps text-[11px] tracking-[0.25em] text-gold-light uppercase">

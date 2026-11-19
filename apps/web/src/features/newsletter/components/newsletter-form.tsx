@@ -47,7 +47,7 @@ export function NewsletterForm({ className }: { className?: string }) {
       onSubmit={handleSubmit}
       noValidate
       aria-label="Newsletter signup"
-      className={cn('relative w-full max-w-[460px]', className)}
+      className={cn('relative w-full max-w-115', className)}
     >
       <label htmlFor={inputId} className="sr-only">
         Email address
@@ -68,11 +68,11 @@ export function NewsletterForm({ className }: { className?: string }) {
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? errorId : undefined}
         onChange={() => clientError && setClientError(null)}
-        className="pr-[138px] sm:pr-[180px]"
+        className="pr-34.5 sm:pr-45"
       />
 
       {/* Honeypot — visually hidden, skipped by keyboard and screen readers */}
-      <div aria-hidden className="absolute -left-[9999px] h-px w-px overflow-hidden">
+      <div aria-hidden className="absolute left-[-9999px] h-px w-px overflow-hidden">
         <label htmlFor={`${inputId}-hp`}>Company</label>
         <input id={`${inputId}-hp`} name={HONEYPOT_FIELD} tabIndex={-1} autoComplete="off" />
       </div>
@@ -82,7 +82,7 @@ export function NewsletterForm({ className }: { className?: string }) {
         variant="gold"
         disabled={pending}
         aria-busy={pending}
-        className="absolute inset-y-0 right-0 w-[128px] px-0 text-[18px] sm:w-[167px] sm:text-[22px]"
+        className="absolute inset-y-0 right-0 w-32 px-0 text-[18px] sm:w-41.75 sm:text-[22px]"
       >
         {pending ? (
           <>

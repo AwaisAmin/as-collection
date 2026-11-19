@@ -69,7 +69,7 @@ export function InstagramGallery() {
             rel="noopener noreferrer"
             className={cn(buttonVariants(), 'gap-2.5')}
           >
-            <FaInstagram aria-hidden className="size-[18px]" />
+            <FaInstagram aria-hidden className="size-4.5" />
             Follow {handle}
             <span className="sr-only"> (opens in a new tab)</span>
           </a>

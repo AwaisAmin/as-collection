@@ -37,7 +37,7 @@ export function ProductCard({ product, actions, footer, preload, className }: Pr
         className,
       )}
     >
-      <div className="relative aspect-[3/4] overflow-hidden bg-sand">
+      <div className="relative aspect-3/4 overflow-hidden bg-sand">
         <Image
           src={product.image.src}
           alt=""
@@ -47,7 +47,7 @@ export function ProductCard({ product, actions, footer, preload, className }: Pr
           className={cn(
             'object-cover transition-all duration-500 ease-elegant group-hover:scale-105',
             product.hoverImage && 'group-hover:opacity-0',
-            !product.inStock && 'opacity-70 grayscale-[35%]',
+            !product.inStock && 'opacity-70 grayscale-35',
           )}
         />
         {product.hoverImage ? (
@@ -67,7 +67,7 @@ export function ProductCard({ product, actions, footer, preload, className }: Pr
           <Link
             href={href}
             data-card-link=""
-            className="transition-colors duration-200 group-hover:text-gold-dark after:absolute after:inset-0 after:z-[1] focus-visible:outline-none"
+            className="transition-colors duration-200 group-hover:text-gold-dark after:absolute after:inset-0 after:z-1 focus-visible:outline-none"
           >
             {product.name}
           </Link>
@@ -81,11 +81,11 @@ export function ProductCard({ product, actions, footer, preload, className }: Pr
           from={product.priceVaries}
           className="mt-auto justify-center pt-1"
         />
-        {footer ? <div className="relative z-[2] mt-2 w-full">{footer}</div> : null}
+        {footer ? <div className="relative z-2 mt-2 w-full">{footer}</div> : null}
       </div>
 
       {actions ? (
-        <div className="absolute top-3 right-3 z-[2] flex flex-col gap-2">{actions}</div>
+        <div className="absolute top-3 right-3 z-2 flex flex-col gap-2">{actions}</div>
       ) : null}
     </article>
   );

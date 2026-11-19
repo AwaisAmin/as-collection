@@ -43,12 +43,12 @@ export function TrustBar({ features = trustFeatures }: TrustBarProps) {
       <h2 id="trust-title" className="sr-only">
         Why shop with us
       </h2>
-      <Container className="py-6 lg:flex lg:h-[92px] lg:items-center lg:py-0">
+      <Container className="py-6 lg:flex lg:h-23 lg:items-center lg:py-0">
         <ul className="grid grid-cols-2 gap-x-4 gap-y-6 sm:gap-x-8 lg:flex lg:w-full lg:items-center lg:justify-between lg:gap-0 lg:px-6 xl:px-8">
           {features.map((feature, i) => (
             <Fragment key={feature.id}>
               {i > 0 ? (
-                <li aria-hidden className="hidden h-[52px] lg:flex">
+                <li aria-hidden className="hidden h-13 lg:flex">
                   <VerticalDivider tone="dark" />
                 </li>
               ) : null}

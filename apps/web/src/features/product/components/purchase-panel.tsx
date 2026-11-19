@@ -140,7 +140,7 @@ export function PurchasePanel({ product, onAdded }: PurchasePanelProps) {
                             ? 'border-ivory shadow-[0_0_0_2px_var(--color-ink)]'
                             : 'border-ivory shadow-[0_0_0_1px_var(--color-gold)] hover:shadow-[0_0_0_2px_var(--color-gold)]',
                           !available &&
-                            'opacity-40 after:absolute after:inset-0 after:m-auto after:h-0.5 after:w-[120%] after:-translate-x-[8%] after:rotate-45 after:bg-ink',
+                            'opacity-40 after:absolute after:inset-0 after:m-auto after:h-0.5 after:w-[120%] after:translate-x-[-8%] after:rotate-45 after:bg-ink',
                         )}
                         style={{ backgroundColor: swatch }}
                       />
@@ -153,7 +153,7 @@ export function PurchasePanel({ product, onAdded }: PurchasePanelProps) {
                         aria-pressed={isSelected}
                         aria-label={label}
                         className={cn(
-                          'min-w-[52px] rounded-full border-[1.5px] px-4 py-2 font-body text-[17px] font-bold transition-colors',
+                          'min-w-13 rounded-full border-[1.5px] px-4 py-2 font-body text-[17px] font-bold transition-colors',
                           isSelected
                             ? 'border-gold bg-ink text-white'
                             : 'border-gold/60 text-text hover:border-gold',
@@ -211,7 +211,7 @@ export function PurchasePanel({ product, onAdded }: PurchasePanelProps) {
           size="lg"
           onClick={() => add()}
           disabled={soldOut}
-          className="h-[52px] min-w-0 flex-1 text-[20px] max-sm:order-last max-sm:basis-full sm:text-[22px]"
+          className="h-13 min-w-0 flex-1 text-[20px] max-sm:order-last max-sm:basis-full sm:text-[22px]"
         >
           <ShoppingBag aria-hidden size={20} />
           {soldOut ? 'Sold out' : 'Add to Cart'}
@@ -224,7 +224,7 @@ export function PurchasePanel({ product, onAdded }: PurchasePanelProps) {
           variant="gold"
           size="lg"
           onClick={buyNow}
-          className="h-[52px] w-full text-[20px] sm:text-[22px]"
+          className="h-13 w-full text-[20px] sm:text-[22px]"
         >
           <Zap aria-hidden size={20} />
           Buy Now

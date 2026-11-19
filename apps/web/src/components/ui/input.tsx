@@ -26,7 +26,7 @@ export const inputVariants = cva(
           'border border-transparent bg-ivory focus-visible:shadow-[0_0_0_2px_var(--color-gold-dark)]',
       },
       size: {
-        md: 'h-[42px] px-5 text-[17px]',
+        md: 'h-10.5 px-5 text-[17px]',
         lg: 'h-14 px-7 text-[18px]',
       },
     },

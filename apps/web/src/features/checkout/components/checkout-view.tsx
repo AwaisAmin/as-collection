@@ -66,9 +66,9 @@ function SummaryLines({ items }: { items: CartItem[] }) {
     <ul className="flex flex-col gap-4">
       {items.map((item) => (
         <li key={item.variantId} className="flex items-center gap-3">
-          <span className="relative aspect-[3/4] w-14 shrink-0 overflow-hidden rounded-lg border border-gold/50 bg-sand">
+          <span className="relative aspect-3/4 w-14 shrink-0 overflow-hidden rounded-lg border border-gold/50 bg-sand">
             <Image src={item.image.src} alt="" fill sizes="56px" className="object-cover" />
-            <span className="absolute -top-0 -right-0 flex size-5 items-center justify-center rounded-bl-lg bg-ink text-[11px] font-bold text-white">
+            <span className="absolute top-0 right-0 flex size-5 items-center justify-center rounded-bl-lg bg-ink text-[11px] font-bold text-white">
               {item.quantity}
             </span>
           </span>
@@ -518,7 +518,7 @@ export function CheckoutView({ prefill }: { prefill?: CheckoutPrefill }) {
                 type="submit"
                 size="lg"
                 disabled={pending || blocked}
-                className="h-[52px] w-full px-5 text-[18px] sm:px-10 sm:text-[20px]"
+                className="h-13 w-full px-5 text-[18px] sm:px-10 sm:text-[20px]"
               >
                 <Lock aria-hidden size={18} />
                 {pending ? 'Placing order…' : `Place order · ${formatPrice(totals.total)}`}

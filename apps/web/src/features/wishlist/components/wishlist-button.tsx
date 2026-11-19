@@ -42,7 +42,7 @@ export function WishlistButton({
         'inline-flex items-center justify-center transition-all duration-200',
         variant === 'floating'
           ? 'size-9 rounded-full border border-gold/60 bg-ivory/90 text-ink shadow-soft backdrop-blur-sm hover:scale-105 hover:border-gold'
-          : 'size-[52px] shrink-0 rounded-full border-[1.5px] border-gold bg-transparent text-ink hover:bg-ivory',
+          : 'size-13 shrink-0 rounded-full border-[1.5px] border-gold bg-transparent text-ink hover:bg-ivory',
         className,
       )}
     >

@@ -83,7 +83,7 @@ async function Tracker({ searchParams }: Pick<PageProps<'/track-order'>, 'search
             autoComplete="tel"
           />
         </label>
-        <Button type="submit" className="h-[42px]">
+        <Button type="submit" className="h-10.5">
           <PackageSearch aria-hidden size={17} />
           Track
         </Button>
@@ -126,7 +126,7 @@ async function Tracker({ searchParams }: Pick<PageProps<'/track-order'>, 'search
             <ul className="flex flex-col gap-3">
               {order.lines.map((l) => (
                 <li key={l.variantId} className="flex items-center gap-3 text-[15px]">
-                  <span className="relative aspect-[3/4] w-11 shrink-0 overflow-hidden rounded-md border border-gold/40">
+                  <span className="relative aspect-3/4 w-11 shrink-0 overflow-hidden rounded-md border border-gold/40">
                     <Image src={l.image.src} alt="" fill sizes="44px" className="object-cover" />
                   </span>
                   <span className="min-w-0 leading-snug">

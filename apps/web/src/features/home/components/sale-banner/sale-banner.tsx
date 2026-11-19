@@ -24,10 +24,10 @@ export function SaleBanner({ promotion = activePromotion }: SaleBannerProps) {
         {/* Soft gold glow behind the copy. */}
         <div
           aria-hidden
-          className="pointer-events-none absolute -top-1/3 right-0 size-[300px] rounded-full bg-gold/10 blur-3xl sm:size-[520px]"
+          className="pointer-events-none absolute -top-1/3 right-0 size-75 rounded-full bg-gold/10 blur-3xl sm:size-130"
         />
         <Container className="relative grid items-center gap-10 py-14 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16 lg:py-16">
-          <Reveal className="relative mx-auto aspect-square w-full max-w-[320px] overflow-hidden rounded-card border border-gold/70 shadow-gold-glow md:aspect-[4/5] md:max-w-none">
+          <Reveal className="relative mx-auto aspect-square w-full max-w-[320px] overflow-hidden rounded-card border border-gold/70 shadow-gold-glow md:aspect-4/5 md:max-w-none">
             <Image
               src={promotion.image.src}
               alt={promotion.image.alt}

@@ -11,13 +11,13 @@ export function NewsletterSection() {
       aria-labelledby="newsletter-title"
       className="relative isolate overflow-hidden border-b-[1.5px] border-gold bg-ink text-white"
     >
-      <GoldLeafBranch className="pointer-events-none absolute bottom-1 -left-4 -z-10 hidden h-[118px] w-[110px] min-[1180px]:block md:block lg:hidden" />
+      <GoldLeafBranch className="pointer-events-none absolute bottom-1 -left-4 -z-10 hidden h-29.5 w-27.5 min-[1180px]:block md:block lg:hidden" />
       <GoldLeafBranch
         flip
-        className="pointer-events-none absolute -right-4 bottom-1 -z-10 hidden h-[118px] w-[110px] min-[1180px]:block md:block lg:hidden"
+        className="pointer-events-none absolute -right-4 bottom-1 -z-10 hidden h-29.5 w-27.5 min-[1180px]:block md:block lg:hidden"
       />
 
-      <Container className="flex flex-col items-center gap-6 py-10 lg:min-h-[135px] lg:flex-row lg:justify-center lg:gap-20 lg:py-0">
+      <Container className="flex flex-col items-center gap-6 py-10 lg:min-h-33.75 lg:flex-row lg:justify-center lg:gap-20 lg:py-0">
         <Reveal className="text-center">
           <h2
             id="newsletter-title"

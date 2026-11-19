@@ -10,19 +10,19 @@ import { siteConfig } from '@/config/site';
 export function Footer() {
   return (
     <footer className="bg-ink font-body text-[17px] text-white">
-      <Container className="flex flex-col items-center gap-5 py-8 text-center lg:h-[104px] lg:flex-row lg:justify-between lg:gap-4 lg:py-0 lg:text-left xl:gap-6">
+      <Container className="flex flex-col items-center gap-5 py-8 text-center lg:h-26 lg:flex-row lg:justify-between lg:gap-4 lg:py-0 lg:text-left xl:gap-6">
         <p className="lg:shrink-0 lg:whitespace-nowrap">
           © {siteConfig.copyrightYear} {siteConfig.name}. All Rights Reserved.
         </p>
 
-        <VerticalDivider className="hidden h-[34px] self-center lg:block" />
+        <VerticalDivider className="hidden h-8.5 self-center lg:block" />
 
         <nav aria-label="Footer">
           <ul className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 lg:flex-nowrap lg:gap-x-4 lg:whitespace-nowrap xl:gap-x-5">
             {footerNav.map((link, i) => (
               <Fragment key={link.href}>
                 {i > 0 ? (
-                  <li aria-hidden className="hidden h-[22px] sm:flex">
+                  <li aria-hidden className="hidden h-5.5 sm:flex">
                     <VerticalDivider />
                   </li>
                 ) : null}
@@ -36,7 +36,7 @@ export function Footer() {
           </ul>
         </nav>
 
-        <VerticalDivider className="hidden h-[34px] self-center lg:block" />
+        <VerticalDivider className="hidden h-8.5 self-center lg:block" />
 
         <SocialLinks variant="circle" />
       </Container>

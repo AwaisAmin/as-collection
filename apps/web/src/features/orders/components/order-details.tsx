@@ -48,7 +48,7 @@ export function OrderDetails({ order }: { order: Order }) {
               key={line.variantId}
               className="flex gap-4 border-b border-gold/40 py-4 last:border-b-0"
             >
-              <span className="relative aspect-[3/4] w-16 shrink-0 overflow-hidden rounded-lg border border-gold/50 bg-sand">
+              <span className="relative aspect-3/4 w-16 shrink-0 overflow-hidden rounded-lg border border-gold/50 bg-sand">
                 <Image src={line.image.src} alt="" fill sizes="64px" className="object-cover" />
               </span>
               <div className="flex min-w-0 flex-1 flex-col gap-0.5 text-[16px]">

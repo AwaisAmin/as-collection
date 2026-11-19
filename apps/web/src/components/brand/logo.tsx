@@ -7,12 +7,12 @@ const sizes = {
   sm: {
     mark: 'text-[46px]/[0.82]',
     word: 'text-[17px]/none',
-    leaf: 'h-[36px] w-[42px] -top-[3px]',
+    leaf: 'h-9 w-10.5 -top-0.75',
   },
   md: {
     mark: 'text-[76px]/[0.82]',
     word: 'text-[28px]/none',
-    leaf: 'h-[58px] w-[68px] -top-[6px]',
+    leaf: 'h-14.5 w-17 -top-1.5',
   },
 } as const;
 
@@ -34,9 +34,9 @@ export function Logo({ size = 'md', className, onClick }: LogoProps) {
     >
       {/* Accessible name comes from the visible text ("AS Collection Hub"); the space
           between the stacked spans is ignored by flex layout but kept in the name. */}
-      <span className={cn('relative -translate-x-[6%] font-display tracking-[-0.045em]', s.mark)}>
+      <span className={cn('relative translate-x-[-6%] font-display tracking-[-0.045em]', s.mark)}>
         AS
-        <GoldLeafBranch className={cn('absolute left-full ml-[2px]', s.leaf)} />
+        <GoldLeafBranch className={cn('absolute left-full ml-0.5', s.leaf)} />
       </span>{' '}
       <span className={cn('font-display whitespace-nowrap', s.word)}>Collection Hub</span>
     </Link>

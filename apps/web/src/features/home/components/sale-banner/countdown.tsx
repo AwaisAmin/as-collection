@@ -28,7 +28,7 @@ export function Countdown({ endsAt }: { endsAt: string }) {
         {units.map(([key, label]) => (
           <li
             key={key}
-            className="flex w-[68px] flex-col items-center rounded-xl border border-gold/70 bg-white/5 py-2.5 sm:w-20"
+            className="flex w-17 flex-col items-center rounded-xl border border-gold/70 bg-white/5 py-2.5 sm:w-20"
           >
             <span className="font-display text-[28px]/none text-white tabular-nums sm:text-[34px]/none">
               {parts ? String(parts[key]).padStart(2, '0') : '--'}

@@ -51,14 +51,14 @@ export function OrderTimeline({ status }: { status: Order['status'] }) {
               <span
                 aria-hidden
                 className={cn(
-                  'absolute top-11 bottom-1 left-[21px] w-0.5',
+                  'absolute top-11 bottom-1 left-5.25 w-0.5',
                   i < current ? 'bg-gold' : 'bg-gold/25',
                 )}
               />
             ) : null}
             <span
               className={cn(
-                'relative z-[1] flex size-11 shrink-0 items-center justify-center rounded-full border-2',
+                'relative z-1 flex size-11 shrink-0 items-center justify-center rounded-full border-2',
                 done && 'border-gold bg-gold text-ink',
                 active && 'border-ink bg-ink text-white shadow-gold-glow',
                 !done && !active && 'border-gold/40 bg-ivory text-muted/60',

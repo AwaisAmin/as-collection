@@ -83,7 +83,7 @@ export function QuickViewButton({ slug, productName }: QuickViewButtonProps) {
             </p>
           ) : (
             <div aria-busy={isLoading} className="contents">
-              <Skeleton className="aspect-[3/4] w-full rounded-card" />
+              <Skeleton className="aspect-3/4 w-full rounded-card" />
               <div className="flex flex-col gap-4">
                 <Skeleton className="h-8 w-3/4" />
                 <Skeleton className="h-4 w-1/3" />

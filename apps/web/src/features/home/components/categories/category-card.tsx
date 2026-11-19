@@ -24,7 +24,7 @@ export function CategoryCard({ category, className }: CategoryCardProps) {
     <Link
       href={category.href}
       className={cn(
-        'group relative flex h-[240px] overflow-hidden rounded-card border border-gold bg-ivory shadow-soft sm:h-[280px]',
+        'group relative flex h-60 overflow-hidden rounded-card border border-gold bg-ivory shadow-soft sm:h-70',
         'transition-all duration-300 ease-elegant hover:-translate-y-1 hover:shadow-card-hover',
         className,
       )}
@@ -42,7 +42,7 @@ export function CategoryCard({ category, className }: CategoryCardProps) {
       </div>
 
       {/* Copy column */}
-      <div className="flex min-w-0 flex-1 flex-col items-center pt-[22%] pr-2 pb-[46px] text-center sm:pt-[84px] sm:pb-[52px] lg:pr-2 xl:pr-3">
+      <div className="flex min-w-0 flex-1 flex-col items-center pt-[22%] pr-2 pb-11.5 text-center sm:pt-21 sm:pb-13 lg:pr-2 xl:pr-3">
         <h3 className="font-display text-[28px]/[1.02] text-ink lg:text-[26px]/[1.02] xl:text-[32px]/[1.02]">
           {category.titleLines.map((line) => (
             <span key={line} className="block whitespace-nowrap">

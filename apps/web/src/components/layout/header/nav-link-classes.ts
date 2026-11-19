@@ -5,7 +5,7 @@ type NavLayout = 'bar' | 'drawer';
 const layouts: Record<NavLayout, { base: string; active: string; idle: string }> = {
   /** Desktop header row. */
   bar: {
-    base: 'inline-flex items-center gap-1.5 py-[13px] text-[18px] leading-none',
+    base: 'inline-flex items-center gap-1.5 py-3.25 text-[18px] leading-none',
     active: 'px-7',
     idle: 'px-1.5',
   },

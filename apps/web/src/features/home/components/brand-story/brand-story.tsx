@@ -12,7 +12,7 @@ export function BrandStory() {
   return (
     <section aria-labelledby="story-title" className="border-y border-gold/50 bg-sand">
       <Container className="grid items-center gap-10 py-16 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16 lg:py-20">
-        <Reveal className="relative mx-auto aspect-[4/5] w-full max-w-[380px] md:max-w-none">
+        <Reveal className="relative mx-auto aspect-4/5 w-full max-w-95 md:max-w-none">
           {/* Offset gold frame behind the photo. */}
           <div
             aria-hidden
@@ -33,7 +33,7 @@ export function BrandStory() {
           delay={120}
           className="flex flex-col items-center gap-5 text-center md:items-start md:text-left"
         >
-          <LotusEmblem className="h-[52px] w-[66px]" />
+          <LotusEmblem className="h-13 w-16.5" />
           <h2
             id="story-title"
             className="font-display text-[38px]/[1.1] text-ink sm:text-[46px]/[1.1]"

@@ -52,7 +52,7 @@ export default function ContactPage() {
                   <Icon aria-hidden size={21} className="text-gold-dark" />
                 </span>
                 <span className="font-display text-[19px] text-ink">{title}</span>
-                <span className="text-[16px] break-words text-muted">{value}</span>
+                <span className="text-[16px] wrap-break-word text-muted">{value}</span>
               </>
             );
             const cls =

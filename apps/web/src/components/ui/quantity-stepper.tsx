@@ -39,7 +39,7 @@ export function QuantityStepper({
       aria-label={`Quantity${of}`}
       className={cn(
         'inline-flex items-center rounded-full border-[1.5px] border-gold bg-ivory p-1',
-        size === 'md' ? 'h-[52px]' : 'h-10',
+        size === 'md' ? 'h-13' : 'h-10',
         className,
       )}
     >

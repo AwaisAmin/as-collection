@@ -15,7 +15,7 @@ export function ScriptTagline({ text, className }: ScriptTaglineProps) {
           aria-hidden
           viewBox="0 0 200 12"
           preserveAspectRatio="none"
-          className="absolute -bottom-[0.18em] left-[43%] h-[0.28em] w-[43%]"
+          className="absolute bottom-[-0.18em] left-[43%] h-[0.28em] w-[43%]"
         >
           <path d="M0 10 C 55 3, 140 0, 200 3 C 140 2.4, 55 5.6, 0 10 Z" fill="currentColor" />
         </svg>
