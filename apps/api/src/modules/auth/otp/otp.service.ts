@@ -2,7 +2,7 @@ import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import type { AppConfig } from '../../../app.module.js';
-import { hmacHex, randomDigits, safeEqualHex } from '../../../common/crypto.js';
+import { hmacHex, ipHashOf, randomDigits, safeEqualHex } from '../../../common/crypto.js';
 import { DomainException, RateLimitedException } from '../../../common/http/problem-details.js';
 import { PrismaService } from '../../../database/prisma.service.js';
 import type { OtpChannel } from '../../../generated/prisma/client.js';
@@ -49,7 +49,7 @@ export class OtpService {
   }
 
   ipHash(ip: string | null): string | null {
-    return ip ? hmacHex(this.secret, `ip:${ip}`) : null;
+    return ipHashOf(this.secret, ip);
   }
 
   async request(phone: string, ip: string | null): Promise<OtpRequestResult> {

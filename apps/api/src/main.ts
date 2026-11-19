@@ -1,21 +1,12 @@
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { type NestNodeApplication, NodeAdapter } from '@nestjs/platform-node';
+import type { NestNodeApplication } from '@nestjs/platform-node';
 
 import { AppModule } from './app.module.js';
 import { configureApp, GLOBAL_PREFIX } from './bootstrap/configure-app.js';
+import { createHttpAdapter } from './bootstrap/http-adapter.js';
 import { createLogger } from './common/logging/create-logger.js';
 import { loadEnvFiles, parseEnv } from './config/env.js';
-
-/** Parse a TRUST_PROXY value: `false` → trust nobody, otherwise an address/CIDR list. */
-function trustProxyFrom(value: string): string | string[] | false {
-  if (value === 'false') return false;
-  const list = value
-    .split(',')
-    .map((v) => v.trim())
-    .filter(Boolean);
-  return list.length === 1 ? (list[0] ?? false) : list;
-}
 
 async function bootstrap(): Promise<void> {
   loadEnvFiles();
@@ -24,7 +15,7 @@ async function bootstrap(): Promise<void> {
 
   const app = await NestFactory.create<NestNodeApplication>(
     AppModule.forRoot(env),
-    new NodeAdapter({ trustProxy: trustProxyFrom(env.TRUST_PROXY) }),
+    createHttpAdapter(env),
     { logger, bufferLogs: true },
   );
   configureApp(app, env);

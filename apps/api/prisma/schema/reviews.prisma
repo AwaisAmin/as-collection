@@ -23,6 +23,8 @@ model Review {
   moderatedByStaffId String?      @map("moderated_by_staff_id") @db.Uuid
   moderatedAt        DateTime?    @map("moderated_at") @db.Timestamptz(3)
   rejectionReason    String?      @map("rejection_reason") @db.VarChar(300)
+  /// HMAC of the submitter's IP (abuse limits); never the raw address.
+  ipHash             String?      @map("ip_hash") @db.Char(64)
   createdAt          DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt          DateTime     @updatedAt @map("updated_at") @db.Timestamptz(3)
 

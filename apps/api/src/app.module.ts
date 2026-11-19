@@ -15,8 +15,12 @@ import { DatabaseModule } from './database/database.module.js';
 import { AccountModule } from './modules/account/account.module.js';
 import { AuthModule } from './modules/auth/auth.module.js';
 import { CatalogModule } from './modules/catalog/catalog.module.js';
+import { ContactModule } from './modules/contact/contact.module.js';
+import { ContentModule } from './modules/content/content.module.js';
 import { HealthModule } from './modules/health/health.module.js';
+import { NewsletterModule } from './modules/newsletter/newsletter.module.js';
 import { OrdersModule } from './modules/orders/orders.module.js';
+import { ReviewsModule } from './modules/reviews/reviews.module.js';
 import { RedisModule } from './redis/redis.module.js';
 import { RedisThrottlerStorage } from './redis/redis-throttler.storage.js';
 import { StorageModule } from './storage/storage.module.js';
@@ -64,6 +68,10 @@ export class AppModule implements NestModule {
         AuthModule,
         AccountModule,
         OrdersModule,
+        ReviewsModule,
+        NewsletterModule,
+        ContactModule,
+        ContentModule,
       ],
       providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
     };

@@ -17,18 +17,21 @@ docker build -f apps/api/Dockerfile -t as-collection-api .   # from the repo roo
 
 ## Routes
 
-| Path                | What                                                                                                                                            |
-| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| `/api/v1/...`       | Versioned API (URI versioning)                                                                                                                  |
-| `/api/health/live`  | Liveness — process is up (no dependencies)                                                                                                      |
-| `/api/health/ready` | Readiness — dependencies healthy (load balancer)                                                                                                |
-| `/api/docs`         | Swagger UI + `/api/docs/json` (off in production)                                                                                               |
-| `/api/v1/catalog/*` | Public catalog: categories, collections, products (search, `f.<code>` filters, sort, pagination), facets, product page, related, variant lookup |
-
-| `/api/v1/auth/*` | Customer sign-in: phone OTP (`otp`, `otp/verify`), Google (`google`), `session`, `logout` |
-| `/api/v1/checkout/quote`, `/api/v1/orders/*` | Checkout quote, place order (Idempotency-Key), order view (access key or session), track, cancel, payment proof |
-| `/api/v1/account/orders` | Signed-in order history (incl. guest orders linked by verified phone) |
-| `/api/v1/account/*` | Signed-in customer: profile, verified phone, address book, signed-in devices |
+| Path                                                                  | What                                                                                                                                            |
+| --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/api/v1/...`                                                         | Versioned API (URI versioning)                                                                                                                  |
+| `/api/health/live`                                                    | Liveness — process is up (no dependencies)                                                                                                      |
+| `/api/health/ready`                                                   | Readiness — dependencies healthy (load balancer)                                                                                                |
+| `/api/docs`                                                           | Swagger UI + `/api/docs/json` (off in production)                                                                                               |
+| `/api/v1/catalog/*`                                                   | Public catalog: categories, collections, products (search, `f.<code>` filters, sort, pagination), facets, product page, related, variant lookup |
+| `/api/v1/catalog/products/:slug/reviews`, `/api/v1/catalog/reviews/*` | Approved reviews (sort, pagination), per-star summary, featured testimonials, store summary; submit (moderated), helpful votes                  |
+| `/api/v1/content/*`                                                   | Storefront content: `pages/:slug` (sections), `menus/:key`, public `settings`, `promotions/active`                                              |
+| `/api/v1/newsletter/*`                                                | `subscriptions` (consent recorded), `unsubscribe` (signed token)                                                                                |
+| `/api/v1/contact`                                                     | Contact form → admin inbox                                                                                                                      |
+| `/api/v1/auth/*`                                                      | Customer sign-in: phone OTP (`otp`, `otp/verify`), Google (`google`), `session`, `logout`                                                       |
+| `/api/v1/checkout/quote`, `/api/v1/orders/*`                          | Checkout quote, place order (Idempotency-Key), order view (access key or session), track, cancel, payment proof                                 |
+| `/api/v1/account/orders`                                              | Signed-in order history (incl. guest orders linked by verified phone)                                                                           |
+| `/api/v1/account/*`                                                   | Signed-in customer: profile, verified phone, address book, signed-in devices                                                                    |
 
 ## Structure
 
@@ -135,6 +138,32 @@ Rules:
   - Staff order workflow: confirm, ship (stock movement), deliver, refunds.
   - Payment-proof review with signed URLs.
   - A job to auto-cancel unpaid transfer orders.
+
+## Reviews, newsletter, contact & content
+
+- **Reviews:**
+  - **Public reads:** only APPROVED reviews, without customer ids, moderation data or IP hashes.
+  - **Submissions:** start PENDING; the request body is strict (no `status` or `isVerifiedPurchase`). Text is cleaned of control and bidi characters before length checks.
+  - **Verified purchase:** set only when a signed-in customer has a DELIVERED order item for the product.
+  - **Limits:** one live review per customer per product (partial unique index); 5 submissions per IP and per customer per day.
+  - **Ratings:** `products.rating_*` are kept in sync by a database trigger on every status change.
+  - **Helpful votes:** once per voter (customer id, else hashed IP).
+- **Newsletter:**
+  - Sign-ups record consent (`consentAt`, `source`); re-subscribing is fresh consent.
+  - Unsubscribe links carry an HMAC of the address (`NewsletterService.unsubscribeToken`), so no token table is needed and nobody can unsubscribe someone else.
+- **Contact:**
+  - Messages need a phone or an email (also a DB check); phone and order number are normalised.
+  - Limit: 5 per IP per hour, counted by HMAC-hashed IP (raw IPs are never stored).
+- **Content:**
+  - **Validation on read:** stored JSON goes through per-type Zod schemas in `content.schemas.ts`. Unknown section types and invalid entries are skipped and logged, so one bad edit can't break the storefront.
+  - **Links:** only site paths, `https:`, `tel:` or `mailto:` (no `javascript:` or `//host`).
+  - **Settings:** only keys listed in `PUBLIC_SETTINGS` are served, and only their listed fields.
+  - **Caching:** pages and menus are cached (`ContentService.invalidate()`); section schedules (`startsAt`/`endsAt`) are applied per request; settings share the `settings` cache with checkout.
+- **Client IP:** comes from `TRUST_PROXY` via `createHttpAdapter`, which the e2e tests use too.
+- **To do in B7:**
+  - Moderation and inbox screens (call `ReviewsService.invalidate()`).
+  - Staff notifications for new contact messages.
+  - Admin content writes validated with the same schemas.
 
 ## Conventions
 

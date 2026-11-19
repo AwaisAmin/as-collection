@@ -425,6 +425,25 @@ async function seedSettings(content: ContentSnapshot): Promise<void> {
       ...content.payments,
     },
     'home.trust-features': content.trustFeatures as Prisma.InputJsonArray,
+    // Top announcement bar; `icon` names map to the storefront's icon set.
+    announcements: [
+      {
+        id: 'shipping',
+        icon: 'truck',
+        text: `Free Shipping on Orders Above ${String(site.freeShippingThreshold)}`,
+      },
+      { id: 'cod', icon: 'shield-check', text: 'Cash on Delivery Available' },
+      ...(typeof site.contact.phone === 'string' && typeof site.contact.phoneHref === 'string'
+        ? [
+            {
+              id: 'support',
+              icon: 'headset',
+              text: `Customer Support: ${site.contact.phone}`,
+              href: site.contact.phoneHref,
+            },
+          ]
+        : []),
+    ],
   };
   for (const [key, value] of Object.entries(settings)) {
     await prisma.setting.upsert({ where: { key }, update: {}, create: { key, value } });

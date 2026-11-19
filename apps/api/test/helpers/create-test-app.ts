@@ -1,10 +1,11 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
-import { type NestNodeApplication, NodeAdapter } from '@nestjs/platform-node';
+import type { NestNodeApplication } from '@nestjs/platform-node';
 import { Test, type TestingModuleBuilder } from '@nestjs/testing';
 import { z } from 'zod';
 
 import { AppModule } from '../../src/app.module.js';
 import { configureApp } from '../../src/bootstrap/configure-app.js';
+import { createHttpAdapter } from '../../src/bootstrap/http-adapter.js';
 import { type Env, loadEnvFiles, parseEnv } from '../../src/config/env.js';
 
 export const TRUSTED_ORIGIN = 'https://shop.example.test';
@@ -70,7 +71,7 @@ export async function createTestApp(
     }),
   ).compile();
 
-  const app = moduleRef.createNestApplication<NestNodeApplication>(new NodeAdapter(), {
+  const app = moduleRef.createNestApplication<NestNodeApplication>(createHttpAdapter(env), {
     logger: false,
   });
   configureApp(app, env);

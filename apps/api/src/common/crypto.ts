@@ -20,3 +20,7 @@ export const randomDigits = (length: number) =>
 
 /** 256-bit random token, base64url (43 chars). */
 export const randomToken = () => randomBytes(32).toString('base64url');
+
+/** Keyed hash of a client IP for abuse limits — the raw address is never stored. */
+export const ipHashOf = (secret: string, ip: string | null) =>
+  ip ? hmacHex(secret, `ip:${ip}`) : null;

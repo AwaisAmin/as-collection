@@ -10,6 +10,15 @@ enum SubscriberStatus {
   UNSUBSCRIBED
 }
 
+/// What a contact message is about (drives routing in the admin inbox).
+enum ContactTopic {
+  ORDER
+  RETURNS
+  PRODUCT
+  WHOLESALE
+  OTHER
+}
+
 enum ContactStatus {
   NEW
   READ
@@ -122,6 +131,9 @@ model ContactMessage {
   email            String?       @db.Citext
   phone            String?       @db.VarChar(16)
   subject          String?       @db.VarChar(160)
+  topic            ContactTopic  @default(OTHER)
+  /// Order the message is about (normalised AS-YYMMDD-XXXXX), when given.
+  orderNumber      String?       @map("order_number") @db.VarChar(20)
   message          String        @db.VarChar(5000)
   status           ContactStatus @default(NEW)
   ipHash           String?       @map("ip_hash") @db.Char(64)

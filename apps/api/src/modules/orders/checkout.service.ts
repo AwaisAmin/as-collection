@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import type { AppConfig } from '../../app.module.js';
 import { hmacHex, safeEqualHex, sha256Hex } from '../../common/crypto.js';
 import { DomainException, type JsonValue } from '../../common/http/problem-details.js';
+import { isUniqueViolation } from '../../common/prisma-errors.js';
 import { PrismaService } from '../../database/prisma.service.js';
 import type { Prisma } from '../../generated/prisma/client.js';
 import { stableStringify } from '../../redis/cache.service.js';
@@ -49,12 +50,6 @@ const discountSelect = {
   perCustomerLimit: true,
   isActive: true,
 } satisfies Prisma.DiscountSelect;
-
-const isUniqueViolation = (error: unknown, field: string) =>
-  error instanceof Error &&
-  error.name === 'PrismaClientKnownRequestError' &&
-  (error as Error & { code?: string }).code === 'P2002' &&
-  JSON.stringify((error as Error & { meta?: unknown }).meta ?? '').includes(field);
 
 const toJson = (value: unknown) => JSON.parse(JSON.stringify(value)) as JsonValue;
 
