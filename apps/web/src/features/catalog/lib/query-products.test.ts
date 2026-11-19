@@ -6,6 +6,7 @@ import { minPrice } from './product-helpers';
 import {
   computeFacets,
   filterProducts,
+  isOnSale,
   matchesSearch,
   paginate,
   sortProducts,
@@ -49,6 +50,21 @@ describe('filterProducts', () => {
     const inStock = filterProducts(mockProducts, query({ category: 'unstitched', inStock: '1' }));
     expect(all.map((p) => p.slug)).toContain('gulnar-jacquard-unstitched-3-piece');
     expect(inStock.map((p) => p.slug)).not.toContain('gulnar-jacquard-unstitched-3-piece');
+  });
+
+  it('matches any selected occasion', () => {
+    const result = filterProducts(mockProducts, query({ occasion: 'wedding,eid' }));
+    expect(result.length).toBeGreaterThan(0);
+    expect(
+      result.every((p) => p.occasions.includes('wedding') || p.occasions.includes('eid')),
+    ).toBe(true);
+    expect(result.map((p) => p.slug)).not.toContain('amber-lawn-straight-shirt');
+  });
+
+  it('keeps only discounted products when sale is set', () => {
+    const result = filterProducts(mockProducts, query({ sale: '1' }));
+    expect(result.length).toBeGreaterThan(0);
+    expect(result.every(isOnSale)).toBe(true);
   });
 });
 
@@ -94,5 +110,11 @@ describe('computeFacets', () => {
     const size = facets.options.find((o) => o.name === 'Size');
     expect(size?.values.map((v) => v.value)).toEqual(['XS', 'S', 'M', 'L', 'XL']);
     expect(facets.priceRange.min).toBeLessThanOrEqual(facets.priceRange.max);
+  });
+
+  it('counts occasions in config order and omits empty ones', () => {
+    const facets = computeFacets(filterProducts(mockProducts, query({ category: 'makeup' })));
+    expect(facets.occasions.map((o) => o.slug)).toEqual(['everyday', 'dawat', 'wedding', 'eid']);
+    expect(facets.occasions.every((o) => o.count > 0)).toBe(true);
   });
 });

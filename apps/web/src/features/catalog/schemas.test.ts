@@ -10,7 +10,9 @@ describe('parseCatalogQuery', () => {
       sort: 'featured',
       size: [],
       shade: [],
+      occasion: [],
       inStock: false,
+      sale: false,
       page: 1,
     });
   });

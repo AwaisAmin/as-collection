@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { categorySlugs } from '@/config/catalog';
+import { isOccasion } from '@/config/occasions';
 
 export const sortOptions = [
   { value: 'featured', label: 'Featured' },
@@ -26,6 +27,13 @@ const csv = z
       .filter(Boolean),
   );
 
+/** Boolean flag in the URL (`inStock=1`). */
+const flag = z
+  .enum(['1', 'true'])
+  .optional()
+  .catch(undefined)
+  .transform((v) => v !== undefined);
+
 /** Invalid values fall back to defaults instead of erroring — URLs are user-editable. */
 const optionalInt = z.coerce.number().int().nonnegative().optional().catch(undefined);
 
@@ -41,11 +49,11 @@ export const catalogQuerySchema = z.object({
   max: optionalInt,
   size: csv,
   shade: csv,
-  inStock: z
-    .enum(['1', 'true'])
-    .optional()
-    .catch(undefined)
-    .transform((v) => v !== undefined),
+  /** Unknown occasions are dropped rather than rejected. */
+  occasion: csv.transform((values) => values.filter(isOccasion)),
+  inStock: flag,
+  /** Only products with a discounted variant. */
+  sale: flag,
   page: z.coerce.number().int().min(1).default(1).catch(1),
 });
 

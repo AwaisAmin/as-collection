@@ -23,7 +23,9 @@ export function toQueryString(
   if (query.max !== undefined) entries.push(['max', String(query.max)]);
   if (query.size.length) entries.push(['size', query.size.join(',')]);
   if (query.shade.length) entries.push(['shade', query.shade.join(',')]);
+  if (query.occasion.length) entries.push(['occasion', query.occasion.join(',')]);
   if (query.inStock) entries.push(['inStock', '1']);
+  if (query.sale) entries.push(['sale', '1']);
   if (query.page > 1) entries.push(['page', String(query.page)]);
   return entries.map(([k, v]) => `${k}=${encode(v)}`).join('&');
 }
@@ -43,7 +45,7 @@ export function catalogHref(
   return (qs ? `${basePath}?${qs}` : basePath) as Route;
 }
 
-export function toggleValue(list: readonly string[], value: string): string[] {
+export function toggleValue<T extends string>(list: readonly T[], value: T): T[] {
   return list.includes(value) ? list.filter((v) => v !== value) : [...list, value];
 }
 
@@ -53,11 +55,23 @@ export function countActiveFilters(query: CatalogQuery): number {
     (query.min !== undefined || query.max !== undefined ? 1 : 0) +
     query.size.length +
     query.shade.length +
-    (query.inStock ? 1 : 0)
+    query.occasion.length +
+    (query.inStock ? 1 : 0) +
+    (query.sale ? 1 : 0)
   );
 }
 
 /** Query with all filters removed (keeps search, category and sort). */
 export function clearFilters(query: CatalogQuery): Partial<CatalogQuery> {
-  return { ...query, min: undefined, max: undefined, size: [], shade: [], inStock: false, page: 1 };
+  return {
+    ...query,
+    min: undefined,
+    max: undefined,
+    size: [],
+    shade: [],
+    occasion: [],
+    inStock: false,
+    sale: false,
+    page: 1,
+  };
 }

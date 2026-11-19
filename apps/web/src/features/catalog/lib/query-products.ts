@@ -2,9 +2,15 @@
  * Pure catalog query logic (filter → sort → paginate, facets).
  * Used by the mock service now; the API will implement the same semantics server-side.
  */
+import { occasionSlugs } from '@/config/occasions';
+
 import type { CatalogQuery, ReviewSort } from '../schemas';
 import type { CatalogFacets, FacetValue, Paginated, Product, Review } from '../types';
 import { isInStock, minPrice } from './product-helpers';
+
+/** Any variant priced below its compare-at price. */
+export const isOnSale = (product: Product): boolean =>
+  product.variants.some((v) => v.compareAtPrice !== undefined && v.compareAtPrice > v.price);
 
 type BaseFilter = Pick<CatalogQuery, 'category' | 'q'>;
 
@@ -16,7 +22,13 @@ function normalize(text: string): string {
 export function matchesSearch(product: Product, q: string | undefined): boolean {
   if (!q) return true;
   const haystack = normalize(
-    [product.name, product.category, product.shortDescription, ...product.tags].join(' '),
+    [
+      product.name,
+      product.category,
+      product.shortDescription,
+      ...product.tags,
+      ...product.occasions,
+    ].join(' '),
   );
   return normalize(q)
     .split(/\s+/)
@@ -43,6 +55,10 @@ export function filterProducts(products: readonly Product[], query: CatalogQuery
     if (query.min !== undefined && price < query.min) return false;
     if (query.max !== undefined && price > query.max) return false;
     if (query.inStock && !isInStock(p)) return false;
+    if (query.sale && !isOnSale(p)) return false;
+    if (query.occasion.length && !p.occasions.some((o) => query.occasion.includes(o))) {
+      return false;
+    }
     if (!hasOptionInStock(p, 'Size', query.size)) return false;
     if (!hasOptionInStock(p, 'Shade', query.shade)) return false;
     return true;
@@ -111,6 +127,9 @@ export function computeFacets(products: readonly Product[]): CatalogFacets {
       max: prices.length ? Math.max(...prices) : 0,
     },
     options: [...options].map(([name, values]) => ({ name, values: [...values.values()] })),
+    occasions: occasionSlugs
+      .map((slug) => ({ slug, count: products.filter((p) => p.occasions.includes(slug)).length }))
+      .filter(({ count }) => count > 0),
   };
 }
 

@@ -30,6 +30,12 @@ describe('toQueryString', () => {
     expect(toQueryString(q)).toBe('q=lawn%20%26%20chiffon&shade=Ruby%20Red,110%20Porcelain');
   });
 
+  it('serializes occasion and sale filters, dropping unknown occasions', () => {
+    const q = parseCatalogQuery({ occasion: 'wedding,party,eid', sale: '1' });
+    expect(q.occasion).toEqual(['wedding', 'eid']);
+    expect(toQueryString(q)).toBe('occasion=wedding,eid&sale=1');
+  });
+
   it('only includes category when asked (search page)', () => {
     const q = parseCatalogQuery({ category: 'makeup' });
     expect(toQueryString(q)).toBe('');

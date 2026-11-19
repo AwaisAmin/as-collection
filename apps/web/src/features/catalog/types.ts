@@ -1,4 +1,5 @@
 import type { CategorySlug } from '@/config/catalog';
+import type { OccasionSlug } from '@/config/occasions';
 
 /** Prices are whole PKR (no paisa) — avoids floating-point money bugs. */
 export type Money = number;
@@ -57,6 +58,8 @@ export interface Product {
   variants: readonly ProductVariant[];
   details: readonly ProductDetail[];
   tags: readonly string[];
+  /** Occasions this product is styled for (Shop by Occasion, `occasion` filter). */
+  occasions: readonly OccasionSlug[];
   /** Which size chart applies (stitched garments). */
   sizeGuide?: 'stitched';
   featured?: boolean;
@@ -121,6 +124,8 @@ export interface FacetValue {
 export interface CatalogFacets {
   priceRange: { min: Money; max: Money };
   options: readonly { name: string; values: readonly FacetValue[] }[];
+  /** Product count per occasion, in config order (zero counts omitted). */
+  occasions: readonly { slug: OccasionSlug; count: number }[];
 }
 
 /** Current server-side price/stock for a variant (cart re-validation, checkout). */

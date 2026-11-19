@@ -2,6 +2,7 @@
 
 import { X } from 'lucide-react';
 
+import { occasionName } from '@/config/occasions';
 import { catalogHref, clearFilters, countActiveFilters } from '@/features/catalog/lib/catalog-url';
 import type { CatalogQuery } from '@/features/catalog/schemas';
 import { formatPrice } from '@/lib/utils/format';
@@ -47,7 +48,15 @@ export function ActiveFilters({ query, basePath, includeCategory }: ActiveFilter
       remove: { shade: query.shade.filter((s) => s !== shade) },
     });
   }
+  for (const occasion of query.occasion) {
+    chips.push({
+      key: `occasion-${occasion}`,
+      label: occasionName(occasion),
+      remove: { occasion: query.occasion.filter((o) => o !== occasion) },
+    });
+  }
   if (query.inStock) chips.push({ key: 'stock', label: 'In stock', remove: { inStock: false } });
+  if (query.sale) chips.push({ key: 'sale', label: 'On sale', remove: { sale: false } });
 
   return (
     <ul aria-label="Active filters" className="flex flex-wrap items-center gap-2">

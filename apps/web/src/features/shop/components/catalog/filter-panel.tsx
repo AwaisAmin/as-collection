@@ -5,6 +5,7 @@ import { type FormEvent, type ReactNode, useId, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { categories } from '@/config/catalog';
+import { occasionName } from '@/config/occasions';
 import {
   catalogHref,
   clearFilters,
@@ -135,6 +136,40 @@ export function FilterPanel({
         </FilterSection>
       ) : null}
 
+      {facets.occasions.length > 0 ? (
+        <FilterSection title="Occasion">
+          <div role="group" aria-label="Occasion" className="flex flex-wrap gap-2">
+            {facets.occasions.map(({ slug, count }) => {
+              const selected = query.occasion.includes(slug);
+              return (
+                <button
+                  key={slug}
+                  type="button"
+                  aria-pressed={selected}
+                  onClick={() => go({ occasion: toggleValue(query.occasion, slug) })}
+                  className={cn(
+                    chip,
+                    selected
+                      ? 'border-gold bg-ink text-white'
+                      : 'border-gold/60 text-text hover:border-gold',
+                  )}
+                >
+                  {occasionName(slug)}
+                  <span
+                    className={cn(
+                      'ml-1.5 text-[14px] font-normal',
+                      selected ? 'text-white/80' : 'text-muted',
+                    )}
+                  >
+                    {count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </FilterSection>
+      ) : null}
+
       <FilterSection title="Price (Rs)">
         <form
           onSubmit={applyPrice}
@@ -235,16 +270,27 @@ export function FilterPanel({
         </FilterSection>
       ) : null}
 
-      <FilterSection title="Availability">
-        <label className="flex cursor-pointer items-center gap-3 text-[17px]">
-          <input
-            type="checkbox"
-            checked={query.inStock}
-            onChange={(e) => go({ inStock: e.target.checked })}
-            className="size-5 accent-ink"
-          />
-          In stock only
-        </label>
+      <FilterSection title="Show only">
+        <div className="flex flex-col gap-3">
+          <label className="flex cursor-pointer items-center gap-3 text-[17px]">
+            <input
+              type="checkbox"
+              checked={query.inStock}
+              onChange={(e) => go({ inStock: e.target.checked })}
+              className="size-5 accent-ink"
+            />
+            In stock
+          </label>
+          <label className="flex cursor-pointer items-center gap-3 text-[17px]">
+            <input
+              type="checkbox"
+              checked={query.sale}
+              onChange={(e) => go({ sale: e.target.checked })}
+              className="size-5 accent-ink"
+            />
+            On sale
+          </label>
+        </div>
       </FilterSection>
     </div>
   );
