@@ -85,16 +85,24 @@ export function MobileNav() {
                       </li>
                     );
                   })}
-                  <li>
-                    <Link
-                      href="/account"
-                      onClick={close}
-                      aria-current={isActive('/account') ? 'page' : undefined}
-                      className={navLinkClasses(isActive('/account'), 'drawer')}
-                    >
-                      My Account
-                    </Link>
-                  </li>
+                  {(
+                    [
+                      { href: '/account', label: 'My Account' },
+                      { href: '/wishlist', label: 'Wishlist' },
+                      { href: '/track-order', label: 'Track Order' },
+                    ] as const
+                  ).map(({ href, label }) => (
+                    <li key={href}>
+                      <Link
+                        href={href}
+                        onClick={close}
+                        aria-current={isActive(href) ? 'page' : undefined}
+                        className={navLinkClasses(isActive(href), 'drawer')}
+                      >
+                        {label}
+                      </Link>
+                    </li>
+                  ))}
                 </ul>
               );
             }}

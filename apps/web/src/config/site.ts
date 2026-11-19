@@ -19,6 +19,8 @@ export const siteConfig = {
     /** E.164 for tel: links and structured data. */
     phoneE164: '+923289485741',
     phoneHref: 'tel:+923289485741',
+    whatsappHref: 'https://wa.me/923289485741',
+    hours: 'Mon–Sat, 10:00 am – 8:00 pm',
     email: 'collectionhubas@gmail.com',
     emailHref: 'mailto:collectionhubas@gmail.com',
   },

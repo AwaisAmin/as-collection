@@ -3,7 +3,15 @@ import type { MetadataRoute } from 'next';
 import { categories } from '@/config/catalog';
 import { siteConfig } from '@/config/site';
 
-const staticPaths = ['/', '/shop', '/about', '/contact', '/privacy-policy', '/terms'] as const;
+const staticPaths = [
+  '/',
+  '/shop',
+  '/about',
+  '/contact',
+  '/track-order',
+  '/privacy-policy',
+  '/terms',
+] as const;
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [

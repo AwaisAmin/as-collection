@@ -1,37 +1,119 @@
-import { Mail, Phone } from 'lucide-react';
+import { Clock, Mail, MessageCircle, Phone, Plus } from 'lucide-react';
 import type { Metadata } from 'next';
 
-import { PagePlaceholder } from '@/components/shared/page-placeholder';
+import { PageHeader } from '@/components/layout/page-header';
+import { Container } from '@/components/ui/container';
+import { SectionHeading } from '@/components/ui/section-heading';
 import { siteConfig } from '@/config/site';
+import { ContactForm } from '@/features/contact/components/contact-form';
+import { faqs } from '@/features/contact/content/faqs';
 
 export const metadata: Metadata = {
   title: 'Contact Us',
-  description: `Contact ${siteConfig.name} — call ${siteConfig.contact.phone} or email ${siteConfig.contact.email}.`,
+  description: `Contact ${siteConfig.name} — call or WhatsApp ${siteConfig.contact.phone} or email ${siteConfig.contact.email}.`,
+  alternates: { canonical: '/contact' },
 };
 
-const linkClasses =
-  'inline-flex items-center gap-3 font-display text-[20px] text-text transition-colors duration-200 hover:text-gold';
+const { phone, phoneHref, whatsappHref, email, emailHref, hours } = siteConfig.contact;
+
+const channels = [
+  { icon: MessageCircle, title: 'WhatsApp', value: phone, href: whatsappHref, external: true },
+  { icon: Phone, title: 'Call us', value: phone, href: phoneHref, external: false },
+  { icon: Mail, title: 'Email', value: email, href: emailHref, external: false },
+  { icon: Clock, title: 'Hours', value: hours, href: undefined, external: false },
+] as const;
 
 export default function ContactPage() {
-  const { phone, phoneHref, email, emailHref } = siteConfig.contact;
+  // FAQ structured data (eligible for rich results).
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map((f) => ({
+      '@type': 'Question',
+      name: f.q,
+      acceptedAnswer: { '@type': 'Answer', text: f.a },
+    })),
+  };
 
   return (
-    <PagePlaceholder
-      title="Contact Us"
-      description="We'd love to hear from you. Reach us by phone or email."
-    >
-      <address className="flex flex-col items-center gap-3 not-italic">
-        <a href={phoneHref} className={linkClasses}>
-          <Phone aria-hidden className="size-5 text-gold-dark" />
-          <span className="sr-only">Phone: </span>
-          {phone}
-        </a>
-        <a href={emailHref} className={linkClasses}>
-          <Mail aria-hidden className="size-5 text-gold-dark" />
-          <span className="sr-only">Email: </span>
-          {email}
-        </a>
-      </address>
-    </PagePlaceholder>
+    <main id="main-content" className="flex-1">
+      <PageHeader
+        title="Contact Us"
+        subtitle="We'd love to hear from you — orders, sizing, returns or anything else."
+        breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Contact Us' }]}
+      />
+
+      <Container className="flex flex-col gap-16 py-12">
+        <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {channels.map(({ icon: Icon, title, value, href, external }) => {
+            const body = (
+              <>
+                <span className="flex size-12 items-center justify-center rounded-full border border-gold bg-cream">
+                  <Icon aria-hidden size={21} className="text-gold-dark" />
+                </span>
+                <span className="font-display text-[19px] text-ink">{title}</span>
+                <span className="text-[16px] break-words text-muted">{value}</span>
+              </>
+            );
+            const cls =
+              'flex h-full flex-col items-center gap-2 rounded-card border border-gold/60 bg-ivory p-6 text-center transition-all';
+            return (
+              <li key={title}>
+                {href ? (
+                  <a
+                    href={href}
+                    {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                    className={`${cls} hover:-translate-y-0.5 hover:border-gold hover:shadow-soft`}
+                  >
+                    {body}
+                    {external ? <span className="sr-only"> (opens in a new tab)</span> : null}
+                  </a>
+                ) : (
+                  <div className={cls}>{body}</div>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-[1.2fr_1fr] lg:gap-14">
+          <section aria-labelledby="contact-form-title" className="flex flex-col gap-6">
+            <div id="contact-form-title">
+              <SectionHeading title="Send us a message" align="left" />
+            </div>
+            <ContactForm />
+          </section>
+
+          <section aria-labelledby="faq-title" className="flex flex-col gap-6">
+            <div id="faq-title">
+              <SectionHeading title="FAQs" align="left" />
+            </div>
+            <div className="flex flex-col gap-3">
+              {faqs.map((f) => (
+                <details
+                  key={f.q}
+                  className="group rounded-2xl border border-gold/60 bg-ivory open:border-gold"
+                >
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 font-display text-[17px] text-ink [&::-webkit-details-marker]:hidden">
+                    {f.q}
+                    <Plus
+                      aria-hidden
+                      size={18}
+                      className="shrink-0 text-gold-dark transition-transform group-open:rotate-45"
+                    />
+                  </summary>
+                  <p className="px-5 pb-5 text-[17px] leading-relaxed text-muted">{f.a}</p>
+                </details>
+              ))}
+            </div>
+          </section>
+        </div>
+      </Container>
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, '\\u003c') }}
+      />
+    </main>
   );
 }
