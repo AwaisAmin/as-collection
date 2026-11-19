@@ -25,4 +25,13 @@ src/
 public/images/         # swappable image assets
 ```
 
-Rules of thumb: features never import from other features; shared code moves to `components/` or `lib/`.
+Rules of thumb:
+
+- Features are layered and may only import **downward**:
+  `catalog` → `wishlist` / `cart` → `checkout` → `account`, with `shop` / `home` composing them at the top.
+  Lower features expose slots (e.g. `ProductCard` `actions`) instead of importing upward.
+- Data access goes through `features/*/services/*.service.ts` (a port + adapter). Today the adapters are
+  mocks; the NestJS API adapters replace them without touching pages.
+- Catalog reads are `'use cache'` scopes (`cacheLife('hours')`, tag `catalog`) — revalidate with `revalidateTag`.
+- Pages that read `params` / `searchParams` render a static shell and stream the URL-dependent part inside `<Suspense>`.
+- Shared, feature-agnostic UI lives in `components/ui`; utilities in `lib/`.
