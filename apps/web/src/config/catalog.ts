@@ -13,6 +13,14 @@ export interface Category {
   titleLines: readonly string[];
   href: Route;
   image: ImageKey;
+  /** Category page hero. Images in /public/images/banners (swap files, keep names). */
+  banner: {
+    eyebrow: string;
+    description: string;
+    image: { src: string; alt: string };
+    /** CSS object-position for the crop, e.g. "50% 30%". */
+    focus?: string;
+  };
 }
 
 export const categories: readonly Category[] = [
@@ -22,6 +30,16 @@ export const categories: readonly Category[] = [
     titleLines: ['Unstitched', 'Dresses'],
     href: '/shop/unstitched',
     image: 'unstitched',
+    banner: {
+      eyebrow: 'Fabric & embroidery',
+      description:
+        'Lawn, chiffon and organza suits with rich zari and tilla work — tailored your way.',
+      image: {
+        src: '/images/banners/unstitched.jpg',
+        alt: 'Folded black and beige unstitched fabrics with gold embroidery',
+      },
+      focus: '50% 45%',
+    },
   },
   {
     slug: 'stitched',
@@ -29,6 +47,15 @@ export const categories: readonly Category[] = [
     titleLines: ['Stitched', 'Dresses'],
     href: '/shop/stitched',
     image: 'stitched',
+    banner: {
+      eyebrow: 'Ready to wear',
+      description: 'Kurtas, frocks and maxis in true-to-size fits, embroidered to impress.',
+      image: {
+        src: '/images/banners/stitched.jpg',
+        alt: 'Maroon embroidered stitched kurta on a hanger',
+      },
+      focus: '50% 30%',
+    },
   },
   {
     slug: 'makeup',
@@ -36,6 +63,15 @@ export const categories: readonly Category[] = [
     titleLines: ['Makeup'],
     href: '/shop/makeup',
     image: 'makeup',
+    banner: {
+      eyebrow: 'Beauty essentials',
+      description: 'Long-wear makeup in shades made for Pakistani skin tones — everyday to bridal.',
+      image: {
+        src: '/images/banners/makeup.jpg',
+        alt: 'Red lipstick, foundation, compact powder and a makeup brush on marble',
+      },
+      focus: '50% 60%',
+    },
   },
 ];
 

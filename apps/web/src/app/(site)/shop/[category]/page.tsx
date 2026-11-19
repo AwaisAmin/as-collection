@@ -2,12 +2,11 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 
-import { PageHeader } from '@/components/layout/page-header';
 import { Container } from '@/components/ui/container';
-import { Skeleton } from '@/components/ui/skeleton';
 import { categories, getCategory } from '@/config/catalog';
 import { CatalogBrowser } from '@/features/shop/components/catalog/catalog-browser';
 import { CatalogBrowserSkeleton } from '@/features/shop/components/catalog/catalog-browser-skeleton';
+import { CategoryBanner, CategoryBannerSkeleton } from '@/features/shop/components/category-banner';
 
 export function generateStaticParams() {
   return categories.map(({ slug }) => ({ category: slug }));
@@ -42,14 +41,7 @@ async function CategoryContent({ params, searchParams }: PageProps<'/shop/[categ
 
   return (
     <>
-      <PageHeader
-        title={category.name}
-        breadcrumbs={[
-          { label: 'Home', href: '/' },
-          { label: 'Shop', href: '/shop' },
-          { label: category.name },
-        ]}
-      />
+      <CategoryBanner category={category} />
       <Container className="py-10">
         <Suspense fallback={<CatalogBrowserSkeleton />}>
           <CatalogBrowser
@@ -67,12 +59,7 @@ async function CategoryContent({ params, searchParams }: PageProps<'/shop/[categ
 function CategoryFallback() {
   return (
     <>
-      <div className="border-b border-gold/50 bg-sand">
-        <Container className="flex flex-col items-center gap-5 py-9 sm:py-11">
-          <Skeleton className="h-4 w-48" />
-          <Skeleton className="h-11 w-72" />
-        </Container>
-      </div>
+      <CategoryBannerSkeleton />
       <Container className="py-10">
         <CatalogBrowserSkeleton />
       </Container>

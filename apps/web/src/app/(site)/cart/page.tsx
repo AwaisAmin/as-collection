@@ -5,6 +5,7 @@ import { Container } from '@/components/ui/container';
 import { SectionHeading } from '@/components/ui/section-heading';
 import { CartView } from '@/features/cart/components/cart-view';
 import { catalogService } from '@/features/catalog/services/catalog.service';
+import { RecentlyViewed } from '@/features/shop/components/recently-viewed';
 import { ShopProductGrid } from '@/features/shop/components/shop-product-grid';
 
 export const metadata: Metadata = {
@@ -33,6 +34,7 @@ export default async function CartPage() {
             </section>
           }
         />
+        <RecentlyViewed className="mt-20" />
       </Container>
     </main>
   );

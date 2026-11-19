@@ -1,4 +1,5 @@
 import { OrganizationJsonLd } from '@/components/seo/organization-json-ld';
+import { Container } from '@/components/ui/container';
 import { BestSellers } from '@/features/home/components/best-sellers/best-sellers';
 import { BrandStory } from '@/features/home/components/brand-story/brand-story';
 import { CategorySection } from '@/features/home/components/categories/category-section';
@@ -10,6 +11,7 @@ import { ShopByOccasion } from '@/features/home/components/shop-by-occasion/shop
 import { ShopTheLook } from '@/features/home/components/shop-the-look/shop-the-look';
 import { Testimonials } from '@/features/home/components/testimonials/testimonials';
 import { TrustBar } from '@/features/home/components/trust-bar/trust-bar';
+import { RecentlyViewed } from '@/features/shop/components/recently-viewed';
 
 /** Home page — composes the home feature sections in order. */
 export default function HomePage() {
@@ -21,6 +23,10 @@ export default function HomePage() {
       <TrustBar />
       <NewArrivals />
       <BestSellers />
+      {/* Returning visitors only — renders nothing (and takes no space) on a first visit. */}
+      <Container>
+        <RecentlyViewed minItems={2} className="py-16" />
+      </Container>
       <SaleBanner />
       <ShopByOccasion />
       <ShopTheLook />

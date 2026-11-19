@@ -15,7 +15,9 @@ import { DeliveryPerks } from '@/features/product/components/delivery-perks';
 import { ProductDetailsTabs } from '@/features/product/components/product-details-tabs';
 import { ProductGallery } from '@/features/product/components/product-gallery';
 import { PurchasePanel } from '@/features/product/components/purchase-panel';
+import { TrackProductView } from '@/features/recently-viewed/components/track-product-view';
 import { ProductReviews } from '@/features/reviews/components/product-reviews';
+import { RecentlyViewed } from '@/features/shop/components/recently-viewed';
 import { ShopProductGrid } from '@/features/shop/components/shop-product-grid';
 import { pluralize } from '@/lib/utils/format';
 
@@ -123,6 +125,9 @@ async function ProductContent({ params }: Pick<PageProps<'/products/[slug]'>, 'p
             <ShopProductGrid products={related} preloadCount={0} className="mt-10" />
           </section>
         ) : null}
+
+        <RecentlyViewed excludeId={product.id} className="mt-20" />
+        <TrackProductView productId={product.id} />
       </Container>
     </>
   );

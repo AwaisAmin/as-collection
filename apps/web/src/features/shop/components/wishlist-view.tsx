@@ -17,7 +17,7 @@ import { useWishlistStore } from '@/features/wishlist/store/wishlist-store';
 import { useHydrated } from '@/hooks/use-hydrated';
 import { pluralize } from '@/lib/utils/format';
 
-import { getVariantForCart, getWishlistProducts } from '../actions';
+import { getProductsByIds, getVariantForCart } from '../actions';
 
 function MoveToCart({ product }: { product: ProductSummary }) {
   const [isPending, startTransition] = useTransition();
@@ -89,7 +89,7 @@ export function WishlistView({ suggestions }: { suggestions?: ReactNode }) {
   useEffect(() => {
     if (!hydrated) return;
     startTransition(async () => {
-      setProducts(key ? await getWishlistProducts(key.split(',')) : []);
+      setProducts(key ? await getProductsByIds(key.split(',')) : []);
     });
   }, [hydrated, key]);
 

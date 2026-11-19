@@ -71,3 +71,4 @@ Lower features expose slots (e.g. `ProductCard` `actions`) instead of importing 
 | Payment screenshots         | Metadata only                          | Object storage (S3 / Cloudinary) |
 | OTP login                   | Code shown in a dev toast              | WhatsApp → SMS fallback          |
 | Google sign-in              | Demo account                           | OAuth 2.0                        |
+| Recently viewed             | Browser only (`localStorage`)          | Optional sync to the account     |

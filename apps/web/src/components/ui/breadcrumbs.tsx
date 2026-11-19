@@ -14,11 +14,29 @@ export interface BreadcrumbItem {
 
 interface BreadcrumbsProps {
   items: readonly BreadcrumbItem[];
+  /** `light` for dark backgrounds (photo banners). */
+  tone?: 'default' | 'light';
   className?: string;
 }
 
+const tones = {
+  default: {
+    list: 'text-muted',
+    link: 'hover:text-gold-dark',
+    current: 'text-text',
+    sep: 'text-gold',
+  },
+  light: {
+    list: 'text-white/80',
+    link: 'hover:text-gold-light',
+    current: 'text-white',
+    sep: 'text-gold-light',
+  },
+} as const;
+
 /** Visible trail + schema.org BreadcrumbList for search results. */
-export function Breadcrumbs({ items, className }: BreadcrumbsProps) {
+export function Breadcrumbs({ items, tone = 'default', className }: BreadcrumbsProps) {
+  const t = tones[tone];
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -32,27 +50,24 @@ export function Breadcrumbs({ items, className }: BreadcrumbsProps) {
 
   return (
     <nav aria-label="Breadcrumb" className={cn('font-body text-[15px]', className)}>
-      <ol className="flex flex-wrap items-center gap-1.5 text-muted">
+      <ol className={cn('flex flex-wrap items-center gap-1.5', t.list)}>
         {items.map((item, i) => {
           const last = i === items.length - 1;
           return (
             <Fragment key={`${item.label}-${i}`}>
               <li>
                 {item.href && !last ? (
-                  <Link
-                    href={item.href}
-                    className="transition-colors duration-200 hover:text-gold-dark"
-                  >
+                  <Link href={item.href} className={cn('transition-colors duration-200', t.link)}>
                     {item.label}
                   </Link>
                 ) : (
-                  <span aria-current={last ? 'page' : undefined} className="text-text">
+                  <span aria-current={last ? 'page' : undefined} className={t.current}>
                     {item.label}
                   </span>
                 )}
               </li>
               {!last ? (
-                <li aria-hidden className="text-gold">
+                <li aria-hidden className={t.sep}>
                   <ChevronRight size={14} />
                 </li>
               ) : null}

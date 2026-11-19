@@ -7,8 +7,8 @@ import type { ProductSummary, VariantDetail } from '@/features/catalog/types';
 
 const idSchema = z.string().regex(/^[a-z0-9-]{1,64}$/);
 
-/** Fresh summaries (price/stock) for wishlisted product ids, in the given order. */
-export async function getWishlistProducts(ids: string[]): Promise<ProductSummary[]> {
+/** Fresh summaries (price/stock) for product ids kept in the browser (wishlist, recently viewed). */
+export async function getProductsByIds(ids: string[]): Promise<ProductSummary[]> {
   const parsed = z.array(idSchema).max(100).safeParse(ids);
   if (!parsed.success) return [];
   return catalogService.getProductSummaries(parsed.data);
