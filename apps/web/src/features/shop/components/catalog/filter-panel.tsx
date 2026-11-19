@@ -241,7 +241,7 @@ export function FilterPanel({
             type="checkbox"
             checked={query.inStock}
             onChange={(e) => go({ inStock: e.target.checked })}
-            className="size-5 accent-[var(--color-ink)]"
+            className="size-5 accent-ink"
           />
           In stock only
         </label>

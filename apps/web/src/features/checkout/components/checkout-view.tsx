@@ -3,6 +3,7 @@
 import { CircleAlert, Lock, ShoppingBag } from 'lucide-react';
 import type { Route } from 'next';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
   type FormEvent,
@@ -23,12 +24,15 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from '@/components/ui/textarea';
 import { pakistanCities } from '@/config/cities';
 import type { TransferChannel } from '@/config/payments';
+import type { Address } from '@/features/auth/types';
 import { OrderSummary } from '@/features/cart/components/order-summary';
 import { useCart } from '@/features/cart/hooks/use-cart';
 import { useCartStore } from '@/features/cart/store/cart-store';
 import type { CartItem } from '@/features/cart/types';
 import type { PaymentMethod } from '@/features/orders/types';
+import { cn } from '@/lib/utils/cn';
 import { formatPrice } from '@/lib/utils/format';
+import { formatPkMobile } from '@/lib/utils/phone';
 
 import { placeOrder } from '../actions';
 import {
@@ -83,7 +87,18 @@ function SummaryLines({ items }: { items: CartItem[] }) {
   );
 }
 
-export function CheckoutView() {
+/** Signed-in customer's details (undefined for guests). */
+export interface CheckoutPrefill {
+  name: string;
+  phone: string;
+  email?: string;
+  addresses: Address[];
+}
+
+export function CheckoutView({ prefill }: { prefill?: CheckoutPrefill }) {
+  const savedAddresses = prefill?.addresses ?? [];
+  const initialAddress = savedAddresses.find((a) => a.isDefault) ?? savedAddresses[0];
+  const [selectedAddressId, setSelectedAddressId] = useState<string>(initialAddress?.id ?? 'new');
   const router = useRouter();
   const { items, totals, hydrated } = useCart();
   const syncWithServer = useCartStore((s) => s.syncWithServer);
@@ -114,6 +129,32 @@ export function CheckoutView() {
       alertRef.current?.focus();
     }
   }, [state, clearCart, router, syncWithServer]);
+
+  /** Fill delivery fields from a saved address (or clear them for a new one). */
+  function selectAddress(id: string) {
+    setSelectedAddressId(id);
+    const form = formRef.current;
+    if (!form) return;
+    const a = savedAddresses.find((x) => x.id === id);
+    const set = (name: string, value: string) => {
+      const el = form.elements.namedItem(name) as HTMLInputElement | HTMLTextAreaElement | null;
+      if (el) el.value = value;
+    };
+    if (a) {
+      set('fullName', a.recipientName);
+      set('phone', formatPkMobile(a.phone));
+      set('city', a.city);
+      set('address', a.address);
+      set('postalCode', a.postalCode ?? '');
+    } else {
+      set('fullName', prefill?.name ?? '');
+      set('phone', prefill?.phone ? formatPkMobile(prefill.phone) : '');
+      set('city', '');
+      set('address', '');
+      set('postalCode', '');
+    }
+    setClientErrors({});
+  }
 
   function clearError(field: CheckoutField) {
     setClientErrors(({ [field]: _removed, ...rest }) => rest);
@@ -240,6 +281,18 @@ export function CheckoutView() {
         </div>
 
         <Section step={1} title="Contact details">
+          {!prefill ? (
+            <p className="-mt-2 mb-5 text-[15px] text-muted">
+              Have an account?{' '}
+              <Link
+                href={'/login?next=/checkout' as Route}
+                className="font-semibold text-gold-dark underline-offset-4 hover:underline"
+              >
+                Sign in
+              </Link>{' '}
+              for faster checkout — or continue as a guest.
+            </p>
+          ) : null}
           <div className="grid gap-5 sm:grid-cols-2">
             <FormField
               id={`${base}-name`}
@@ -254,6 +307,7 @@ export function CheckoutView() {
                   name="fullName"
                   autoComplete="name"
                   maxLength={80}
+                  defaultValue={initialAddress?.recipientName ?? prefill?.name}
                   onChange={() => clearError('fullName')}
                 />
               )}
@@ -274,6 +328,13 @@ export function CheckoutView() {
                   autoComplete="tel"
                   placeholder="03XX-XXXXXXX"
                   maxLength={16}
+                  defaultValue={
+                    initialAddress
+                      ? formatPkMobile(initialAddress.phone)
+                      : prefill?.phone
+                        ? formatPkMobile(prefill.phone)
+                        : undefined
+                  }
                   onChange={() => clearError('phone')}
                 />
               )}
@@ -291,6 +352,7 @@ export function CheckoutView() {
                   type="email"
                   autoComplete="email"
                   maxLength={120}
+                  defaultValue={prefill?.email}
                   onChange={() => clearError('email')}
                 />
               )}
@@ -299,6 +361,51 @@ export function CheckoutView() {
         </Section>
 
         <Section step={2} title="Delivery address">
+          {savedAddresses.length > 0 ? (
+            <fieldset className="mb-6">
+              <legend className="mb-3 px-1 font-display text-[16px]">Deliver to</legend>
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                {[...savedAddresses, null].map((a) => {
+                  const id = a?.id ?? 'new';
+                  const checked = selectedAddressId === id;
+                  return (
+                    <label
+                      key={id}
+                      className={cn(
+                        'flex cursor-pointer gap-3 rounded-2xl border-[1.5px] p-4 transition-colors',
+                        checked
+                          ? 'border-ink bg-ivory shadow-soft'
+                          : 'border-gold/60 hover:border-gold',
+                        'has-[input:focus-visible]:outline-2 has-[input:focus-visible]:outline-offset-2 has-[input:focus-visible]:outline-gold-dark',
+                      )}
+                    >
+                      <input
+                        type="radio"
+                        name="savedAddress"
+                        value={id}
+                        checked={checked}
+                        onChange={() => selectAddress(id)}
+                        className="mt-1 size-4 shrink-0 accent-ink"
+                      />
+                      {a ? (
+                        <span className="min-w-0 text-[15px] leading-snug">
+                          <span className="block font-display text-[16px] text-ink">
+                            {a.label}
+                            {a.isDefault ? <span className="text-muted"> · Default</span> : null}
+                          </span>
+                          <span className="block text-muted">
+                            {a.recipientName}, {a.address}, {a.city}
+                          </span>
+                        </span>
+                      ) : (
+                        <span className="font-display text-[16px] text-ink">+ New address</span>
+                      )}
+                    </label>
+                  );
+                })}
+              </div>
+            </fieldset>
+          ) : null}
           <div className="grid gap-5 sm:grid-cols-2">
             <FormField id={`${base}-city`} label="City" required error={errors.city}>
               {(a11y) => (
@@ -309,6 +416,7 @@ export function CheckoutView() {
                     list={`${base}-cities`}
                     autoComplete="address-level2"
                     maxLength={60}
+                    defaultValue={initialAddress?.city}
                     onChange={() => clearError('city')}
                   />
                   <datalist id={`${base}-cities`}>
@@ -327,6 +435,7 @@ export function CheckoutView() {
                   inputMode="numeric"
                   autoComplete="postal-code"
                   maxLength={5}
+                  defaultValue={initialAddress?.postalCode}
                   onChange={() => clearError('postalCode')}
                 />
               )}
@@ -346,10 +455,22 @@ export function CheckoutView() {
                   rows={3}
                   autoComplete="street-address"
                   maxLength={250}
+                  defaultValue={initialAddress?.address}
                   onChange={() => clearError('address')}
                 />
               )}
             </FormField>
+            {prefill && selectedAddressId === 'new' ? (
+              <label className="flex items-center gap-3 text-[16px] sm:col-span-2">
+                <input
+                  type="checkbox"
+                  name="saveAddress"
+                  defaultChecked
+                  className="size-5 accent-ink"
+                />
+                Save this address to my account
+              </label>
+            ) : null}
             <FormField
               id={`${base}-notes`}
               label="Order notes"

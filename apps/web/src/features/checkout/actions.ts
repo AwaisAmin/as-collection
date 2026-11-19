@@ -2,6 +2,8 @@
 
 import { z } from 'zod';
 
+import { authService } from '@/features/auth/services/auth.service';
+import { getCurrentUser } from '@/features/auth/session';
 import { ordersService } from '@/features/orders/services/orders.service';
 import type { PlaceOrderInput } from '@/features/orders/types';
 import { reportError } from '@/lib/errors/report-error';
@@ -82,9 +84,11 @@ export async function placeOrder(_prev: CheckoutState, formData: FormData): Prom
   if (!meta.success) return fail({}, 'Something went wrong. Please refresh and try again.');
 
   const f = fields.data;
+  const user = await getCurrentUser();
   try {
     const result = await ordersService.placeOrder({
       checkoutId: meta.data.checkoutId,
+      userId: user?.id,
       expectedTotal: meta.data.expectedTotal,
       customer: { fullName: f.fullName, phone: f.phone, email: f.email || undefined },
       shipping: {
@@ -110,6 +114,28 @@ export async function placeOrder(_prev: CheckoutState, formData: FormData): Prom
           : 'Prices in your cart changed. We updated your cart — please review the new total and place your order again.',
         { snapshots: result.snapshots },
       );
+    }
+
+    // Best-effort: saving to the address book must never fail a placed order.
+    if (user && formData.get('saveAddress') === 'on') {
+      try {
+        const existing = await authService.listAddresses(user.id);
+        const duplicate = existing.some(
+          (a) => a.city.toLowerCase() === f.city.toLowerCase() && a.address === f.address,
+        );
+        if (!duplicate) {
+          await authService.saveAddress(user.id, {
+            label: existing.length === 0 ? 'Home' : `Address ${existing.length + 1}`,
+            recipientName: f.fullName,
+            phone: f.phone,
+            city: f.city,
+            address: f.address,
+            postalCode: f.postalCode || undefined,
+          });
+        }
+      } catch (error) {
+        reportError(error, { action: 'checkout.saveAddress' });
+      }
     }
 
     return {

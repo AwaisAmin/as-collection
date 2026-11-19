@@ -81,7 +81,7 @@ export function PaymentSection({
                   onMethodChange(value);
                   clearError('paymentMethod');
                 }}
-                className="mt-1 size-4 shrink-0 accent-[var(--color-ink)]"
+                className="mt-1 size-4 shrink-0 accent-ink"
               />
               <span className="flex-1">
                 <span className="flex items-center gap-2 font-display text-[17px] text-ink">

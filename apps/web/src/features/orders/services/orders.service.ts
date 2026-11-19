@@ -15,7 +15,19 @@ export interface OrdersService {
   getOrderForCustomer(orderNumber: string, accessKey: string): Promise<Order | null>;
   /** Public tracking — order number + the phone used at checkout. */
   findOrderByNumberAndPhone(orderNumber: string, phone: string): Promise<Order | null>;
+  /** Account history: orders placed while signed in + guest orders with the verified phone. */
+  listOrdersForCustomer(customer: CustomerRef): Promise<Order[]>;
+  getOrderForAccount(orderNumber: string, customer: CustomerRef): Promise<Order | null>;
 }
+
+export interface CustomerRef {
+  userId: string;
+  /** Verified phone ('' for Google-only accounts). */
+  phone: string;
+}
+
+const belongsTo = (order: Order, c: CustomerRef) =>
+  order.userId === c.userId || (c.phone !== '' && order.customer.phone === c.phone);
 
 /*
  * Adapter: in-memory mock. Kept on globalThis so orders survive dev hot-reloads.
@@ -71,6 +83,7 @@ async function placeOrder(input: PlaceOrderInput): Promise<PlaceOrderResult> {
     orderNumber: generateOrderNumber(),
     accessKey: generateAccessKey(),
     checkoutId: input.checkoutId,
+    userId: input.userId,
     createdAt: new Date().toISOString(),
     status: 'pending',
     customer: input.customer,
@@ -103,8 +116,21 @@ async function findOrderByNumberAndPhone(orderNumber: string, phone: string) {
   return order && normalized && order.customer.phone === normalized ? order : null;
 }
 
+async function listOrdersForCustomer(customer: CustomerRef) {
+  return [...store.values()]
+    .filter((o) => belongsTo(o, customer))
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}
+
+async function getOrderForAccount(orderNumber: string, customer: CustomerRef) {
+  const order = store.get(orderNumber);
+  return order && belongsTo(order, customer) ? order : null;
+}
+
 export const ordersService: OrdersService = {
   placeOrder,
   getOrderForCustomer,
   findOrderByNumberAndPhone,
+  listOrdersForCustomer,
+  getOrderForAccount,
 };

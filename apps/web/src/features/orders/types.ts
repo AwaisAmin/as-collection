@@ -38,6 +38,8 @@ export interface OrderTotals {
 
 export interface Order {
   orderNumber: string;
+  /** Set when placed while signed in. Guest orders link to accounts by verified phone. */
+  userId?: string;
   /** Secret for the customer's confirmation link (orders aren't guessable by number alone). */
   accessKey: string;
   /** Client-generated id that makes "place order" idempotent. */
@@ -60,6 +62,7 @@ export interface Order {
 
 export interface PlaceOrderInput {
   checkoutId: string;
+  userId?: string;
   customer: Order['customer'];
   shipping: Order['shipping'];
   payment: {
