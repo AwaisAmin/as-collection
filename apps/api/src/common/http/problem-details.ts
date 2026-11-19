@@ -77,6 +77,27 @@ function messageOf(response: unknown): string | undefined {
   return undefined;
 }
 
+/** Prisma "known request" errors, matched structurally so this module stays ORM-agnostic. */
+interface PrismaKnownError {
+  name: 'PrismaClientKnownRequestError';
+  code: string;
+}
+
+const isPrismaKnownError = (error: unknown): error is PrismaKnownError =>
+  error instanceof Error &&
+  error.name === 'PrismaClientKnownRequestError' &&
+  typeof (error as Partial<PrismaKnownError>).code === 'string';
+
+/** Database errors that are the client's fault, not ours. Everything else stays a 500. */
+const prismaProblems: Record<string, { status: number; code: string; detail: string }> = {
+  P2002: {
+    status: 409,
+    code: 'ALREADY_EXISTS',
+    detail: 'A record with these details already exists.',
+  },
+  P2025: { status: 404, code: 'NOT_FOUND', detail: 'The requested record does not exist.' },
+};
+
 interface ToProblemOptions {
   instance?: string;
   requestId?: string;
@@ -101,6 +122,11 @@ export function toProblemDetails(exception: unknown, options: ToProblemOptions):
     // Nest's built-in 5xx exceptions can carry internal details too.
     if (status >= 500 && !options.exposeInternalErrors) delete problem.detail;
     return problem;
+  }
+
+  if (isPrismaKnownError(exception)) {
+    const known = prismaProblems[exception.code];
+    if (known) return { ...base, title: titleFor(known.status), ...known };
   }
 
   return {

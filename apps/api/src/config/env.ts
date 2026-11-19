@@ -42,6 +42,14 @@ export const envSchema = z
     /** Default rate limit per client IP: RATE_LIMIT_MAX requests per RATE_LIMIT_TTL_MS. */
     RATE_LIMIT_TTL_MS: z.coerce.number().int().positive().default(60_000),
     RATE_LIMIT_MAX: z.coerce.number().int().positive().default(120),
+
+    /** postgresql://user:password@host:port/db?schema=public */
+    DATABASE_URL: z.url({ protocol: /^postgres(ql)?$/ }).describe('PostgreSQL connection string'),
+    /** Connections per API instance. Total across instances must stay below Postgres max_connections. */
+    DATABASE_POOL_MAX: z.coerce.number().int().min(1).max(100).default(10),
+    /** Cancel any single query running longer than this (protects the pool from runaway queries). */
+    DATABASE_STATEMENT_TIMEOUT_MS: z.coerce.number().int().positive().default(15_000),
+    DATABASE_CONNECT_TIMEOUT_MS: z.coerce.number().int().positive().default(5_000),
   })
   .superRefine((env, ctx) => {
     if (env.NODE_ENV === 'production' && env.CORS_ORIGINS.length === 0) {

@@ -6,3 +6,4 @@ coverage
 pnpm-lock.yaml
 *.min.*
 public
+apps/api/src/generated

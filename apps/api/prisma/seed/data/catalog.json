@@ -1,0 +1,2440 @@
+{
+  "categories": [
+    {
+      "slug": "unstitched",
+      "name": "Unstitched Dresses",
+      "titleLines": ["Unstitched", "Dresses"],
+      "href": "/shop/unstitched",
+      "image": "unstitched",
+      "banner": {
+        "eyebrow": "Fabric & embroidery",
+        "description": "Lawn, chiffon and organza suits with rich zari and tilla work — tailored your way.",
+        "image": {
+          "src": "/images/banners/unstitched.jpg",
+          "alt": "Folded black and beige unstitched fabrics with gold embroidery"
+        },
+        "focus": "50% 45%"
+      }
+    },
+    {
+      "slug": "stitched",
+      "name": "Stitched Dresses",
+      "titleLines": ["Stitched", "Dresses"],
+      "href": "/shop/stitched",
+      "image": "stitched",
+      "banner": {
+        "eyebrow": "Ready to wear",
+        "description": "Kurtas, frocks and maxis in true-to-size fits, embroidered to impress.",
+        "image": {
+          "src": "/images/banners/stitched.jpg",
+          "alt": "Maroon embroidered stitched kurta on a hanger"
+        },
+        "focus": "50% 30%"
+      }
+    },
+    {
+      "slug": "makeup",
+      "name": "Makeup",
+      "titleLines": ["Makeup"],
+      "href": "/shop/makeup",
+      "image": "makeup",
+      "banner": {
+        "eyebrow": "Beauty essentials",
+        "description": "Long-wear makeup in shades made for Pakistani skin tones — everyday to bridal.",
+        "image": {
+          "src": "/images/banners/makeup.jpg",
+          "alt": "Red lipstick, foundation, compact powder and a makeup brush on marble"
+        },
+        "focus": "50% 60%"
+      }
+    }
+  ],
+  "products": [
+    {
+      "id": "unst-001",
+      "slug": "noor-e-zar-embroidered-lawn-3-piece",
+      "name": "Noor-e-Zar Embroidered Lawn 3-Piece",
+      "category": "unstitched",
+      "shortDescription": "Jet-black lawn with dense gold zari embroidery and a chiffon dupatta.",
+      "description": [
+        "Noor-e-Zar pairs a deep black lawn shirt with intricate gold zari embroidery along the neckline, front panel and sleeves.",
+        "Completed with dyed trousers and a lightweight embroidered chiffon dupatta — an effortless choice for dawats and festive evenings."
+      ],
+      "images": [
+        {
+          "src": "/images/unstitched.jpg",
+          "alt": "Noor-e-Zar 3-piece suit, folded"
+        },
+        {
+          "src": "/images/products/unstitched-embroidery.jpg",
+          "alt": "Close-up of gold zari embroidery on black lawn"
+        },
+        {
+          "src": "/images/products/unstitched-border.jpg",
+          "alt": "Embroidered border detail"
+        },
+        {
+          "src": "/images/products/model-outfit.jpg",
+          "alt": "Styled look in black and gold"
+        }
+      ],
+      "options": [],
+      "variants": [
+        {
+          "id": "unst-001-default",
+          "sku": "UNST-001",
+          "options": {},
+          "price": 6490,
+          "compareAtPrice": 7990,
+          "stock": 18
+        }
+      ],
+      "details": [
+        {
+          "label": "Fabric",
+          "value": "Lawn shirt · Chiffon dupatta · Cambric trouser"
+        },
+        {
+          "label": "Pieces",
+          "value": "3-Piece (Shirt, Dupatta, Trouser)"
+        },
+        {
+          "label": "Shirt",
+          "value": "3.0 m embroidered front, back & sleeves"
+        },
+        {
+          "label": "Work",
+          "value": "Gold zari & sequin embroidery"
+        },
+        {
+          "label": "Care",
+          "value": "Dry clean recommended. Iron on reverse."
+        }
+      ],
+      "tags": ["lawn", "black", "gold", "festive", "3-piece"],
+      "occasions": ["eid", "dawat"],
+      "featured": true,
+      "bestseller": true,
+      "createdAt": "2026-11-08T10:00:00.000Z"
+    },
+    {
+      "id": "unst-002",
+      "slug": "ivory-dream-embroidered-organza-3-piece",
+      "name": "Ivory Dream Embroidered Organza 3-Piece",
+      "category": "unstitched",
+      "shortDescription": "Soft beige organza with tonal gold floral embroidery.",
+      "description": [
+        "A delicate ivory-beige organza shirt layered with tonal gold floral motifs and a scalloped border.",
+        "Comes with a matching organza dupatta and raw silk trouser fabric."
+      ],
+      "images": [
+        {
+          "src": "/images/products/unstitched-beige.jpg",
+          "alt": "Ivory organza suit with gold floral embroidery"
+        },
+        {
+          "src": "/images/unstitched.jpg",
+          "alt": "Suit shown folded with coordinating pieces"
+        },
+        {
+          "src": "/images/products/unstitched-embroidery.jpg",
+          "alt": "Embroidery close-up"
+        }
+      ],
+      "options": [],
+      "variants": [
+        {
+          "id": "unst-002-default",
+          "sku": "UNST-002",
+          "options": {},
+          "price": 8990,
+          "stock": 7
+        }
+      ],
+      "details": [
+        {
+          "label": "Fabric",
+          "value": "Organza shirt & dupatta · Raw silk trouser"
+        },
+        {
+          "label": "Pieces",
+          "value": "3-Piece"
+        },
+        {
+          "label": "Work",
+          "value": "Tonal gold thread & pearl embroidery"
+        },
+        {
+          "label": "Care",
+          "value": "Dry clean recommended. Iron on reverse."
+        }
+      ],
+      "tags": ["organza", "beige", "gold", "formal", "3-piece"],
+      "occasions": ["wedding", "dawat"],
+      "featured": true,
+      "createdAt": "2026-10-28T10:00:00.000Z"
+    },
+    {
+      "id": "unst-003",
+      "slug": "midnight-tilla-work-lawn-2-piece",
+      "name": "Midnight Tilla Work Lawn 2-Piece",
+      "category": "unstitched",
+      "shortDescription": "Everyday-luxe black lawn with fine tilla buttis.",
+      "description": [
+        "Fine tilla buttis scattered over breathable black lawn, finished with a broad embroidered hem border.",
+        "A versatile 2-piece for work, family gatherings and casual dinners."
+      ],
+      "images": [
+        {
+          "src": "/images/products/unstitched-border.jpg",
+          "alt": "Black lawn with tilla buttis"
+        },
+        {
+          "src": "/images/products/unstitched-embroidery.jpg",
+          "alt": "Tilla embroidery close-up"
+        },
+        {
+          "src": "/images/unstitched.jpg",
+          "alt": "Folded 2-piece suit"
+        }
+      ],
+      "options": [],
+      "variants": [
+        {
+          "id": "unst-003-default",
+          "sku": "UNST-003",
+          "options": {},
+          "price": 3490,
+          "stock": 26
+        }
+      ],
+      "details": [
+        {
+          "label": "Fabric",
+          "value": "Lawn shirt · Cambric trouser"
+        },
+        {
+          "label": "Pieces",
+          "value": "2-Piece (Shirt, Trouser)"
+        },
+        {
+          "label": "Work",
+          "value": "Tilla buttis with embroidered hem"
+        },
+        {
+          "label": "Care",
+          "value": "Dry clean recommended. Iron on reverse."
+        }
+      ],
+      "tags": ["lawn", "black", "casual", "2-piece"],
+      "occasions": ["everyday"],
+      "bestseller": true,
+      "createdAt": "2026-08-14T10:00:00.000Z"
+    },
+    {
+      "id": "unst-004",
+      "slug": "siyah-chiffon-gold-zari-suit",
+      "name": "Siyah Chiffon Gold Zari Suit",
+      "category": "unstitched",
+      "shortDescription": "Sheer black chiffon with a heavily embroidered neckline.",
+      "description": [
+        "Sheer black chiffon with a statement embroidered neckline and sleeves — the classic Pakistani formal silhouette.",
+        "Includes inner fabric, a jacquard dupatta and silk trouser fabric."
+      ],
+      "images": [
+        {
+          "src": "/images/products/model-outfit.jpg",
+          "alt": "Black chiffon suit with gold zari"
+        },
+        {
+          "src": "/images/products/model-portrait.jpg",
+          "alt": "Styled with statement earrings"
+        },
+        {
+          "src": "/images/products/unstitched-embroidery.jpg",
+          "alt": "Neckline embroidery detail"
+        }
+      ],
+      "options": [],
+      "variants": [
+        {
+          "id": "unst-004-default",
+          "sku": "UNST-004",
+          "options": {},
+          "price": 7490,
+          "compareAtPrice": 8990,
+          "stock": 3
+        }
+      ],
+      "details": [
+        {
+          "label": "Fabric",
+          "value": "Chiffon shirt · Jacquard dupatta · Silk trouser"
+        },
+        {
+          "label": "Pieces",
+          "value": "3-Piece + inner"
+        },
+        {
+          "label": "Work",
+          "value": "Zari, sequins & cut-dana"
+        },
+        {
+          "label": "Care",
+          "value": "Dry clean recommended. Iron on reverse."
+        }
+      ],
+      "tags": ["chiffon", "black", "gold", "formal", "3-piece"],
+      "occasions": ["dawat", "wedding"],
+      "featured": true,
+      "createdAt": "2026-11-15T10:00:00.000Z"
+    },
+    {
+      "id": "unst-005",
+      "slug": "gulnar-jacquard-unstitched-3-piece",
+      "name": "Gulnar Jacquard Unstitched 3-Piece",
+      "category": "unstitched",
+      "shortDescription": "Woven jacquard with gold floral jaal and embroidered borders.",
+      "description": [
+        "Rich woven jacquard with an all-over floral jaal, paired with embroidered borders for the daman and sleeves."
+      ],
+      "images": [
+        {
+          "src": "/images/products/unstitched-embroidery.jpg",
+          "alt": "Gulnar jacquard suit"
+        },
+        {
+          "src": "/images/products/unstitched-beige.jpg",
+          "alt": "Border and jaal details"
+        }
+      ],
+      "options": [],
+      "variants": [
+        {
+          "id": "unst-005-default",
+          "sku": "UNST-005",
+          "options": {},
+          "price": 5290,
+          "stock": 0
+        }
+      ],
+      "details": [
+        {
+          "label": "Fabric",
+          "value": "Jacquard shirt · Organza dupatta · Cambric trouser"
+        },
+        {
+          "label": "Pieces",
+          "value": "3-Piece"
+        },
+        {
+          "label": "Care",
+          "value": "Dry clean recommended. Iron on reverse."
+        }
+      ],
+      "tags": ["jacquard", "black", "gold", "3-piece"],
+      "occasions": ["dawat", "eid"],
+      "createdAt": "2026-07-02T10:00:00.000Z"
+    },
+    {
+      "id": "unst-006",
+      "slug": "zarnigar-velvet-shawl-suit",
+      "name": "Zarnigar Velvet Shawl Suit",
+      "category": "unstitched",
+      "shortDescription": "Winter velvet shirt with an embroidered pashmina-style shawl.",
+      "description": [
+        "A plush velvet shirt with gold embroidered neckline, paired with a warm embroidered shawl for winter weddings."
+      ],
+      "images": [
+        {
+          "src": "/images/products/unstitched-border.jpg",
+          "alt": "Velvet shawl suit"
+        },
+        {
+          "src": "/images/unstitched.jpg",
+          "alt": "Folded suit with shawl"
+        }
+      ],
+      "options": [],
+      "variants": [
+        {
+          "id": "unst-006-default",
+          "sku": "UNST-006",
+          "options": {},
+          "price": 11990,
+          "stock": 5
+        }
+      ],
+      "details": [
+        {
+          "label": "Fabric",
+          "value": "Velvet shirt · Embroidered shawl · Silk trouser"
+        },
+        {
+          "label": "Pieces",
+          "value": "3-Piece"
+        },
+        {
+          "label": "Season",
+          "value": "Winter"
+        },
+        {
+          "label": "Care",
+          "value": "Dry clean recommended. Iron on reverse."
+        }
+      ],
+      "tags": ["velvet", "winter", "formal", "3-piece"],
+      "occasions": ["wedding", "dawat"],
+      "createdAt": "2026-11-17T10:00:00.000Z"
+    },
+    {
+      "id": "stch-001",
+      "slug": "maroon-ruby-embroidered-kurta",
+      "name": "Maroon Ruby Embroidered Kurta",
+      "category": "stitched",
+      "shortDescription": "Deep maroon chiffon kurta with gold embroidery and sheer sleeves.",
+      "description": [
+        "A deep maroon kurta with gold and beige embroidery on the neckline, front panel and sleeves, finished with a scalloped embroidered hem.",
+        "Fully lined, with sheer chiffon sleeves. Pair with gold heels and jhumkas for weddings and dawats."
+      ],
+      "images": [
+        {
+          "src": "/images/stitched.jpg",
+          "alt": "Maroon embroidered kurta on a hanger"
+        },
+        {
+          "src": "/images/products/stitched-neckline.jpg",
+          "alt": "Neckline embroidery"
+        },
+        {
+          "src": "/images/products/stitched-hem.jpg",
+          "alt": "Scalloped embroidered hem"
+        },
+        {
+          "src": "/images/products/stitched-sleeve.jpg",
+          "alt": "Sheer embroidered sleeve"
+        }
+      ],
+      "options": [
+        {
+          "name": "Size",
+          "values": [
+            {
+              "value": "XS"
+            },
+            {
+              "value": "S"
+            },
+            {
+              "value": "M"
+            },
+            {
+              "value": "L"
+            },
+            {
+              "value": "XL"
+            }
+          ]
+        }
+      ],
+      "variants": [
+        {
+          "id": "stch-001-xs",
+          "sku": "STCH-001-XS",
+          "options": {
+            "Size": "XS"
+          },
+          "price": 9990,
+          "compareAtPrice": 12500,
+          "stock": 2
+        },
+        {
+          "id": "stch-001-s",
+          "sku": "STCH-001-S",
+          "options": {
+            "Size": "S"
+          },
+          "price": 9990,
+          "compareAtPrice": 12500,
+          "stock": 6
+        },
+        {
+          "id": "stch-001-m",
+          "sku": "STCH-001-M",
+          "options": {
+            "Size": "M"
+          },
+          "price": 9990,
+          "compareAtPrice": 12500,
+          "stock": 8
+        },
+        {
+          "id": "stch-001-l",
+          "sku": "STCH-001-L",
+          "options": {
+            "Size": "L"
+          },
+          "price": 9990,
+          "compareAtPrice": 12500,
+          "stock": 4
+        },
+        {
+          "id": "stch-001-xl",
+          "sku": "STCH-001-XL",
+          "options": {
+            "Size": "XL"
+          },
+          "price": 9990,
+          "compareAtPrice": 12500,
+          "stock": 0
+        }
+      ],
+      "details": [
+        {
+          "label": "Fabric",
+          "value": "Chiffon with silk inner"
+        },
+        {
+          "label": "Length",
+          "value": "46 inches (Size M)"
+        },
+        {
+          "label": "Fit",
+          "value": "Straight, true to size"
+        },
+        {
+          "label": "Work",
+          "value": "Gold zari, sequins & pearls"
+        },
+        {
+          "label": "Care",
+          "value": "Dry clean only. Store folded in a cool, dry place."
+        }
+      ],
+      "tags": ["chiffon", "maroon", "gold", "formal", "kurta"],
+      "occasions": ["eid", "dawat"],
+      "sizeGuide": "stitched",
+      "featured": true,
+      "bestseller": true,
+      "createdAt": "2026-11-05T10:00:00.000Z"
+    },
+    {
+      "id": "stch-002",
+      "slug": "black-sheesha-chiffon-frock",
+      "name": "Black Sheesha Chiffon Frock",
+      "category": "stitched",
+      "shortDescription": "Flared black chiffon frock with gold embroidery and mirror work.",
+      "description": [
+        "A graceful flared frock in black chiffon with gold embroidery and delicate sheesha (mirror) accents."
+      ],
+      "images": [
+        {
+          "src": "/images/products/model-portrait.jpg",
+          "alt": "Black chiffon frock with gold embroidery"
+        },
+        {
+          "src": "/images/products/model-outfit.jpg",
+          "alt": "Embroidery and sleeve detail"
+        },
+        {
+          "src": "/images/products/model-earring.jpg",
+          "alt": "Styled with gold chandbali earrings"
+        }
+      ],
+      "options": [
+        {
+          "name": "Size",
+          "values": [
+            {
+              "value": "XS"
+            },
+            {
+              "value": "S"
+            },
+            {
+              "value": "M"
+            },
+            {
+              "value": "L"
+            },
+            {
+              "value": "XL"
+            }
+          ]
+        }
+      ],
+      "variants": [
+        {
+          "id": "stch-002-xs",
+          "sku": "STCH-002-XS",
+          "options": {
+            "Size": "XS"
+          },
+          "price": 12500,
+          "stock": 0
+        },
+        {
+          "id": "stch-002-s",
+          "sku": "STCH-002-S",
+          "options": {
+            "Size": "S"
+          },
+          "price": 12500,
+          "stock": 3
+        },
+        {
+          "id": "stch-002-m",
+          "sku": "STCH-002-M",
+          "options": {
+            "Size": "M"
+          },
+          "price": 12500,
+          "stock": 5
+        },
+        {
+          "id": "stch-002-l",
+          "sku": "STCH-002-L",
+          "options": {
+            "Size": "L"
+          },
+          "price": 12500,
+          "stock": 2
+        },
+        {
+          "id": "stch-002-xl",
+          "sku": "STCH-002-XL",
+          "options": {
+            "Size": "XL"
+          },
+          "price": 12500,
+          "stock": 1
+        }
+      ],
+      "details": [
+        {
+          "label": "Fabric",
+          "value": "Chiffon with grip inner"
+        },
+        {
+          "label": "Length",
+          "value": "52 inches (Size M)"
+        },
+        {
+          "label": "Fit",
+          "value": "Fitted bodice, flared skirt"
+        },
+        {
+          "label": "Care",
+          "value": "Dry clean only. Store folded in a cool, dry place."
+        }
+      ],
+      "tags": ["chiffon", "black", "gold", "formal", "frock"],
+      "occasions": ["wedding", "dawat"],
+      "sizeGuide": "stitched",
+      "featured": true,
+      "createdAt": "2026-11-12T10:00:00.000Z"
+    },
+    {
+      "id": "stch-003",
+      "slug": "zarqa-gold-embroidered-kurta-set",
+      "name": "Zarqa Gold Embroidered Kurta Set",
+      "category": "stitched",
+      "shortDescription": "Kurta, trouser and dupatta set with all-over gold buttis.",
+      "description": [
+        "A ready-to-wear 3-piece set: embroidered kurta, straight trousers and a chiffon dupatta with a gold border."
+      ],
+      "images": [
+        {
+          "src": "/images/products/stitched-neckline.jpg",
+          "alt": "Zarqa kurta set"
+        },
+        {
+          "src": "/images/stitched.jpg",
+          "alt": "Full-length view"
+        },
+        {
+          "src": "/images/products/stitched-hem.jpg",
+          "alt": "Hem border"
+        }
+      ],
+      "options": [
+        {
+          "name": "Size",
+          "values": [
+            {
+              "value": "XS"
+            },
+            {
+              "value": "S"
+            },
+            {
+              "value": "M"
+            },
+            {
+              "value": "L"
+            },
+            {
+              "value": "XL"
+            }
+          ]
+        }
+      ],
+      "variants": [
+        {
+          "id": "stch-003-xs",
+          "sku": "STCH-003-XS",
+          "options": {
+            "Size": "XS"
+          },
+          "price": 8490,
+          "stock": 4
+        },
+        {
+          "id": "stch-003-s",
+          "sku": "STCH-003-S",
+          "options": {
+            "Size": "S"
+          },
+          "price": 8490,
+          "stock": 7
+        },
+        {
+          "id": "stch-003-m",
+          "sku": "STCH-003-M",
+          "options": {
+            "Size": "M"
+          },
+          "price": 8490,
+          "stock": 9
+        },
+        {
+          "id": "stch-003-l",
+          "sku": "STCH-003-L",
+          "options": {
+            "Size": "L"
+          },
+          "price": 8490,
+          "stock": 6
+        },
+        {
+          "id": "stch-003-xl",
+          "sku": "STCH-003-XL",
+          "options": {
+            "Size": "XL"
+          },
+          "price": 8490,
+          "stock": 3
+        }
+      ],
+      "details": [
+        {
+          "label": "Fabric",
+          "value": "Lawn kurta · Cambric trouser · Chiffon dupatta"
+        },
+        {
+          "label": "Pieces",
+          "value": "3-Piece"
+        },
+        {
+          "label": "Care",
+          "value": "Dry clean only. Store folded in a cool, dry place."
+        }
+      ],
+      "tags": ["lawn", "maroon", "gold", "3-piece", "kurta"],
+      "occasions": ["eid", "everyday"],
+      "sizeGuide": "stitched",
+      "createdAt": "2026-09-20T10:00:00.000Z"
+    },
+    {
+      "id": "stch-004",
+      "slug": "mehr-formal-maxi",
+      "name": "Mehr Formal Maxi",
+      "category": "stitched",
+      "shortDescription": "Floor-length maxi with an embroidered bodice and sheer sleeves.",
+      "description": [
+        "Mehr is a floor-length formal maxi with an embroidered bodice, sheer sleeves and a softly flared skirt."
+      ],
+      "images": [
+        {
+          "src": "/images/products/stitched-hem.jpg",
+          "alt": "Mehr formal maxi"
+        },
+        {
+          "src": "/images/products/stitched-sleeve.jpg",
+          "alt": "Sleeve embroidery"
+        },
+        {
+          "src": "/images/stitched.jpg",
+          "alt": "Full view"
+        }
+      ],
+      "options": [
+        {
+          "name": "Size",
+          "values": [
+            {
+              "value": "XS"
+            },
+            {
+              "value": "S"
+            },
+            {
+              "value": "M"
+            },
+            {
+              "value": "L"
+            },
+            {
+              "value": "XL"
+            }
+          ]
+        }
+      ],
+      "variants": [
+        {
+          "id": "stch-004-xs",
+          "sku": "STCH-004-XS",
+          "options": {
+            "Size": "XS"
+          },
+          "price": 14990,
+          "compareAtPrice": 17990,
+          "stock": 0
+        },
+        {
+          "id": "stch-004-s",
+          "sku": "STCH-004-S",
+          "options": {
+            "Size": "S"
+          },
+          "price": 14990,
+          "compareAtPrice": 17990,
+          "stock": 2
+        },
+        {
+          "id": "stch-004-m",
+          "sku": "STCH-004-M",
+          "options": {
+            "Size": "M"
+          },
+          "price": 14990,
+          "compareAtPrice": 17990,
+          "stock": 3
+        },
+        {
+          "id": "stch-004-l",
+          "sku": "STCH-004-L",
+          "options": {
+            "Size": "L"
+          },
+          "price": 14990,
+          "compareAtPrice": 17990,
+          "stock": 2
+        },
+        {
+          "id": "stch-004-xl",
+          "sku": "STCH-004-XL",
+          "options": {
+            "Size": "XL"
+          },
+          "price": 14990,
+          "compareAtPrice": 17990,
+          "stock": 0
+        }
+      ],
+      "details": [
+        {
+          "label": "Fabric",
+          "value": "Net with silk lining"
+        },
+        {
+          "label": "Length",
+          "value": "58 inches (Size M)"
+        },
+        {
+          "label": "Care",
+          "value": "Dry clean only. Store folded in a cool, dry place."
+        }
+      ],
+      "tags": ["net", "maroon", "formal", "maxi", "bridal"],
+      "occasions": ["wedding"],
+      "sizeGuide": "stitched",
+      "createdAt": "2026-10-10T10:00:00.000Z"
+    },
+    {
+      "id": "stch-005",
+      "slug": "amber-lawn-straight-shirt",
+      "name": "Amber Lawn Straight Shirt",
+      "category": "stitched",
+      "shortDescription": "Everyday embroidered lawn shirt with a straight cut.",
+      "description": [
+        "A breathable everyday lawn shirt with embroidered neckline and sleeves in a clean straight cut."
+      ],
+      "images": [
+        {
+          "src": "/images/products/stitched-sleeve.jpg",
+          "alt": "Amber lawn shirt"
+        },
+        {
+          "src": "/images/products/stitched-neckline.jpg",
+          "alt": "Neckline detail"
+        }
+      ],
+      "options": [
+        {
+          "name": "Size",
+          "values": [
+            {
+              "value": "XS"
+            },
+            {
+              "value": "S"
+            },
+            {
+              "value": "M"
+            },
+            {
+              "value": "L"
+            },
+            {
+              "value": "XL"
+            }
+          ]
+        }
+      ],
+      "variants": [
+        {
+          "id": "stch-005-xs",
+          "sku": "STCH-005-XS",
+          "options": {
+            "Size": "XS"
+          },
+          "price": 4990,
+          "stock": 8
+        },
+        {
+          "id": "stch-005-s",
+          "sku": "STCH-005-S",
+          "options": {
+            "Size": "S"
+          },
+          "price": 4990,
+          "stock": 12
+        },
+        {
+          "id": "stch-005-m",
+          "sku": "STCH-005-M",
+          "options": {
+            "Size": "M"
+          },
+          "price": 4990,
+          "stock": 15
+        },
+        {
+          "id": "stch-005-l",
+          "sku": "STCH-005-L",
+          "options": {
+            "Size": "L"
+          },
+          "price": 4990,
+          "stock": 10
+        },
+        {
+          "id": "stch-005-xl",
+          "sku": "STCH-005-XL",
+          "options": {
+            "Size": "XL"
+          },
+          "price": 4990,
+          "stock": 6
+        }
+      ],
+      "details": [
+        {
+          "label": "Fabric",
+          "value": "Lawn"
+        },
+        {
+          "label": "Length",
+          "value": "42 inches (Size M)"
+        },
+        {
+          "label": "Care",
+          "value": "Dry clean only. Store folded in a cool, dry place."
+        }
+      ],
+      "tags": ["lawn", "casual", "shirt"],
+      "occasions": ["everyday"],
+      "sizeGuide": "stitched",
+      "bestseller": true,
+      "createdAt": "2026-06-18T10:00:00.000Z"
+    },
+    {
+      "id": "mkup-001",
+      "slug": "velvet-matte-lipstick",
+      "name": "Velvet Matte Lipstick",
+      "category": "makeup",
+      "shortDescription": "Long-wear matte lipstick in a gold-embossed case.",
+      "description": [
+        "A creamy, highly pigmented matte lipstick that glides on smoothly and stays comfortable for up to 8 hours.",
+        "Housed in a black and gold floral-embossed case."
+      ],
+      "images": [
+        {
+          "src": "/images/products/makeup-lipstick.jpg",
+          "alt": "Velvet Matte Lipstick in Ruby Red"
+        },
+        {
+          "src": "/images/makeup.jpg",
+          "alt": "Lipstick with the AS makeup collection"
+        }
+      ],
+      "options": [
+        {
+          "name": "Shade",
+          "values": [
+            {
+              "value": "Ruby Red",
+              "swatch": "#9b1b30"
+            },
+            {
+              "value": "Rosewood",
+              "swatch": "#8e4a49"
+            },
+            {
+              "value": "Nude Petal",
+              "swatch": "#c08a7a"
+            },
+            {
+              "value": "Berry Wine",
+              "swatch": "#5e1a2e"
+            }
+          ]
+        }
+      ],
+      "variants": [
+        {
+          "id": "mkup-001-1",
+          "sku": "MKUP-001-01",
+          "options": {
+            "Shade": "Ruby Red"
+          },
+          "price": 1290,
+          "compareAtPrice": 1490,
+          "stock": 14
+        },
+        {
+          "id": "mkup-001-2",
+          "sku": "MKUP-001-02",
+          "options": {
+            "Shade": "Rosewood"
+          },
+          "price": 1290,
+          "compareAtPrice": 1490,
+          "stock": 9
+        },
+        {
+          "id": "mkup-001-3",
+          "sku": "MKUP-001-03",
+          "options": {
+            "Shade": "Nude Petal"
+          },
+          "price": 1290,
+          "compareAtPrice": 1490,
+          "stock": 0
+        },
+        {
+          "id": "mkup-001-4",
+          "sku": "MKUP-001-04",
+          "options": {
+            "Shade": "Berry Wine"
+          },
+          "price": 1290,
+          "compareAtPrice": 1490,
+          "stock": 6
+        }
+      ],
+      "details": [
+        {
+          "label": "Finish",
+          "value": "Matte"
+        },
+        {
+          "label": "Net weight",
+          "value": "3.8 g"
+        },
+        {
+          "label": "Wear",
+          "value": "Up to 8 hours"
+        }
+      ],
+      "tags": ["lipstick", "matte", "red"],
+      "occasions": ["everyday", "dawat"],
+      "featured": true,
+      "bestseller": true,
+      "createdAt": "2026-11-01T10:00:00.000Z"
+    },
+    {
+      "id": "mkup-002",
+      "slug": "long-wear-liquid-foundation-spf-30",
+      "name": "Long Wear Liquid Foundation SPF 30",
+      "category": "makeup",
+      "shortDescription": "Natural-finish, medium-to-full coverage with SPF 30.",
+      "description": [
+        "A lightweight liquid foundation with buildable medium-to-full coverage, a natural finish and SPF 30."
+      ],
+      "images": [
+        {
+          "src": "/images/products/makeup-foundation.jpg",
+          "alt": "Long Wear Liquid Foundation bottle"
+        },
+        {
+          "src": "/images/makeup.jpg",
+          "alt": "Foundation with the AS makeup collection"
+        }
+      ],
+      "options": [
+        {
+          "name": "Shade",
+          "values": [
+            {
+              "value": "110 Porcelain",
+              "swatch": "#f1d3bd"
+            },
+            {
+              "value": "220 Warm Beige",
+              "swatch": "#e0b590"
+            },
+            {
+              "value": "330 Golden Sand",
+              "swatch": "#c99a6e"
+            },
+            {
+              "value": "440 Honey",
+              "swatch": "#a87449"
+            }
+          ]
+        }
+      ],
+      "variants": [
+        {
+          "id": "mkup-002-1",
+          "sku": "MKUP-002-01",
+          "options": {
+            "Shade": "110 Porcelain"
+          },
+          "price": 2490,
+          "stock": 5
+        },
+        {
+          "id": "mkup-002-2",
+          "sku": "MKUP-002-02",
+          "options": {
+            "Shade": "220 Warm Beige"
+          },
+          "price": 2490,
+          "stock": 11
+        },
+        {
+          "id": "mkup-002-3",
+          "sku": "MKUP-002-03",
+          "options": {
+            "Shade": "330 Golden Sand"
+          },
+          "price": 2490,
+          "stock": 8
+        },
+        {
+          "id": "mkup-002-4",
+          "sku": "MKUP-002-04",
+          "options": {
+            "Shade": "440 Honey"
+          },
+          "price": 2490,
+          "stock": 3
+        }
+      ],
+      "details": [
+        {
+          "label": "Finish",
+          "value": "Natural"
+        },
+        {
+          "label": "Coverage",
+          "value": "Medium to full"
+        },
+        {
+          "label": "Volume",
+          "value": "30 ml"
+        },
+        {
+          "label": "SPF",
+          "value": "30"
+        }
+      ],
+      "tags": ["foundation", "base", "spf"],
+      "occasions": ["everyday", "wedding"],
+      "featured": true,
+      "createdAt": "2026-09-02T10:00:00.000Z"
+    },
+    {
+      "id": "mkup-003",
+      "slug": "silk-finish-compact-powder",
+      "name": "Silk Finish Compact Powder",
+      "category": "makeup",
+      "shortDescription": "Finely milled pressed powder with a mirror compact.",
+      "description": [
+        "Finely milled pressed powder that sets makeup and controls shine for a soft, silky finish."
+      ],
+      "images": [
+        {
+          "src": "/images/products/makeup-compact.jpg",
+          "alt": "Silk Finish Compact Powder, open"
+        },
+        {
+          "src": "/images/makeup.jpg",
+          "alt": "Compact with the AS makeup collection"
+        }
+      ],
+      "options": [
+        {
+          "name": "Shade",
+          "values": [
+            {
+              "value": "Light",
+              "swatch": "#ecc9ad"
+            },
+            {
+              "value": "Medium",
+              "swatch": "#d9ad88"
+            },
+            {
+              "value": "Tan",
+              "swatch": "#b88660"
+            }
+          ]
+        }
+      ],
+      "variants": [
+        {
+          "id": "mkup-003-1",
+          "sku": "MKUP-003-01",
+          "options": {
+            "Shade": "Light"
+          },
+          "price": 1690,
+          "stock": 10
+        },
+        {
+          "id": "mkup-003-2",
+          "sku": "MKUP-003-02",
+          "options": {
+            "Shade": "Medium"
+          },
+          "price": 1690,
+          "stock": 12
+        },
+        {
+          "id": "mkup-003-3",
+          "sku": "MKUP-003-03",
+          "options": {
+            "Shade": "Tan"
+          },
+          "price": 1690,
+          "stock": 4
+        }
+      ],
+      "details": [
+        {
+          "label": "Finish",
+          "value": "Soft matte"
+        },
+        {
+          "label": "Net weight",
+          "value": "12 g"
+        }
+      ],
+      "tags": ["powder", "compact", "base"],
+      "occasions": ["everyday"],
+      "createdAt": "2026-08-22T10:00:00.000Z"
+    },
+    {
+      "id": "mkup-004",
+      "slug": "pro-kabuki-powder-brush",
+      "name": "Pro Kabuki Powder Brush",
+      "category": "makeup",
+      "shortDescription": "Ultra-soft synthetic bristles with a gold ferrule.",
+      "description": [
+        "A dense, ultra-soft synthetic brush for seamless powder and foundation blending."
+      ],
+      "images": [
+        {
+          "src": "/images/products/makeup-brush.jpg",
+          "alt": "Pro Kabuki Powder Brush"
+        },
+        {
+          "src": "/images/makeup.jpg",
+          "alt": "Brush with the AS makeup collection"
+        }
+      ],
+      "options": [],
+      "variants": [
+        {
+          "id": "mkup-004-default",
+          "sku": "MKUP-004",
+          "options": {},
+          "price": 899,
+          "stock": 30
+        }
+      ],
+      "details": [
+        {
+          "label": "Bristles",
+          "value": "Synthetic, cruelty-free"
+        },
+        {
+          "label": "Handle",
+          "value": "Black lacquer with gold floral print"
+        }
+      ],
+      "tags": ["brush", "tools"],
+      "occasions": ["everyday"],
+      "createdAt": "2026-11-10T10:00:00.000Z"
+    },
+    {
+      "id": "mkup-005",
+      "slug": "glam-essentials-makeup-set",
+      "name": "Glam Essentials Makeup Set",
+      "category": "makeup",
+      "shortDescription": "Lipstick, foundation, compact and brush — gift-boxed.",
+      "description": [
+        "Everything for a complete look in one gift box: Velvet Matte Lipstick (Ruby Red), Long Wear Foundation, Silk Finish Compact and the Pro Kabuki Brush."
+      ],
+      "images": [
+        {
+          "src": "/images/makeup.jpg",
+          "alt": "Glam Essentials Makeup Set"
+        },
+        {
+          "src": "/images/products/makeup-lipstick.jpg",
+          "alt": "Included lipstick"
+        },
+        {
+          "src": "/images/products/makeup-compact.jpg",
+          "alt": "Included compact"
+        },
+        {
+          "src": "/images/products/makeup-brush.jpg",
+          "alt": "Included brush"
+        }
+      ],
+      "options": [],
+      "variants": [
+        {
+          "id": "mkup-005-default",
+          "sku": "MKUP-005",
+          "options": {},
+          "price": 5490,
+          "compareAtPrice": 6370,
+          "stock": 9
+        }
+      ],
+      "details": [
+        {
+          "label": "Includes",
+          "value": "Lipstick · Foundation · Compact · Brush"
+        },
+        {
+          "label": "Packaging",
+          "value": "Black & gold gift box"
+        }
+      ],
+      "tags": ["set", "gift"],
+      "occasions": ["wedding", "eid"],
+      "featured": true,
+      "createdAt": "2026-11-14T10:00:00.000Z"
+    }
+  ],
+  "reviews": [
+    {
+      "id": "unst-001-r1",
+      "productId": "unst-001",
+      "author": "Amna F.",
+      "city": "Lahore",
+      "rating": 4,
+      "title": "Lovely suit, slightly sheer",
+      "body": "Beautiful embroidery and good quality, but the shirt fabric is a little sheer so I added a lining. Still very happy with it.",
+      "createdAt": "2026-11-12T22:33:18.060Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 19
+    },
+    {
+      "id": "unst-001-r2",
+      "productId": "unst-001",
+      "author": "Rabia Z.",
+      "city": "Islamabad",
+      "rating": 5,
+      "title": "Exactly as pictured",
+      "body": "Colours are exactly like the pictures. Packing was neat and delivery reached Lahore in 3 days. Cash on delivery made it easy.",
+      "createdAt": "2026-11-10T14:11:21.572Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 13
+    },
+    {
+      "id": "unst-001-r3",
+      "productId": "unst-001",
+      "author": "Laiba W.",
+      "city": "Sialkot",
+      "rating": 4,
+      "title": "Beautiful colours",
+      "body": "Rich colours and neat embroidery. Trouser fabric could be a bit thicker but overall very good.",
+      "createdAt": "2026-11-10T10:58:29.150Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 10
+    },
+    {
+      "id": "unst-001-r4",
+      "productId": "unst-001",
+      "author": "Areeba Q.",
+      "city": "Sialkot",
+      "rating": 5,
+      "title": "Perfect for Eid",
+      "body": "Wore this on Eid and everyone asked where it was from. The gold work does not look cheap at all.",
+      "createdAt": "2026-11-18T22:36:41.890Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 18
+    },
+    {
+      "id": "unst-001-r5",
+      "productId": "unst-001",
+      "author": "Iqra N.",
+      "city": "Karachi",
+      "rating": 3,
+      "title": "Good but delivery was late",
+      "body": "The suit itself is nice, but delivery took a week. Customer support was helpful when I called though.",
+      "createdAt": "2026-11-11T20:07:34.432Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 5
+    },
+    {
+      "id": "unst-001-r6",
+      "productId": "unst-001",
+      "author": "Ayesha K.",
+      "city": "Karachi",
+      "rating": 5,
+      "title": "Worth every rupee",
+      "body": "Premium feel at a fair price. My tailor said the cutting length is generous. Will definitely order again.",
+      "createdAt": "2026-11-16T02:25:50.255Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 3
+    },
+    {
+      "id": "unst-001-r7",
+      "productId": "unst-001",
+      "author": "Sana M.",
+      "city": "Islamabad",
+      "rating": 5,
+      "title": "Embroidery is stunning",
+      "body": "The zari work is even more beautiful in person. Fabric quality is excellent and the dupatta is so soft. Got so many compliments at the dawat!",
+      "createdAt": "2026-11-08T22:22:32.736Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 20
+    },
+    {
+      "id": "unst-002-r1",
+      "productId": "unst-002",
+      "author": "Iqra N.",
+      "city": "Karachi",
+      "rating": 3,
+      "title": "Good but delivery was late",
+      "body": "The suit itself is nice, but delivery took a week. Customer support was helpful when I called though.",
+      "createdAt": "2026-11-01T13:25:17.816Z",
+      "verifiedPurchase": false,
+      "helpfulCount": 22
+    },
+    {
+      "id": "unst-002-r2",
+      "productId": "unst-002",
+      "author": "Sana M.",
+      "city": "Faisalabad",
+      "rating": 5,
+      "title": "Embroidery is stunning",
+      "body": "The zari work is even more beautiful in person. Fabric quality is excellent and the dupatta is so soft. Got so many compliments at the dawat!",
+      "createdAt": "2026-11-11T02:44:59.389Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 5
+    },
+    {
+      "id": "unst-002-r3",
+      "productId": "unst-002",
+      "author": "Amna F.",
+      "city": "Faisalabad",
+      "rating": 5,
+      "title": "Perfect for Eid",
+      "body": "Wore this on Eid and everyone asked where it was from. The gold work does not look cheap at all.",
+      "createdAt": "2026-11-04T22:23:20.893Z",
+      "verifiedPurchase": false,
+      "helpfulCount": 12
+    },
+    {
+      "id": "unst-002-r4",
+      "productId": "unst-002",
+      "author": "Ayesha K.",
+      "city": "Lahore",
+      "rating": 5,
+      "title": "Worth every rupee",
+      "body": "Premium feel at a fair price. My tailor said the cutting length is generous. Will definitely order again.",
+      "createdAt": "2026-10-29T15:56:59.262Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 19
+    },
+    {
+      "id": "unst-002-r5",
+      "productId": "unst-002",
+      "author": "Maryam T.",
+      "city": "Lahore",
+      "rating": 4,
+      "title": "Beautiful colours",
+      "body": "Rich colours and neat embroidery. Trouser fabric could be a bit thicker but overall very good.",
+      "createdAt": "2026-11-18T14:43:01.528Z",
+      "verifiedPurchase": false,
+      "helpfulCount": 23
+    },
+    {
+      "id": "unst-002-r6",
+      "productId": "unst-002",
+      "author": "Areeba Q.",
+      "city": "Multan",
+      "rating": 5,
+      "title": "Exactly as pictured",
+      "body": "Colours are exactly like the pictures. Packing was neat and delivery reached Lahore in 3 days. Cash on delivery made it easy.",
+      "createdAt": "2026-11-01T14:53:05.743Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 1
+    },
+    {
+      "id": "unst-002-r7",
+      "productId": "unst-002",
+      "author": "Kiran B.",
+      "city": "Sialkot",
+      "rating": 4,
+      "title": "Lovely suit, slightly sheer",
+      "body": "Beautiful embroidery and good quality, but the shirt fabric is a little sheer so I added a lining. Still very happy with it.",
+      "createdAt": "2026-11-17T02:12:08.590Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 10
+    },
+    {
+      "id": "unst-002-r8",
+      "productId": "unst-002",
+      "author": "Hafsa Y.",
+      "city": "Hyderabad",
+      "rating": 3,
+      "title": "Good but delivery was late",
+      "body": "The suit itself is nice, but delivery took a week. Customer support was helpful when I called though.",
+      "createdAt": "2026-10-29T22:51:16.813Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 23
+    },
+    {
+      "id": "unst-003-r1",
+      "productId": "unst-003",
+      "author": "Ayesha K.",
+      "city": "Multan",
+      "rating": 5,
+      "title": "Perfect for Eid",
+      "body": "Wore this on Eid and everyone asked where it was from. The gold work does not look cheap at all.",
+      "createdAt": "2026-08-15T12:54:09.339Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 7
+    },
+    {
+      "id": "unst-003-r2",
+      "productId": "unst-003",
+      "author": "Areeba Q.",
+      "city": "Hyderabad",
+      "rating": 3,
+      "title": "Good but delivery was late",
+      "body": "The suit itself is nice, but delivery took a week. Customer support was helpful when I called though.",
+      "createdAt": "2026-10-27T17:23:52.347Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 17
+    },
+    {
+      "id": "unst-003-r3",
+      "productId": "unst-003",
+      "author": "Zainab H.",
+      "city": "Karachi",
+      "rating": 5,
+      "title": "Exactly as pictured",
+      "body": "Colours are exactly like the pictures. Packing was neat and delivery reached Lahore in 3 days. Cash on delivery made it easy.",
+      "createdAt": "2026-09-18T22:50:46.237Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 0
+    },
+    {
+      "id": "unst-003-r4",
+      "productId": "unst-003",
+      "author": "Maryam T.",
+      "city": "Lahore",
+      "rating": 5,
+      "title": "Worth every rupee",
+      "body": "Premium feel at a fair price. My tailor said the cutting length is generous. Will definitely order again.",
+      "createdAt": "2026-09-29T14:43:14.578Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 14
+    },
+    {
+      "id": "unst-003-r5",
+      "productId": "unst-003",
+      "author": "Saba J.",
+      "city": "Peshawar",
+      "rating": 4,
+      "title": "Beautiful colours",
+      "body": "Rich colours and neat embroidery. Trouser fabric could be a bit thicker but overall very good.",
+      "createdAt": "2026-10-29T08:40:22.125Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 13
+    },
+    {
+      "id": "unst-003-r6",
+      "productId": "unst-003",
+      "author": "Amna F.",
+      "city": "Lahore",
+      "rating": 4,
+      "title": "Lovely suit, slightly sheer",
+      "body": "Beautiful embroidery and good quality, but the shirt fabric is a little sheer so I added a lining. Still very happy with it.",
+      "createdAt": "2026-09-19T08:58:48.653Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 20
+    },
+    {
+      "id": "unst-003-r7",
+      "productId": "unst-003",
+      "author": "Kiran B.",
+      "city": "Faisalabad",
+      "rating": 5,
+      "title": "Embroidery is stunning",
+      "body": "The zari work is even more beautiful in person. Fabric quality is excellent and the dupatta is so soft. Got so many compliments at the dawat!",
+      "createdAt": "2026-09-28T05:28:25.515Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 13
+    },
+    {
+      "id": "unst-003-r8",
+      "productId": "unst-003",
+      "author": "Rabia Z.",
+      "city": "Sialkot",
+      "rating": 5,
+      "title": "Perfect for Eid",
+      "body": "Wore this on Eid and everyone asked where it was from. The gold work does not look cheap at all.",
+      "createdAt": "2026-11-05T00:55:12.789Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 8
+    },
+    {
+      "id": "unst-004-r1",
+      "productId": "unst-004",
+      "author": "Fatima R.",
+      "city": "Rawalpindi",
+      "rating": 4,
+      "title": "Beautiful colours",
+      "body": "Rich colours and neat embroidery. Trouser fabric could be a bit thicker but overall very good.",
+      "createdAt": "2026-11-18T05:46:32.808Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 18
+    },
+    {
+      "id": "unst-004-r2",
+      "productId": "unst-004",
+      "author": "Ayesha K.",
+      "city": "Multan",
+      "rating": 5,
+      "title": "Worth every rupee",
+      "body": "Premium feel at a fair price. My tailor said the cutting length is generous. Will definitely order again.",
+      "createdAt": "2026-11-16T15:29:12.305Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 0
+    },
+    {
+      "id": "unst-004-r3",
+      "productId": "unst-004",
+      "author": "Iqra N.",
+      "city": "Faisalabad",
+      "rating": 5,
+      "title": "Perfect for Eid",
+      "body": "Wore this on Eid and everyone asked where it was from. The gold work does not look cheap at all.",
+      "createdAt": "2026-11-17T08:26:30.300Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 2
+    },
+    {
+      "id": "unst-004-r4",
+      "productId": "unst-004",
+      "author": "Kiran B.",
+      "city": "Gujranwala",
+      "rating": 3,
+      "title": "Good but delivery was late",
+      "body": "The suit itself is nice, but delivery took a week. Customer support was helpful when I called though.",
+      "createdAt": "2026-11-16T20:45:45.521Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 13
+    },
+    {
+      "id": "unst-004-r5",
+      "productId": "unst-004",
+      "author": "Sana M.",
+      "city": "Lahore",
+      "rating": 5,
+      "title": "Embroidery is stunning",
+      "body": "The zari work is even more beautiful in person. Fabric quality is excellent and the dupatta is so soft. Got so many compliments at the dawat!",
+      "createdAt": "2026-11-17T15:38:34.492Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 13
+    },
+    {
+      "id": "unst-004-r6",
+      "productId": "unst-004",
+      "author": "Maryam T.",
+      "city": "Karachi",
+      "rating": 5,
+      "title": "Exactly as pictured",
+      "body": "Colours are exactly like the pictures. Packing was neat and delivery reached Lahore in 3 days. Cash on delivery made it easy.",
+      "createdAt": "2026-11-18T20:00:33.668Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 22
+    },
+    {
+      "id": "unst-004-r7",
+      "productId": "unst-004",
+      "author": "Hira S.",
+      "city": "Rawalpindi",
+      "rating": 4,
+      "title": "Lovely suit, slightly sheer",
+      "body": "Beautiful embroidery and good quality, but the shirt fabric is a little sheer so I added a lining. Still very happy with it.",
+      "createdAt": "2026-11-16T02:00:41.742Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 11
+    },
+    {
+      "id": "unst-004-r8",
+      "productId": "unst-004",
+      "author": "Zainab H.",
+      "city": "Lahore",
+      "rating": 4,
+      "title": "Beautiful colours",
+      "body": "Rich colours and neat embroidery. Trouser fabric could be a bit thicker but overall very good.",
+      "createdAt": "2026-11-18T03:58:19.240Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 0
+    },
+    {
+      "id": "unst-004-r9",
+      "productId": "unst-004",
+      "author": "Saba J.",
+      "city": "Faisalabad",
+      "rating": 5,
+      "title": "Worth every rupee",
+      "body": "Premium feel at a fair price. My tailor said the cutting length is generous. Will definitely order again.",
+      "createdAt": "2026-11-18T15:50:04.469Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 13
+    },
+    {
+      "id": "unst-005-r1",
+      "productId": "unst-005",
+      "author": "Zainab H.",
+      "city": "Sialkot",
+      "rating": 3,
+      "title": "Good but delivery was late",
+      "body": "The suit itself is nice, but delivery took a week. Customer support was helpful when I called though.",
+      "createdAt": "2026-07-31T11:45:46.812Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 2
+    },
+    {
+      "id": "unst-005-r2",
+      "productId": "unst-005",
+      "author": "Saba J.",
+      "city": "Faisalabad",
+      "rating": 4,
+      "title": "Lovely suit, slightly sheer",
+      "body": "Beautiful embroidery and good quality, but the shirt fabric is a little sheer so I added a lining. Still very happy with it.",
+      "createdAt": "2026-11-17T20:00:19.268Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 1
+    },
+    {
+      "id": "unst-005-r3",
+      "productId": "unst-005",
+      "author": "Amna F.",
+      "city": "Gujranwala",
+      "rating": 4,
+      "title": "Beautiful colours",
+      "body": "Rich colours and neat embroidery. Trouser fabric could be a bit thicker but overall very good.",
+      "createdAt": "2026-08-15T16:01:52.343Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 23
+    },
+    {
+      "id": "unst-005-r4",
+      "productId": "unst-005",
+      "author": "Kiran B.",
+      "city": "Islamabad",
+      "rating": 5,
+      "title": "Embroidery is stunning",
+      "body": "The zari work is even more beautiful in person. Fabric quality is excellent and the dupatta is so soft. Got so many compliments at the dawat!",
+      "createdAt": "2026-08-25T07:26:35.345Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 20
+    },
+    {
+      "id": "unst-005-r5",
+      "productId": "unst-005",
+      "author": "Areeba Q.",
+      "city": "Sialkot",
+      "rating": 5,
+      "title": "Worth every rupee",
+      "body": "Premium feel at a fair price. My tailor said the cutting length is generous. Will definitely order again.",
+      "createdAt": "2026-11-02T02:01:18.346Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 19
+    },
+    {
+      "id": "unst-005-r6",
+      "productId": "unst-005",
+      "author": "Fatima R.",
+      "city": "Peshawar",
+      "rating": 5,
+      "title": "Exactly as pictured",
+      "body": "Colours are exactly like the pictures. Packing was neat and delivery reached Lahore in 3 days. Cash on delivery made it easy.",
+      "createdAt": "2026-07-21T21:45:31.500Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 13
+    },
+    {
+      "id": "unst-005-r7",
+      "productId": "unst-005",
+      "author": "Maryam T.",
+      "city": "Rawalpindi",
+      "rating": 5,
+      "title": "Perfect for Eid",
+      "body": "Wore this on Eid and everyone asked where it was from. The gold work does not look cheap at all.",
+      "createdAt": "2026-10-19T03:16:00.085Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 0
+    },
+    {
+      "id": "stch-001-r1",
+      "productId": "stch-001",
+      "author": "Saba J.",
+      "city": "Gujranwala",
+      "rating": 5,
+      "title": "Premium quality",
+      "body": "Feels like a designer piece. The sleeves are so pretty and the colour is rich in person.",
+      "createdAt": "2026-11-08T00:11:53.150Z",
+      "verifiedPurchase": false,
+      "helpfulCount": 3
+    },
+    {
+      "id": "stch-001-r2",
+      "productId": "stch-001",
+      "author": "Ayesha K.",
+      "city": "Islamabad",
+      "rating": 5,
+      "title": "Fast delivery, great packing",
+      "body": "Arrived in Karachi in 2 days, beautifully packed. The fit and finish are excellent.",
+      "createdAt": "2026-11-12T20:36:57.120Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 1
+    },
+    {
+      "id": "stch-001-r3",
+      "productId": "stch-001",
+      "author": "Rabia Z.",
+      "city": "Hyderabad",
+      "rating": 5,
+      "title": "Gorgeous for weddings",
+      "body": "Wore it to my cousin’s mehndi and loved it. The embroidery catches the light beautifully.",
+      "createdAt": "2026-11-12T22:30:34.933Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 16
+    },
+    {
+      "id": "stch-002-r1",
+      "productId": "stch-002",
+      "author": "Hira S.",
+      "city": "Faisalabad",
+      "rating": 5,
+      "title": "Fast delivery, great packing",
+      "body": "Arrived in Karachi in 2 days, beautifully packed. The fit and finish are excellent.",
+      "createdAt": "2026-11-17T08:55:46.356Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 0
+    },
+    {
+      "id": "stch-002-r2",
+      "productId": "stch-002",
+      "author": "Laiba W.",
+      "city": "Faisalabad",
+      "rating": 5,
+      "title": "Fits perfectly",
+      "body": "Ordered my usual size and it fits perfectly. Stitching is neat and the inner lining is comfortable. Really elegant!",
+      "createdAt": "2026-11-14T18:39:39.925Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 7
+    },
+    {
+      "id": "stch-002-r3",
+      "productId": "stch-002",
+      "author": "Areeba Q.",
+      "city": "Multan",
+      "rating": 2,
+      "title": "Colour a bit different",
+      "body": "The maroon was darker than I expected from the photos. Quality is fine but not what I imagined.",
+      "createdAt": "2026-11-13T05:41:30.196Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 7
+    },
+    {
+      "id": "stch-002-r4",
+      "productId": "stch-002",
+      "author": "Amna F.",
+      "city": "Sialkot",
+      "rating": 4,
+      "title": "Runs slightly large",
+      "body": "Lovely dress but it runs a little large — I would size down. Exchange process was simple though.",
+      "createdAt": "2026-11-18T08:08:52.796Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 16
+    },
+    {
+      "id": "stch-003-r1",
+      "productId": "stch-003",
+      "author": "Ayesha K.",
+      "city": "Faisalabad",
+      "rating": 2,
+      "title": "Colour a bit different",
+      "body": "The maroon was darker than I expected from the photos. Quality is fine but not what I imagined.",
+      "createdAt": "2026-11-11T11:22:24.406Z",
+      "verifiedPurchase": false,
+      "helpfulCount": 16
+    },
+    {
+      "id": "stch-003-r2",
+      "productId": "stch-003",
+      "author": "Laiba W.",
+      "city": "Rawalpindi",
+      "rating": 5,
+      "title": "Gorgeous for weddings",
+      "body": "Wore it to my cousin’s mehndi and loved it. The embroidery catches the light beautifully.",
+      "createdAt": "2026-09-23T06:46:32.563Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 4
+    },
+    {
+      "id": "stch-003-r3",
+      "productId": "stch-003",
+      "author": "Noor U.",
+      "city": "Multan",
+      "rating": 4,
+      "title": "Runs slightly large",
+      "body": "Lovely dress but it runs a little large — I would size down. Exchange process was simple though.",
+      "createdAt": "2026-10-19T20:32:59.743Z",
+      "verifiedPurchase": false,
+      "helpfulCount": 20
+    },
+    {
+      "id": "stch-003-r4",
+      "productId": "stch-003",
+      "author": "Iqra N.",
+      "city": "Sialkot",
+      "rating": 5,
+      "title": "Premium quality",
+      "body": "Feels like a designer piece. The sleeves are so pretty and the colour is rich in person.",
+      "createdAt": "2026-10-02T03:25:15.714Z",
+      "verifiedPurchase": false,
+      "helpfulCount": 11
+    },
+    {
+      "id": "stch-004-r1",
+      "productId": "stch-004",
+      "author": "Zainab H.",
+      "city": "Peshawar",
+      "rating": 4,
+      "title": "Runs slightly large",
+      "body": "Lovely dress but it runs a little large — I would size down. Exchange process was simple though.",
+      "createdAt": "2026-10-31T00:32:59.588Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 7
+    },
+    {
+      "id": "stch-004-r2",
+      "productId": "stch-004",
+      "author": "Hira S.",
+      "city": "Rawalpindi",
+      "rating": 5,
+      "title": "Fits perfectly",
+      "body": "Ordered my usual size and it fits perfectly. Stitching is neat and the inner lining is comfortable. Really elegant!",
+      "createdAt": "2026-10-25T14:47:26.885Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 1
+    },
+    {
+      "id": "stch-004-r3",
+      "productId": "stch-004",
+      "author": "Hafsa Y.",
+      "city": "Multan",
+      "rating": 5,
+      "title": "Gorgeous for weddings",
+      "body": "Wore it to my cousin’s mehndi and loved it. The embroidery catches the light beautifully.",
+      "createdAt": "2026-10-11T22:33:55.871Z",
+      "verifiedPurchase": false,
+      "helpfulCount": 4
+    },
+    {
+      "id": "stch-004-r4",
+      "productId": "stch-004",
+      "author": "Iqra N.",
+      "city": "Karachi",
+      "rating": 2,
+      "title": "Colour a bit different",
+      "body": "The maroon was darker than I expected from the photos. Quality is fine but not what I imagined.",
+      "createdAt": "2026-10-13T18:50:31.027Z",
+      "verifiedPurchase": false,
+      "helpfulCount": 18
+    },
+    {
+      "id": "stch-004-r5",
+      "productId": "stch-004",
+      "author": "Mehwish A.",
+      "city": "Faisalabad",
+      "rating": 5,
+      "title": "Premium quality",
+      "body": "Feels like a designer piece. The sleeves are so pretty and the colour is rich in person.",
+      "createdAt": "2026-10-26T23:03:49.453Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 19
+    },
+    {
+      "id": "stch-004-r6",
+      "productId": "stch-004",
+      "author": "Noor U.",
+      "city": "Karachi",
+      "rating": 5,
+      "title": "Fast delivery, great packing",
+      "body": "Arrived in Karachi in 2 days, beautifully packed. The fit and finish are excellent.",
+      "createdAt": "2026-10-28T00:25:20.490Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 5
+    },
+    {
+      "id": "stch-005-r1",
+      "productId": "stch-005",
+      "author": "Ayesha K.",
+      "city": "Karachi",
+      "rating": 5,
+      "title": "Fits perfectly",
+      "body": "Ordered my usual size and it fits perfectly. Stitching is neat and the inner lining is comfortable. Really elegant!",
+      "createdAt": "2026-09-18T02:50:38.763Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 10
+    },
+    {
+      "id": "stch-005-r2",
+      "productId": "stch-005",
+      "author": "Hira S.",
+      "city": "Gujranwala",
+      "rating": 5,
+      "title": "Gorgeous for weddings",
+      "body": "Wore it to my cousin’s mehndi and loved it. The embroidery catches the light beautifully.",
+      "createdAt": "2026-10-20T02:38:54.309Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 7
+    },
+    {
+      "id": "stch-005-r3",
+      "productId": "stch-005",
+      "author": "Sana M.",
+      "city": "Peshawar",
+      "rating": 2,
+      "title": "Colour a bit different",
+      "body": "The maroon was darker than I expected from the photos. Quality is fine but not what I imagined.",
+      "createdAt": "2026-07-27T01:41:22.163Z",
+      "verifiedPurchase": false,
+      "helpfulCount": 17
+    },
+    {
+      "id": "stch-005-r4",
+      "productId": "stch-005",
+      "author": "Noor U.",
+      "city": "Hyderabad",
+      "rating": 4,
+      "title": "Runs slightly large",
+      "body": "Lovely dress but it runs a little large — I would size down. Exchange process was simple though.",
+      "createdAt": "2026-08-03T00:08:26.187Z",
+      "verifiedPurchase": false,
+      "helpfulCount": 17
+    },
+    {
+      "id": "stch-005-r5",
+      "productId": "stch-005",
+      "author": "Areeba Q.",
+      "city": "Rawalpindi",
+      "rating": 5,
+      "title": "Fast delivery, great packing",
+      "body": "Arrived in Karachi in 2 days, beautifully packed. The fit and finish are excellent.",
+      "createdAt": "2026-09-11T10:00:06.417Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 20
+    },
+    {
+      "id": "stch-005-r6",
+      "productId": "stch-005",
+      "author": "Hafsa Y.",
+      "city": "Karachi",
+      "rating": 5,
+      "title": "Premium quality",
+      "body": "Feels like a designer piece. The sleeves are so pretty and the colour is rich in person.",
+      "createdAt": "2026-10-26T22:01:13.508Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 9
+    },
+    {
+      "id": "mkup-001-r1",
+      "productId": "mkup-001",
+      "author": "Fatima R.",
+      "city": "Gujranwala",
+      "rating": 5,
+      "title": "Great shade range",
+      "body": "Found my exact shade. Blends easily and stays all day even in Karachi heat.",
+      "createdAt": "2026-11-08T05:37:31.633Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 5
+    },
+    {
+      "id": "mkup-001-r2",
+      "productId": "mkup-001",
+      "author": "Hira S.",
+      "city": "Karachi",
+      "rating": 3,
+      "title": "Okay for the price",
+      "body": "Works fine, nothing extraordinary. Packaging is the best part honestly.",
+      "createdAt": "2026-11-08T10:45:58.001Z",
+      "verifiedPurchase": false,
+      "helpfulCount": 6
+    },
+    {
+      "id": "mkup-001-r3",
+      "productId": "mkup-001",
+      "author": "Laiba W.",
+      "city": "Islamabad",
+      "rating": 5,
+      "title": "Original and fresh",
+      "body": "Product was fresh with a long expiry date. Will reorder for sure.",
+      "createdAt": "2026-11-07T02:45:11.165Z",
+      "verifiedPurchase": false,
+      "helpfulCount": 14
+    },
+    {
+      "id": "mkup-001-r4",
+      "productId": "mkup-001",
+      "author": "Maryam T.",
+      "city": "Peshawar",
+      "rating": 5,
+      "title": "Perfect gift",
+      "body": "Bought this as a gift for my sister and she loved it. The black and gold design looks so classy.",
+      "createdAt": "2026-11-06T08:38:37.734Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 8
+    },
+    {
+      "id": "mkup-001-r5",
+      "productId": "mkup-001",
+      "author": "Hafsa Y.",
+      "city": "Islamabad",
+      "rating": 4,
+      "title": "Lovely but a little drying",
+      "body": "Beautiful colour and payoff. Slightly drying after a few hours so I use a balm underneath.",
+      "createdAt": "2026-11-08T10:38:00.547Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 4
+    },
+    {
+      "id": "mkup-002-r1",
+      "productId": "mkup-002",
+      "author": "Maryam T.",
+      "city": "Peshawar",
+      "rating": 5,
+      "title": "Great shade range",
+      "body": "Found my exact shade. Blends easily and stays all day even in Karachi heat.",
+      "createdAt": "2026-09-28T17:27:55.008Z",
+      "verifiedPurchase": false,
+      "helpfulCount": 17
+    },
+    {
+      "id": "mkup-002-r2",
+      "productId": "mkup-002",
+      "author": "Kiran B.",
+      "city": "Faisalabad",
+      "rating": 5,
+      "title": "Original and fresh",
+      "body": "Product was fresh with a long expiry date. Will reorder for sure.",
+      "createdAt": "2026-09-09T08:43:27.084Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 0
+    },
+    {
+      "id": "mkup-002-r3",
+      "productId": "mkup-002",
+      "author": "Noor U.",
+      "city": "Lahore",
+      "rating": 5,
+      "title": "Perfect gift",
+      "body": "Bought this as a gift for my sister and she loved it. The black and gold design looks so classy.",
+      "createdAt": "2026-09-24T21:03:46.323Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 8
+    },
+    {
+      "id": "mkup-002-r4",
+      "productId": "mkup-002",
+      "author": "Ayesha K.",
+      "city": "Sialkot",
+      "rating": 3,
+      "title": "Okay for the price",
+      "body": "Works fine, nothing extraordinary. Packaging is the best part honestly.",
+      "createdAt": "2026-09-19T12:25:41.204Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 7
+    },
+    {
+      "id": "mkup-002-r5",
+      "productId": "mkup-002",
+      "author": "Areeba Q.",
+      "city": "Sialkot",
+      "rating": 5,
+      "title": "My new favourite",
+      "body": "Long-lasting and so comfortable. The packaging is gorgeous — feels very luxurious.",
+      "createdAt": "2026-09-03T20:44:35.343Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 1
+    },
+    {
+      "id": "mkup-002-r6",
+      "productId": "mkup-002",
+      "author": "Sana M.",
+      "city": "Karachi",
+      "rating": 4,
+      "title": "Lovely but a little drying",
+      "body": "Beautiful colour and payoff. Slightly drying after a few hours so I use a balm underneath.",
+      "createdAt": "2026-10-04T13:25:31.813Z",
+      "verifiedPurchase": false,
+      "helpfulCount": 4
+    },
+    {
+      "id": "mkup-003-r1",
+      "productId": "mkup-003",
+      "author": "Zainab H.",
+      "city": "Sialkot",
+      "rating": 5,
+      "title": "Perfect gift",
+      "body": "Bought this as a gift for my sister and she loved it. The black and gold design looks so classy.",
+      "createdAt": "2026-09-26T03:54:18.705Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 15
+    },
+    {
+      "id": "mkup-003-r2",
+      "productId": "mkup-003",
+      "author": "Sana M.",
+      "city": "Hyderabad",
+      "rating": 3,
+      "title": "Okay for the price",
+      "body": "Works fine, nothing extraordinary. Packaging is the best part honestly.",
+      "createdAt": "2026-09-14T10:19:42.350Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 1
+    },
+    {
+      "id": "mkup-003-r3",
+      "productId": "mkup-003",
+      "author": "Amna F.",
+      "city": "Peshawar",
+      "rating": 5,
+      "title": "My new favourite",
+      "body": "Long-lasting and so comfortable. The packaging is gorgeous — feels very luxurious.",
+      "createdAt": "2026-09-12T03:15:47.126Z",
+      "verifiedPurchase": false,
+      "helpfulCount": 14
+    },
+    {
+      "id": "mkup-003-r4",
+      "productId": "mkup-003",
+      "author": "Rabia Z.",
+      "city": "Islamabad",
+      "rating": 5,
+      "title": "Great shade range",
+      "body": "Found my exact shade. Blends easily and stays all day even in Karachi heat.",
+      "createdAt": "2026-08-26T23:31:51.937Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 13
+    },
+    {
+      "id": "mkup-003-r5",
+      "productId": "mkup-003",
+      "author": "Kiran B.",
+      "city": "Sialkot",
+      "rating": 5,
+      "title": "Original and fresh",
+      "body": "Product was fresh with a long expiry date. Will reorder for sure.",
+      "createdAt": "2026-10-30T02:24:06.862Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 7
+    },
+    {
+      "id": "mkup-003-r6",
+      "productId": "mkup-003",
+      "author": "Maryam T.",
+      "city": "Faisalabad",
+      "rating": 4,
+      "title": "Lovely but a little drying",
+      "body": "Beautiful colour and payoff. Slightly drying after a few hours so I use a balm underneath.",
+      "createdAt": "2026-10-13T23:48:44.303Z",
+      "verifiedPurchase": false,
+      "helpfulCount": 9
+    },
+    {
+      "id": "mkup-004-r1",
+      "productId": "mkup-004",
+      "author": "Rabia Z.",
+      "city": "Lahore",
+      "rating": 3,
+      "title": "Okay for the price",
+      "body": "Works fine, nothing extraordinary. Packaging is the best part honestly.",
+      "createdAt": "2026-11-14T12:56:56.093Z",
+      "verifiedPurchase": false,
+      "helpfulCount": 9
+    },
+    {
+      "id": "mkup-004-r2",
+      "productId": "mkup-004",
+      "author": "Zainab H.",
+      "city": "Karachi",
+      "rating": 5,
+      "title": "Perfect gift",
+      "body": "Bought this as a gift for my sister and she loved it. The black and gold design looks so classy.",
+      "createdAt": "2026-11-16T21:13:49.595Z",
+      "verifiedPurchase": false,
+      "helpfulCount": 14
+    },
+    {
+      "id": "mkup-004-r3",
+      "productId": "mkup-004",
+      "author": "Hira S.",
+      "city": "Rawalpindi",
+      "rating": 5,
+      "title": "My new favourite",
+      "body": "Long-lasting and so comfortable. The packaging is gorgeous — feels very luxurious.",
+      "createdAt": "2026-11-15T20:20:45.643Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 1
+    },
+    {
+      "id": "mkup-004-r4",
+      "productId": "mkup-004",
+      "author": "Noor U.",
+      "city": "Peshawar",
+      "rating": 5,
+      "title": "Great shade range",
+      "body": "Found my exact shade. Blends easily and stays all day even in Karachi heat.",
+      "createdAt": "2026-11-16T03:43:02.231Z",
+      "verifiedPurchase": false,
+      "helpfulCount": 3
+    },
+    {
+      "id": "mkup-005-r1",
+      "productId": "mkup-005",
+      "author": "Areeba Q.",
+      "city": "Rawalpindi",
+      "rating": 4,
+      "title": "Lovely but a little drying",
+      "body": "Beautiful colour and payoff. Slightly drying after a few hours so I use a balm underneath.",
+      "createdAt": "2026-11-17T09:44:17.808Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 11
+    },
+    {
+      "id": "mkup-005-r2",
+      "productId": "mkup-005",
+      "author": "Fatima R.",
+      "city": "Multan",
+      "rating": 5,
+      "title": "Original and fresh",
+      "body": "Product was fresh with a long expiry date. Will reorder for sure.",
+      "createdAt": "2026-11-18T03:13:28.560Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 3
+    },
+    {
+      "id": "mkup-005-r3",
+      "productId": "mkup-005",
+      "author": "Noor U.",
+      "city": "Lahore",
+      "rating": 3,
+      "title": "Okay for the price",
+      "body": "Works fine, nothing extraordinary. Packaging is the best part honestly.",
+      "createdAt": "2026-11-18T09:32:59.536Z",
+      "verifiedPurchase": false,
+      "helpfulCount": 21
+    },
+    {
+      "id": "mkup-005-r4",
+      "productId": "mkup-005",
+      "author": "Rabia Z.",
+      "city": "Peshawar",
+      "rating": 5,
+      "title": "Great shade range",
+      "body": "Found my exact shade. Blends easily and stays all day even in Karachi heat.",
+      "createdAt": "2026-11-17T17:11:47.062Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 13
+    },
+    {
+      "id": "mkup-005-r5",
+      "productId": "mkup-005",
+      "author": "Maryam T.",
+      "city": "Peshawar",
+      "rating": 5,
+      "title": "Perfect gift",
+      "body": "Bought this as a gift for my sister and she loved it. The black and gold design looks so classy.",
+      "createdAt": "2026-11-18T00:46:44.369Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 21
+    },
+    {
+      "id": "mkup-005-r6",
+      "productId": "mkup-005",
+      "author": "Amna F.",
+      "city": "Gujranwala",
+      "rating": 5,
+      "title": "My new favourite",
+      "body": "Long-lasting and so comfortable. The packaging is gorgeous — feels very luxurious.",
+      "createdAt": "2026-11-17T16:17:24.088Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 4
+    },
+    {
+      "id": "mkup-005-r7",
+      "productId": "mkup-005",
+      "author": "Saba J.",
+      "city": "Islamabad",
+      "rating": 4,
+      "title": "Lovely but a little drying",
+      "body": "Beautiful colour and payoff. Slightly drying after a few hours so I use a balm underneath.",
+      "createdAt": "2026-11-18T03:29:07.573Z",
+      "verifiedPurchase": true,
+      "helpfulCount": 2
+    }
+  ]
+}

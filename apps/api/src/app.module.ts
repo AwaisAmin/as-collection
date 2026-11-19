@@ -10,6 +10,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
 import { RequestIdMiddleware } from './common/http/request-id.middleware.js';
 import type { Env } from './config/env.js';
+import { DatabaseModule } from './database/database.module.js';
 import { HealthModule } from './modules/health/health.module.js';
 
 /** Typed access to the validated environment: `config.get('PORT', { infer: true })`. */
@@ -34,6 +35,7 @@ export class AppModule implements NestModule {
         ThrottlerModule.forRoot({
           throttlers: [{ name: 'default', ttl: env.RATE_LIMIT_TTL_MS, limit: env.RATE_LIMIT_MAX }],
         }),
+        DatabaseModule,
         HealthModule,
       ],
       providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],

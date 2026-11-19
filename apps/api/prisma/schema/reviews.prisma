@@ -1,0 +1,51 @@
+// ─── Reviews (moderated) ───
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model Review {
+  id                 String       @id @default(uuid(7)) @db.Uuid
+  productId          String       @map("product_id") @db.Uuid
+  customerId         String?      @map("customer_id") @db.Uuid
+  /// Set when written for a delivered order item → "Verified purchase".
+  orderItemId        String?      @unique @map("order_item_id") @db.Uuid
+  authorName         String       @map("author_name") @db.VarChar(80)
+  city               String?      @db.VarChar(80)
+  rating             Int          @db.SmallInt
+  title              String       @db.VarChar(120)
+  body               String       @db.VarChar(2000)
+  status             ReviewStatus @default(PENDING)
+  isVerifiedPurchase Boolean      @default(false) @map("is_verified_purchase")
+  helpfulCount       Int          @default(0) @map("helpful_count")
+  moderatedByStaffId String?      @map("moderated_by_staff_id") @db.Uuid
+  moderatedAt        DateTime?    @map("moderated_at") @db.Timestamptz(3)
+  rejectionReason    String?      @map("rejection_reason") @db.VarChar(300)
+  createdAt          DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt          DateTime     @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  product     Product      @relation(fields: [productId], references: [id], onDelete: Cascade)
+  customer    Customer?    @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  orderItem   OrderItem?   @relation(fields: [orderItemId], references: [id], onDelete: SetNull)
+  moderatedBy StaffUser?   @relation(fields: [moderatedByStaffId], references: [id], onDelete: SetNull)
+  votes       ReviewVote[]
+
+  @@index([productId, status, createdAt(sort: Desc)])
+  @@index([status, createdAt(sort: Desc)])
+  @@index([customerId])
+  @@map("reviews")
+}
+
+/// One "helpful" vote per voter (customer id, or a hashed anonymous device key).
+model ReviewVote {
+  reviewId  String   @map("review_id") @db.Uuid
+  voterKey  String   @map("voter_key") @db.VarChar(64)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  review Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
+  @@id([reviewId, voterKey])
+  @@map("review_votes")
+}

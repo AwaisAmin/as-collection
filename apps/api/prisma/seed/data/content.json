@@ -1,0 +1,406 @@
+{
+  "occasions": [
+    {
+      "slug": "everyday",
+      "name": "Everyday",
+      "blurb": "Breathable lawn & easy essentials",
+      "image": {
+        "src": "/images/occasions/everyday.jpg",
+        "alt": "Folded lawn fabric with a woven gold border"
+      }
+    },
+    {
+      "slug": "dawat",
+      "name": "Dawat",
+      "blurb": "Dinner-ready formals that shine",
+      "image": {
+        "src": "/images/occasions/dawat.jpg",
+        "alt": "Black chiffon outfit with gold embroidery on the sleeves"
+      }
+    },
+    {
+      "slug": "wedding",
+      "name": "Wedding",
+      "blurb": "Statement pieces for the big days",
+      "image": {
+        "src": "/images/occasions/wedding.jpg",
+        "alt": "Maroon embroidered kurta with a gold-worked neckline"
+      }
+    },
+    {
+      "slug": "eid",
+      "name": "Eid",
+      "blurb": "Festive edits for Eid mornings",
+      "image": {
+        "src": "/images/occasions/eid.jpg",
+        "alt": "Model in a black and gold embroidered outfit with gold earrings"
+      }
+    }
+  ],
+  "promotion": {
+    "id": "festive-2026",
+    "eyebrow": "Limited time",
+    "title": "Festive Sale",
+    "highlight": "Up to 20% off",
+    "description": "Embroidered lawn, chiffon formals and beauty essentials at special prices — while stock lasts.",
+    "endsAt": "2026-12-31T23:59:59+05:00",
+    "cta": {
+      "label": "Shop the sale",
+      "href": "/shop?sale=1"
+    },
+    "image": {
+      "src": "/images/promo/festive-sale.jpg",
+      "alt": "Model wearing gold jhumka earrings and a black embroidered outfit"
+    }
+  },
+  "look": {
+    "id": "festive-black",
+    "title": "The Festive Black Edit",
+    "description": "Gold-on-black embroidery, a soft matte lip and a flawless base — dawat-ready.",
+    "image": {
+      "src": "/images/looks/festive-black.jpg",
+      "alt": "Model in a black chiffon outfit with gold embroidery, gold jhumkas and a soft matte lip"
+    },
+    "hotspots": [
+      {
+        "productSlug": "black-sheesha-chiffon-frock",
+        "x": 46,
+        "y": 74
+      },
+      {
+        "productSlug": "velvet-matte-lipstick",
+        "x": 62,
+        "y": 35
+      },
+      {
+        "productSlug": "long-wear-liquid-foundation-spf-30",
+        "x": 51,
+        "y": 27
+      }
+    ]
+  },
+  "instagram": {
+    "handle": "@as_collection60",
+    "profileUrl": "https://www.instagram.com/as_collection60/",
+    "posts": [
+      {
+        "id": "post-1",
+        "image": {
+          "src": "/images/instagram/post-1.jpg",
+          "alt": "Gold kundan jhumkas styled with black embroidery"
+        }
+      },
+      {
+        "id": "post-2",
+        "image": {
+          "src": "/images/instagram/post-2.jpg",
+          "alt": "Close-up of gold floral embroidery on black fabric"
+        }
+      },
+      {
+        "id": "post-3",
+        "image": {
+          "src": "/images/instagram/post-3.jpg",
+          "alt": "Embroidered hem of a maroon stitched kurta"
+        }
+      },
+      {
+        "id": "post-4",
+        "image": {
+          "src": "/images/instagram/post-4.jpg",
+          "alt": "Red matte lipstick on a marble stand"
+        }
+      },
+      {
+        "id": "post-5",
+        "image": {
+          "src": "/images/instagram/post-5.jpg",
+          "alt": "Black chiffon sleeves with gold zari work"
+        }
+      },
+      {
+        "id": "post-6",
+        "image": {
+          "src": "/images/instagram/post-6.jpg",
+          "alt": "Folded beige lawn fabric with gold embroidery"
+        }
+      }
+    ]
+  },
+  "navigation": {
+    "mainNav": [
+      {
+        "label": "Home",
+        "href": "/"
+      },
+      {
+        "label": "Shop",
+        "href": "/shop",
+        "children": [
+          {
+            "label": "All Products",
+            "href": "/shop"
+          },
+          {
+            "label": "Unstitched Dresses",
+            "href": "/shop/unstitched"
+          },
+          {
+            "label": "Stitched Dresses",
+            "href": "/shop/stitched"
+          },
+          {
+            "label": "Makeup",
+            "href": "/shop/makeup"
+          }
+        ]
+      },
+      {
+        "label": "About Us",
+        "href": "/about"
+      },
+      {
+        "label": "Contact Us",
+        "href": "/contact"
+      }
+    ],
+    "footerNav": [
+      {
+        "label": "Privacy Policy",
+        "href": "/privacy-policy"
+      },
+      {
+        "label": "Terms & Conditions",
+        "href": "/terms"
+      },
+      {
+        "label": "Contact Us",
+        "href": "/contact"
+      }
+    ],
+    "shopMegaMenu": {
+      "columns": [
+        {
+          "label": "Unstitched Dresses",
+          "href": "/shop/unstitched",
+          "links": [
+            {
+              "label": "Lawn",
+              "href": "/shop/unstitched?q=lawn"
+            },
+            {
+              "label": "Chiffon",
+              "href": "/shop/unstitched?q=chiffon"
+            },
+            {
+              "label": "Organza",
+              "href": "/shop/unstitched?q=organza"
+            },
+            {
+              "label": "Velvet",
+              "href": "/shop/unstitched?q=velvet"
+            }
+          ]
+        },
+        {
+          "label": "Stitched Dresses",
+          "href": "/shop/stitched",
+          "links": [
+            {
+              "label": "Kurtas",
+              "href": "/shop/stitched?q=kurta"
+            },
+            {
+              "label": "Frocks",
+              "href": "/shop/stitched?q=frock"
+            },
+            {
+              "label": "Maxis",
+              "href": "/shop/stitched?q=maxi"
+            },
+            {
+              "label": "Shirts",
+              "href": "/shop/stitched?q=shirt"
+            }
+          ]
+        },
+        {
+          "label": "Makeup",
+          "href": "/shop/makeup",
+          "links": [
+            {
+              "label": "Lipstick",
+              "href": "/shop/makeup?q=lipstick"
+            },
+            {
+              "label": "Foundation",
+              "href": "/shop/makeup?q=foundation"
+            },
+            {
+              "label": "Powder & compact",
+              "href": "/shop/makeup?q=powder"
+            },
+            {
+              "label": "Brushes & tools",
+              "href": "/shop/makeup?q=brush"
+            }
+          ]
+        }
+      ],
+      "occasions": [
+        {
+          "label": "Everyday",
+          "href": "/shop?occasion=everyday"
+        },
+        {
+          "label": "Dawat",
+          "href": "/shop?occasion=dawat"
+        },
+        {
+          "label": "Wedding",
+          "href": "/shop?occasion=wedding"
+        },
+        {
+          "label": "Eid",
+          "href": "/shop?occasion=eid"
+        }
+      ],
+      "highlights": [
+        {
+          "label": "New Arrivals",
+          "href": "/shop?sort=newest"
+        },
+        {
+          "label": "Best Sellers",
+          "href": "/shop?sort=rating"
+        },
+        {
+          "label": "On Sale",
+          "href": "/shop?sale=1"
+        },
+        {
+          "label": "All Products",
+          "href": "/shop"
+        }
+      ]
+    }
+  },
+  "site": {
+    "name": "AS Collection Hub",
+    "shortName": "AS Collection",
+    "tagline": "Shop Smart • Look Elegant",
+    "description": "AS Collection Hub — premium unstitched & stitched dresses and makeup for women in Pakistan. Shop smart, look elegant.",
+    "url": "http://localhost:3000",
+    "locale": "en_PK",
+    "currency": "PKR",
+    "freeShippingThreshold": 2500,
+    "shippingFee": 250,
+    "returnWindowDays": 7,
+    "contact": {
+      "phone": "0328-9485741",
+      "phoneE164": "+923289485741",
+      "phoneHref": "tel:+923289485741",
+      "whatsappHref": "https://wa.me/923289485741",
+      "hours": "Mon–Sat, 10:00 am – 8:00 pm",
+      "email": "collectionhubas@gmail.com",
+      "emailHref": "mailto:collectionhubas@gmail.com"
+    },
+    "copyrightYear": 2025
+  },
+  "socials": [
+    {
+      "platform": "facebook",
+      "label": "Facebook",
+      "href": "https://www.facebook.com/share/1E9KNLqtSp/"
+    },
+    {
+      "platform": "instagram",
+      "label": "Instagram",
+      "href": "https://www.instagram.com/as_collection60/"
+    },
+    {
+      "platform": "tiktok",
+      "label": "TikTok",
+      "href": "https://www.tiktok.com/@ascollection16"
+    },
+    {
+      "platform": "youtube",
+      "label": "YouTube",
+      "href": "https://www.youtube.com/@ASCollectionHub"
+    }
+  ],
+  "payments": {
+    "transferAccounts": {
+      "bank": {
+        "channel": "bank",
+        "label": "Bank transfer",
+        "fields": [
+          {
+            "label": "Bank",
+            "value": "Meezan Bank"
+          },
+          {
+            "label": "Account title",
+            "value": "AS Collection Hub"
+          },
+          {
+            "label": "Account number",
+            "value": "0000-0000000000"
+          },
+          {
+            "label": "IBAN",
+            "value": "PK00MEZN0000000000000000"
+          }
+        ]
+      },
+      "jazzcash": {
+        "channel": "jazzcash",
+        "label": "JazzCash",
+        "fields": [
+          {
+            "label": "Account title",
+            "value": "AS Collection Hub"
+          },
+          {
+            "label": "JazzCash number",
+            "value": "0328-9485741"
+          }
+        ]
+      },
+      "easypaisa": {
+        "channel": "easypaisa",
+        "label": "Easypaisa",
+        "fields": [
+          {
+            "label": "Account title",
+            "value": "AS Collection Hub"
+          },
+          {
+            "label": "Easypaisa number",
+            "value": "0328-9485741"
+          }
+        ]
+      }
+    },
+    "transferChannels": ["bank", "jazzcash", "easypaisa"]
+  },
+  "trustFeatures": [
+    {
+      "id": "shipping",
+      "lines": ["Free Shipping", "on Orders Above 2500"]
+    },
+    {
+      "id": "cod",
+      "lines": ["Cash on Delivery", "Available"]
+    },
+    {
+      "id": "support",
+      "lines": ["Customer Support", "0328-9485741"],
+      "href": "tel:+923289485741"
+    },
+    {
+      "id": "returns",
+      "lines": ["Easy Returns", "& Exchange"]
+    }
+  ]
+}

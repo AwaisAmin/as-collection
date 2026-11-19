@@ -1,0 +1,33 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// AS Collection Hub — database schema (PostgreSQL 18, Prisma ORM 7)
+//
+// Conventions
+//   • snake_case tables (@@map, plural) and columns (@map); camelCase in TypeScript.
+//   • Primary keys: UUIDv7 (time-ordered → index-friendly, safe to expose in URLs).
+//   • Money: integers in minor units (paisa, Rs 1 = 100) suffixed `Minor`. Never floats.
+//   • Timestamps: timestamptz(3). `created_at` / `updated_at` on every mutable table.
+//   • Admin-editable content (page sections, menus, settings) is JSON validated by Zod schemas
+//     in the API, so new section types need no migration.
+//   • CHECK constraints and extensions live in migration SQL (Prisma ignores CHECKs in diffs).
+// ─────────────────────────────────────────────────────────────────────────────
+
+generator client {
+  provider               = "prisma-client"
+  output                 = "../../src/generated/prisma"
+  moduleFormat           = "esm"
+  importFileExtension    = "js"
+  generatedFileExtension = "ts"
+  previewFeatures        = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  extensions = [citext, pg_trgm]
+}
+
+/// Who performed an action (orders timeline, audit log).
+enum ActorType {
+  SYSTEM
+  CUSTOMER
+  STAFF
+}

@@ -19,6 +19,20 @@ jobs:
     name: Lint, typecheck, test, build
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:18.7-alpine
+        env:
+          POSTGRES_DB: as_collection
+          POSTGRES_USER: as_ci
+          POSTGRES_PASSWORD: as_ci_password
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U as_ci -d as_collection"
+          --health-interval 5s --health-timeout 3s --health-retries 10
+    env:
+      DATABASE_URL: postgresql://as_ci:as_ci_password@localhost:5432/as_collection?schema=public
+      PRISMA_HIDE_UPDATE_MESSAGE: '1'
     steps:
       - uses: actions/checkout@v5
 
@@ -35,6 +49,11 @@ jobs:
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm test
+      - name: Migrate and seed the CI database
+        run: pnpm --filter @as/api db:deploy && pnpm --filter @as/api db:seed
+      - name: Schema matches migrations (no drift)
+        working-directory: apps/api
+        run: pnpm exec prisma migrate diff --from-config-datasource --to-schema prisma/schema --exit-code
       - run: pnpm test:e2e
       - run: pnpm build
         env:

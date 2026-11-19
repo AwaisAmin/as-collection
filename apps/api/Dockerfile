@@ -2,6 +2,10 @@
 # Production image for apps/api. Build from the REPOSITORY ROOT (pnpm workspace):
 #   docker build -f apps/api/Dockerfile -t as-collection-api .
 #   docker run --env-file apps/api/.env -p 4000:4000 as-collection-api
+#
+# Database migrations run as a separate release step, before new API instances start:
+#   docker build -f apps/api/Dockerfile --target migrator -t as-collection-api-migrator .
+#   docker run --rm -e DATABASE_URL=... as-collection-api-migrator
 
 ARG NODE_VERSION=24
 
@@ -21,7 +25,14 @@ RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
 COPY packages/typescript-config packages/typescript-config
 COPY apps/api apps/api
 RUN pnpm --filter @as/api build \
- && pnpm --filter @as/api deploy --prod --legacy /out
+ && pnpm --filter @as/api deploy --prod --legacy --no-optional /out
+
+# ---- migrator: applies pending Prisma migrations, then exits ----
+FROM build AS migrator
+WORKDIR /repo/apps/api
+ENV PRISMA_HIDE_UPDATE_MESSAGE=1
+USER node
+CMD ["pnpm", "exec", "prisma", "migrate", "deploy"]
 
 # ---- runtime: minimal, non-root ----
 FROM node:${NODE_VERSION}-alpine AS runtime

@@ -40,6 +40,22 @@ describe('toProblemDetails', () => {
     });
   });
 
+  it('maps Prisma unique-constraint and not-found errors without leaking details', () => {
+    const prismaError = (code: string) =>
+      Object.assign(new Error('Unique constraint failed on the fields: (`email`)'), {
+        name: 'PrismaClientKnownRequestError',
+        code,
+      });
+    expect(toProblemDetails(prismaError('P2002'), opts)).toMatchObject({
+      status: 409,
+      code: 'ALREADY_EXISTS',
+    });
+    expect(toProblemDetails(prismaError('P2025'), opts)).toMatchObject({ status: 404 });
+    const other = toProblemDetails(prismaError('P2010'), opts);
+    expect(other.status).toBe(500);
+    expect(other.detail).not.toContain('email');
+  });
+
   it('never leaks internal error messages in production', () => {
     const problem = toProblemDetails(new Error('connect ECONNREFUSED 10.0.0.5:5432'), opts);
     expect(problem.status).toBe(500);

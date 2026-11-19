@@ -5,7 +5,7 @@ import { z } from 'zod';
 
 import { AppModule } from '../../src/app.module.js';
 import { configureApp } from '../../src/bootstrap/configure-app.js';
-import { type Env, parseEnv } from '../../src/config/env.js';
+import { type Env, loadEnvFiles, parseEnv } from '../../src/config/env.js';
 
 export const TRUSTED_ORIGIN = 'https://shop.example.test';
 
@@ -37,7 +37,9 @@ class ProbeController {
 export async function createTestApp(
   overrides: Record<string, string> = {},
 ): Promise<{ app: NestNodeApplication; env: Env }> {
+  loadEnvFiles(); // DATABASE_URL from apps/api/.env locally; CI sets it directly
   const env = parseEnv({
+    DATABASE_URL: process.env.DATABASE_URL,
     NODE_ENV: 'test',
     LOG_LEVEL: 'fatal',
     CORS_ORIGINS: TRUSTED_ORIGIN,

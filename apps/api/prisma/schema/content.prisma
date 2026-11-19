@@ -1,0 +1,136 @@
+// ─── Admin-managed content: pages + sections, menus, settings, newsletter, contact ───
+
+enum PublishStatus {
+  DRAFT
+  PUBLISHED
+}
+
+enum SubscriberStatus {
+  SUBSCRIBED
+  UNSUBSCRIBED
+}
+
+enum ContactStatus {
+  NEW
+  READ
+  ARCHIVED
+}
+
+/// A page built from ordered sections (the home page first). `slug` = "home", "about", …
+model Page {
+  id             String        @id @default(uuid(7)) @db.Uuid
+  slug           String        @unique @db.VarChar(120)
+  title          String        @db.VarChar(160)
+  status         PublishStatus @default(DRAFT)
+  seoTitle       String?       @map("seo_title") @db.VarChar(160)
+  seoDescription String?       @map("seo_description") @db.VarChar(320)
+  createdAt      DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime      @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  sections PageSection[]
+
+  @@map("pages")
+}
+
+/// One block of a page. `type` picks the component (hero, product-carousel, sale-banner,
+/// occasions, shop-the-look, testimonials, brand-story, instagram, …); `settings` holds its
+/// content, validated by that type's Zod schema. Optional schedule for campaigns.
+model PageSection {
+  id        String    @id @default(uuid(7)) @db.Uuid
+  pageId    String    @map("page_id") @db.Uuid
+  type      String    @db.VarChar(60)
+  settings  Json      @default("{}")
+  position  Int       @default(0)
+  isVisible Boolean   @default(true) @map("is_visible")
+  startsAt  DateTime? @map("starts_at") @db.Timestamptz(3)
+  endsAt    DateTime? @map("ends_at") @db.Timestamptz(3)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  page Page @relation(fields: [pageId], references: [id], onDelete: Cascade)
+
+  @@index([pageId, position])
+  @@map("page_sections")
+}
+
+/// Navigation menus by key: "main", "shop-mega", "footer", "mobile".
+model Menu {
+  id        String   @id @default(uuid(7)) @db.Uuid
+  key       String   @unique @db.VarChar(60)
+  name      String   @db.VarChar(120)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  items MenuItem[]
+
+  @@map("menus")
+}
+
+/// Nested menu entries (mega-menu columns are items with children). `settings` holds
+/// presentation options (column heading style, feature card, badge…).
+model MenuItem {
+  id           String   @id @default(uuid(7)) @db.Uuid
+  menuId       String   @map("menu_id") @db.Uuid
+  parentId     String?  @map("parent_id") @db.Uuid
+  label        String   @db.VarChar(80)
+  /// Internal path ("/shop/stitched?q=kurta") or absolute URL.
+  url          String?  @db.VarChar(500)
+  openInNewTab Boolean  @default(false) @map("open_in_new_tab")
+  settings     Json?
+  position     Int      @default(0)
+  isVisible    Boolean  @default(true) @map("is_visible")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  menu     Menu       @relation(fields: [menuId], references: [id], onDelete: Cascade)
+  parent   MenuItem?  @relation("MenuTree", fields: [parentId], references: [id], onDelete: Cascade)
+  children MenuItem[] @relation("MenuTree")
+
+  @@index([menuId, parentId, position])
+  @@map("menu_items")
+}
+
+/// Store settings by key ("store.contact", "shipping", "payments.accounts", …), each validated
+/// by its own Zod schema in the API.
+model Setting {
+  key              String   @id @db.VarChar(100)
+  value            Json
+  updatedByStaffId String?  @map("updated_by_staff_id") @db.Uuid
+  updatedAt        DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  updatedBy StaffUser? @relation(fields: [updatedByStaffId], references: [id], onDelete: SetNull)
+
+  @@map("settings")
+}
+
+model NewsletterSubscriber {
+  id             String           @id @default(uuid(7)) @db.Uuid
+  email          String           @unique @db.Citext
+  status         SubscriberStatus @default(SUBSCRIBED)
+  source         String?          @db.VarChar(40)
+  consentAt      DateTime         @default(now()) @map("consent_at") @db.Timestamptz(3)
+  unsubscribedAt DateTime?        @map("unsubscribed_at") @db.Timestamptz(3)
+  createdAt      DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@index([status, createdAt(sort: Desc)])
+  @@map("newsletter_subscribers")
+}
+
+model ContactMessage {
+  id               String        @id @default(uuid(7)) @db.Uuid
+  name             String        @db.VarChar(120)
+  email            String?       @db.Citext
+  phone            String?       @db.VarChar(16)
+  subject          String?       @db.VarChar(160)
+  message          String        @db.VarChar(5000)
+  status           ContactStatus @default(NEW)
+  ipHash           String?       @map("ip_hash") @db.Char(64)
+  handledByStaffId String?       @map("handled_by_staff_id") @db.Uuid
+  createdAt        DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt        DateTime      @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  handledBy StaffUser? @relation(fields: [handledByStaffId], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt(sort: Desc)])
+  @@map("contact_messages")
+}

@@ -21,9 +21,10 @@ describe('API foundation (e2e)', () => {
       expect(res.body).toMatchObject({ status: 'ok' });
     });
 
-    it('reports readiness', async () => {
+    it('reports readiness, including the database', async () => {
       const res = await http().get('/api/health/ready').expect(200);
       expect(res.body.info.memory_heap.status).toBe('up');
+      expect(res.body.info.database.status).toBe('up');
     });
   });
 
