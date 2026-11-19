@@ -4,6 +4,8 @@ import { OrnamentDivider } from './ornament-divider';
 
 interface SectionHeadingProps {
   title: string;
+  /** Id for the heading — lets the parent section use `aria-labelledby`. */
+  id?: string;
   subtitle?: string;
   /** Heading level — pages use h1, sections h2. */
   as?: 'h1' | 'h2';
@@ -14,6 +16,7 @@ interface SectionHeadingProps {
 /** Marcellus title + gold ornament divider, matching the card titles on the home page. */
 export function SectionHeading({
   title,
+  id,
   subtitle,
   as: Heading = 'h2',
   align = 'center',
@@ -27,7 +30,7 @@ export function SectionHeading({
         className,
       )}
     >
-      <Heading className="font-display text-[34px]/[1.1] text-ink sm:text-[42px]/[1.1]">
+      <Heading id={id} className="font-display text-[34px]/[1.1] text-ink sm:text-[42px]/[1.1]">
         {title}
       </Heading>
       <OrnamentDivider width={110} />

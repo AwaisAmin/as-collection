@@ -15,7 +15,7 @@ pnpm --filter @as/web build    # production build
 
 | Route                                                     | What                                                                             |
 | --------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| `/`                                                       | Home (hero, categories, trust bar)                                               |
+| `/`                                                       | Home: hero, categories, trust bar, new arrivals carousel, best sellers tabs      |
 | `/shop`, `/shop/[category]`, `/search`                    | Catalog with URL-driven filters, sort, pagination                                |
 | `/products/[slug]`                                        | Product page: gallery, variants, add to cart, size guide, tabs, reviews, related |
 | `/cart`, `/checkout`, `/order-confirmation/[orderNumber]` | Cart (stock re-validation), COD / bank transfer checkout, private confirmation   |

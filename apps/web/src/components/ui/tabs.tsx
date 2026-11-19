@@ -13,11 +13,31 @@ export interface TabItem {
 interface TabsProps {
   items: readonly TabItem[];
   label: string;
+  /** `underline` (product details) or `pills` (centered black pills, home sections). */
+  variant?: 'underline' | 'pills';
   className?: string;
 }
 
+const styles = {
+  underline: {
+    list: 'scrollbar-none flex gap-1 overflow-x-auto border-b border-gold/50',
+    tab: '-mb-px shrink-0 border-b-2 px-4 py-3 font-display text-[17px] whitespace-nowrap transition-colors duration-200 sm:px-6 sm:text-[18px]',
+    selected: 'border-ink text-ink',
+    idle: 'border-transparent text-muted hover:text-gold-dark',
+    panel: 'pt-6',
+  },
+  pills: {
+    list: 'scrollbar-none mx-auto flex w-fit max-w-full gap-2 overflow-x-auto p-1 sm:gap-3',
+    tab: 'shrink-0 rounded-full border-[1.5px] px-4 py-2 font-display text-[16px] whitespace-nowrap transition-colors duration-200 sm:px-7 sm:text-[17px]',
+    selected: 'border-gold bg-ink text-white',
+    idle: 'border-gold/60 bg-ivory text-text hover:border-gold hover:text-gold-dark',
+    panel: 'pt-8',
+  },
+} as const;
+
 /** WAI-ARIA tabs: roving tabindex, ←/→ Home/End keyboard support, automatic activation. */
-export function Tabs({ items, label, className }: TabsProps) {
+export function Tabs({ items, label, variant = 'underline', className }: TabsProps) {
+  const style = styles[variant];
   const [active, setActive] = useState(0);
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const base = useId();
@@ -46,12 +66,7 @@ export function Tabs({ items, label, className }: TabsProps) {
 
   return (
     <div className={className}>
-      <div
-        role="tablist"
-        aria-label={label}
-        onKeyDown={onKeyDown}
-        className="scrollbar-none flex gap-1 overflow-x-auto border-b border-gold/50"
-      >
+      <div role="tablist" aria-label={label} onKeyDown={onKeyDown} className={style.list}>
         {items.map((item, i) => {
           const selected = i === active;
           return (
@@ -67,12 +82,7 @@ export function Tabs({ items, label, className }: TabsProps) {
               aria-controls={`${base}-panel-${item.id}`}
               tabIndex={selected ? 0 : -1}
               onClick={() => setActive(i)}
-              className={cn(
-                '-mb-px shrink-0 border-b-2 px-4 py-3 font-display text-[17px] whitespace-nowrap transition-colors duration-200 sm:px-6 sm:text-[18px]',
-                selected
-                  ? 'border-ink text-ink'
-                  : 'border-transparent text-muted hover:text-gold-dark',
-              )}
+              className={cn(style.tab, selected ? style.selected : style.idle)}
             >
               {item.label}
             </button>
@@ -87,7 +97,7 @@ export function Tabs({ items, label, className }: TabsProps) {
           aria-labelledby={`${base}-tab-${item.id}`}
           hidden={i !== active}
           tabIndex={0}
-          className="pt-6 focus-visible:outline-offset-4"
+          className={cn(style.panel, 'focus-visible:outline-offset-4')}
         >
           {item.content}
         </div>

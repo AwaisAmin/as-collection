@@ -2,8 +2,10 @@ import 'server-only';
 
 import { cacheLife, cacheTag } from 'next/cache';
 
+import type { CategorySlug } from '@/config/catalog';
+
 import { mockProducts } from '../data';
-import { toSummary } from '../lib/product-helpers';
+import { isInStock, toSummary } from '../lib/product-helpers';
 import {
   computeFacets,
   filterBase,
@@ -32,6 +34,10 @@ export interface CatalogService {
   getProductSummaries(ids: readonly string[]): Promise<ProductSummary[]>;
   getRelatedProducts(product: Product, limit?: number): Promise<ProductSummary[]>;
   getFeaturedProducts(limit?: number): Promise<ProductSummary[]>;
+  /** Newest in-stock products first (home "New Arrivals"). */
+  getNewArrivals(limit?: number): Promise<ProductSummary[]>;
+  /** Bestsellers of a category, topped up with its best-rated products. */
+  getBestSellers(category: CategorySlug, limit?: number): Promise<ProductSummary[]>;
   listProductSlugs(): Promise<string[]>;
   /** Fresh (uncached) price/stock per variant — for cart re-validation and checkout. */
   getVariantSnapshots(variantIds: readonly string[]): Promise<VariantSnapshot[]>;
@@ -113,6 +119,34 @@ async function getFeaturedProducts(limit = 8): Promise<ProductSummary[]> {
     .map((p) => toSummary(p));
 }
 
+async function getNewArrivals(limit = 8): Promise<ProductSummary[]> {
+  'use cache';
+  cacheLife('hours');
+  cacheTag(CATALOG_TAG);
+  return sortProducts(
+    mockProducts.filter((p) => isInStock(p)),
+    'newest',
+  )
+    .slice(0, limit)
+    .map((p) => toSummary(p));
+}
+
+async function getBestSellers(category: CategorySlug, limit = 4): Promise<ProductSummary[]> {
+  'use cache';
+  cacheLife('hours');
+  cacheTag(CATALOG_TAG);
+  const inCategory = sortProducts(
+    mockProducts.filter((p) => p.category === category),
+    'rating',
+  );
+  // In stock first, then bestsellers; the stable sort keeps the rating order inside each group.
+  const rank = (p: Product) => (isInStock(p) ? 2 : 0) + (p.bestseller ? 1 : 0);
+  return [...inCategory]
+    .sort((a, b) => rank(b) - rank(a))
+    .slice(0, limit)
+    .map((p) => toSummary(p));
+}
+
 async function listProductSlugs(): Promise<string[]> {
   'use cache';
   cacheLife('hours');
@@ -156,5 +190,7 @@ export const catalogService: CatalogService = {
   getProductSummaries,
   getRelatedProducts,
   getFeaturedProducts,
+  getNewArrivals,
+  getBestSellers,
   listProductSlugs,
 };
