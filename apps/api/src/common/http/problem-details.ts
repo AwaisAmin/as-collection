@@ -22,6 +22,8 @@ export interface ProblemDetails {
   instance?: string;
   requestId?: string;
   errors?: FieldError[];
+  /** Extension members (DomainException `extensions`). */
+  [extension: string]: unknown;
 }
 
 /** Thrown by the global validation pipe; rendered as 422 with per-field `errors`. */
@@ -34,17 +36,57 @@ export class ValidationFailedException extends HttpException {
   }
 }
 
+/** Extra machine-readable members of a problem (RFC 9457 §3.2), e.g. `{ attemptsLeft: 2 }`. */
+export type ProblemExtensions = Record<string, string | number | boolean | null>;
+
+/** Problem members that extensions may never overwrite. */
+const RESERVED_MEMBERS = new Set([
+  'type',
+  'title',
+  'status',
+  'code',
+  'detail',
+  'instance',
+  'requestId',
+  'errors',
+]);
+
+export interface DomainExceptionOptions {
+  extensions?: ProblemExtensions;
+  /** Response headers, e.g. `{ 'Retry-After': '30' }`. */
+  headers?: Record<string, string>;
+}
+
 /**
  * Base class for business errors with a stable `code`, e.g.
  * `throw new DomainException(HttpStatus.CONFLICT, 'OUT_OF_STOCK', 'Only 2 left in stock.')`.
  */
 export class DomainException extends HttpException {
+  readonly extensions: ProblemExtensions;
+  readonly headers: Readonly<Record<string, string>>;
+
   constructor(
     status: HttpStatus,
     readonly code: string,
     detail: string,
+    options: DomainExceptionOptions = {},
   ) {
     super({ message: detail }, status);
+    this.extensions = Object.fromEntries(
+      Object.entries(options.extensions ?? {}).filter(([key]) => !RESERVED_MEMBERS.has(key)),
+    );
+    this.headers = options.headers ?? {};
+  }
+}
+
+/** 429 with `Retry-After` (seconds) as header and as a `retryAfterSeconds` member. */
+export class RateLimitedException extends DomainException {
+  constructor(code: string, detail: string, retryAfterSeconds: number) {
+    const seconds = Math.max(1, Math.ceil(retryAfterSeconds));
+    super(HttpStatus.TOO_MANY_REQUESTS, code, detail, {
+      extensions: { retryAfterSeconds: seconds },
+      headers: { 'Retry-After': String(seconds) },
+    });
   }
 }
 
@@ -119,6 +161,7 @@ export function toProblemDetails(exception: unknown, options: ToProblemOptions):
       detail: messageOf(exception.getResponse()),
     };
     if (exception instanceof ValidationFailedException) problem.errors = exception.errors;
+    if (exception instanceof DomainException) Object.assign(problem, exception.extensions);
     // Nest's built-in 5xx exceptions can carry internal details too.
     if (status >= 500 && !options.exposeInternalErrors) delete problem.detail;
     return problem;

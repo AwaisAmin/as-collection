@@ -21,6 +21,8 @@ model Customer {
   status          CustomerStatus @default(ACTIVE)
   marketingOptIn  Boolean        @default(false) @map("marketing_opt_in")
   phoneVerifiedAt DateTime?      @map("phone_verified_at") @db.Timestamptz(3)
+  /// Set when the email came from a verified source (Google). Only verified emails link accounts.
+  emailVerifiedAt DateTime?      @map("email_verified_at") @db.Timestamptz(3)
   lastLoginAt     DateTime?      @map("last_login_at") @db.Timestamptz(3)
   createdAt       DateTime       @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt       DateTime       @updatedAt @map("updated_at") @db.Timestamptz(3)
@@ -88,6 +90,7 @@ model Address {
 
   customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
 
+  /// Plus a partial unique index (migration): at most one default address per customer.
   @@index([customerId])
   @@map("addresses")
 }

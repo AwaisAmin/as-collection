@@ -25,6 +25,9 @@ docker build -f apps/api/Dockerfile -t as-collection-api .   # from the repo roo
 | `/api/docs`         | Swagger UI + `/api/docs/json` (off in production)                                                                                               |
 | `/api/v1/catalog/*` | Public catalog: categories, collections, products (search, `f.<code>` filters, sort, pagination), facets, product page, related, variant lookup |
 
+| `/api/v1/auth/*` | Customer sign-in: phone OTP (`otp`, `otp/verify`), Google (`google`), `session`, `logout` |
+| `/api/v1/account/*` | Signed-in customer: profile, verified phone, address book, signed-in devices |
+
 ## Structure
 
 ```
@@ -79,6 +82,28 @@ Rules:
   - **Fail-open:** if Redis is down the API serves from Postgres, and readiness reports `degraded` but still returns 200.
 - **Uncached by design**: `GET /catalog/variants`, the price and stock checks for cart and checkout.
 - **Stock privacy**: customers see `availableQuantity` capped at 10, never exact stock.
+
+## Customer auth
+
+- **Who calls it:** the storefront's Next.js server, not the browser.
+  - It stores the returned `token` in an HttpOnly cookie and sends it as `Authorization: Bearer <token>`.
+  - It forwards the shopper's IP via `X-Forwarded-For`; list that server in `TRUST_PROXY` so the per-IP limits see real clients.
+- **Phone OTP:** 6-digit, single-use codes. They expire after 5 minutes and allow 5 guesses; requesting a new code replaces the old one.
+  - **Limits:** a 30 s cooldown, 5 codes per phone per 15 minutes, and 20 per IP per hour. They're counted in Postgres, so they hold across instances and without Redis.
+  - **Concurrency:** requests for one phone are serialized with an advisory lock. Guesses are claimed with conditional updates, so parallel requests can't bypass any limit.
+  - **Storage:** only HMACs of the code and the IP are stored, keyed by `AUTH_SECRET`.
+- **Delivery:** `OTP_CHANNELS` lists the channels in fallback order, for example `whatsapp,sms` (WhatsApp Cloud authentication template, then Twilio SMS).
+  - `log` plus `OTP_DEV_ECHO` is for local development only; env validation rejects both in production.
+- **Google:** Google Identity Services ID tokens are verified with Google's keys and checked against issuer, audience (`GOOGLE_CLIENT_IDS`) and expiry.
+  - Accounts link by Google id, or by an email that is verified. A typed-in email never links, which prevents account pre-hijacking.
+- **Sessions:** opaque 256-bit tokens, stored as SHA-256 hashes.
+  - **Expiry:** `SESSION_TTL_DAYS` from last use, with an absolute cap of 180 days. Activity is written at most hourly.
+  - **Cache:** lookups are cached for 60 s in Redis, and revoking a session deletes its entry. Blocking a customer must call `SessionService.revokeAll`.
+  - **Limit:** at most 10 active sessions per customer; the oldest is revoked.
+- **Account data:** verifying a phone links earlier guest orders placed with it.
+  - **Addresses:** up to 20; there's always exactly one default, enforced by a partial unique index.
+- **Rate limits:** the global and `@StrictRateLimit()` limits (`AUTH_RATE_LIMIT_MAX` per minute) are counted in Redis and shared by all instances. If Redis is down they fall back to per-process memory.
+- **To do in B7:** a cleanup job for expired codes and sessions.
 
 ## Conventions
 

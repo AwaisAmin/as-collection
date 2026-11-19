@@ -3,7 +3,7 @@ import type { IncomingMessage, ServerResponse } from 'node:http';
 import { type ArgumentsHost, Catch, type ExceptionFilter, Logger } from '@nestjs/common';
 
 import { currentRequestId } from '../request-context.js';
-import { toProblemDetails } from './problem-details.js';
+import { DomainException, toProblemDetails } from './problem-details.js';
 import { REQUEST_ID_HEADER } from './request-id.middleware.js';
 import { requestPath } from './request-path.js';
 
@@ -48,6 +48,9 @@ export class ProblemDetailsFilter implements ExceptionFilter {
     res.statusCode = problem.status;
     res.setHeader('Content-Type', 'application/problem+json; charset=utf-8');
     res.setHeader('Cache-Control', 'no-store');
+    if (exception instanceof DomainException) {
+      for (const [name, value] of Object.entries(exception.headers)) res.setHeader(name, value);
+    }
     res.end(JSON.stringify(problem));
   }
 }

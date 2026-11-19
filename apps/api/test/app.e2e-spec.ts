@@ -1,14 +1,16 @@
 import type { NestNodeApplication } from '@nestjs/platform-node';
+import type { Redis } from 'ioredis';
 import request from 'supertest';
 
-import { createTestApp, TRUSTED_ORIGIN } from './helpers/create-test-app.js';
+import { REDIS } from '../src/redis/redis.constants.js';
+import { createTestApp, PRODUCTION_ENV, TRUSTED_ORIGIN } from './helpers/create-test-app.js';
 
 describe('API foundation (e2e)', () => {
   let app: NestNodeApplication;
   const http = () => request(app.getHttpServer());
 
   beforeAll(async () => {
-    ({ app } = await createTestApp({ NODE_ENV: 'production', SWAGGER_ENABLED: 'true' }));
+    ({ app } = await createTestApp({ ...PRODUCTION_ENV, SWAGGER_ENABLED: 'true' }));
   });
 
   afterAll(async () => {
@@ -158,6 +160,10 @@ describe('rate limiting (e2e)', () => {
 
   beforeAll(async () => {
     ({ app } = await createTestApp({ RATE_LIMIT_MAX: '3', RATE_LIMIT_TTL_MS: '60000' }));
+    // Counters live in Redis (shared by instances and test runs): start from zero.
+    const redis = app.get<Redis>(REDIS);
+    const keys = await redis.keys('as:throttle:*');
+    if (keys.length) await redis.del(...keys);
   });
 
   afterAll(async () => {
@@ -180,7 +186,7 @@ describe('rate limiting (e2e)', () => {
 
 describe('API docs toggle (e2e)', () => {
   it('is off by default in production', async () => {
-    const { app } = await createTestApp({ NODE_ENV: 'production' });
+    const { app } = await createTestApp(PRODUCTION_ENV);
     await request(app.getHttpServer()).get('/api/docs/json').expect(404);
     await app.close();
   });

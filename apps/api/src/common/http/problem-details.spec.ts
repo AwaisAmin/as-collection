@@ -1,7 +1,12 @@
 import { HttpStatus, NotFoundException } from '@nestjs/common';
 import { ThrottlerException } from '@nestjs/throttler';
 
-import { DomainException, toProblemDetails, ValidationFailedException } from './problem-details.js';
+import {
+  DomainException,
+  RateLimitedException,
+  toProblemDetails,
+  ValidationFailedException,
+} from './problem-details.js';
 import { formatIssuePath } from './validation.js';
 
 const opts = { instance: '/api/v1/x', requestId: 'req-12345678', exposeInternalErrors: false };
@@ -31,6 +36,23 @@ describe('toProblemDetails', () => {
       opts,
     );
     expect(problem).toMatchObject({ status: 409, code: 'OUT_OF_STOCK', detail: 'Only 2 left.' });
+  });
+
+  it('adds extension members but never lets them overwrite standard members', () => {
+    const error = new DomainException(HttpStatus.BAD_REQUEST, 'OTP_INVALID', 'Wrong code.', {
+      extensions: { attemptsLeft: 2, status: 200, code: 'HACKED' },
+    });
+    expect(toProblemDetails(error, opts)).toMatchObject({
+      status: 400,
+      code: 'OTP_INVALID',
+      attemptsLeft: 2,
+    });
+  });
+
+  it('carries Retry-After for rate-limited domain errors', () => {
+    const error = new RateLimitedException('OTP_RATE_LIMITED', 'Wait a moment.', 12.2);
+    expect(error.headers).toEqual({ 'Retry-After': '13' });
+    expect(toProblemDetails(error, opts)).toMatchObject({ status: 429, retryAfterSeconds: 13 });
   });
 
   it('marks rate limiting as RATE_LIMITED', () => {

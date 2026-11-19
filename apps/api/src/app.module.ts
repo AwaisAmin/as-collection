@@ -8,12 +8,16 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
+import { isStrictRateLimited } from './common/http/rate-limit.js';
 import { RequestIdMiddleware } from './common/http/request-id.middleware.js';
 import type { Env } from './config/env.js';
 import { DatabaseModule } from './database/database.module.js';
+import { AccountModule } from './modules/account/account.module.js';
+import { AuthModule } from './modules/auth/auth.module.js';
 import { CatalogModule } from './modules/catalog/catalog.module.js';
 import { HealthModule } from './modules/health/health.module.js';
 import { RedisModule } from './redis/redis.module.js';
+import { RedisThrottlerStorage } from './redis/redis-throttler.storage.js';
 
 /** Typed access to the validated environment: `config.get('PORT', { infer: true })`. */
 export type AppConfig = ConfigService<Env, true>;
@@ -34,13 +38,28 @@ export class AppModule implements NestModule {
           ignoreEnvFile: true,
           load: [() => env],
         }),
-        ThrottlerModule.forRoot({
-          throttlers: [{ name: 'default', ttl: env.RATE_LIMIT_TTL_MS, limit: env.RATE_LIMIT_MAX }],
-        }),
         DatabaseModule,
         RedisModule,
+        // Per client IP, counted in Redis so the limit holds across every API instance.
+        ThrottlerModule.forRootAsync({
+          inject: [RedisThrottlerStorage],
+          useFactory: (storage: RedisThrottlerStorage) => ({
+            throttlers: [
+              { name: 'default', ttl: env.RATE_LIMIT_TTL_MS, limit: env.RATE_LIMIT_MAX },
+              {
+                name: 'strict',
+                ttl: 60_000,
+                limit: env.AUTH_RATE_LIMIT_MAX,
+                skipIf: (context) => !isStrictRateLimited(context),
+              },
+            ],
+            storage,
+          }),
+        }),
         HealthModule,
         CatalogModule,
+        AuthModule,
+        AccountModule,
       ],
       providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
     };

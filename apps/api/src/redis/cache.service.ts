@@ -64,6 +64,24 @@ export class CacheService {
     return promise;
   }
 
+  /** Plain JSON read of `as:<key>`; `null` on a miss or when Redis is unavailable. */
+  async getJson<T>(key: string): Promise<T | null> {
+    const raw = await this.safe(() => this.redis.get(`as:${key}`), null);
+    return raw === null ? null : (JSON.parse(raw) as T);
+  }
+
+  async setJson(key: string, value: unknown, ttlSeconds: number): Promise<void> {
+    await this.safe(
+      () => this.redis.set(`as:${key}`, JSON.stringify(value), 'EX', ttlSeconds),
+      null,
+    );
+  }
+
+  async delete(...keys: string[]): Promise<void> {
+    if (keys.length === 0) return;
+    await this.safe(() => this.redis.del(...keys.map((key) => `as:${key}`)), null);
+  }
+
   /** Makes every cached entry of `namespace` stale immediately. */
   async invalidate(namespace: string): Promise<void> {
     await this.safe(() => this.redis.incr(this.versionKey(namespace)), null);

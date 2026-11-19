@@ -5,6 +5,7 @@ import {
   Logger,
   Module,
   type OnApplicationShutdown,
+  type OnModuleInit,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Redis } from 'ioredis';
@@ -12,6 +13,7 @@ import { Redis } from 'ioredis';
 import type { AppConfig } from '../app.module.js';
 import { CacheService } from './cache.service.js';
 import { REDIS } from './redis.constants.js';
+import { RedisThrottlerStorage } from './redis-throttler.storage.js';
 
 export { REDIS } from './redis.constants.js';
 
@@ -41,9 +43,25 @@ function createRedis(config: AppConfig): Redis {
   return client;
 }
 
+/** How long startup waits for Redis before serving without it (cache and limits fail open). */
+const STARTUP_WAIT_MS = 3_000;
+
 @Injectable()
-class RedisLifecycle implements OnApplicationShutdown {
+class RedisLifecycle implements OnModuleInit, OnApplicationShutdown {
   constructor(@Inject(REDIS) private readonly redis: Redis) {}
+
+  /** Avoids a burst of cache misses and per-process rate counting right after boot. */
+  async onModuleInit(): Promise<void> {
+    if (this.redis.status === 'ready') return;
+    await new Promise<void>((resolve) => {
+      const timer = setTimeout(done, STARTUP_WAIT_MS);
+      this.redis.once('ready', done);
+      function done() {
+        clearTimeout(timer);
+        resolve();
+      }
+    });
+  }
 
   async onApplicationShutdown(): Promise<void> {
     if (this.redis.status === 'end') return;
@@ -53,14 +71,15 @@ class RedisLifecycle implements OnApplicationShutdown {
   }
 }
 
-/** Global Redis client (`@Inject(REDIS)`) and the read-through `CacheService`. */
+/** Global Redis client (`@Inject(REDIS)`), the read-through `CacheService` and rate-limit storage. */
 @Global()
 @Module({
   providers: [
     { provide: REDIS, inject: [ConfigService], useFactory: createRedis },
     RedisLifecycle,
     CacheService,
+    RedisThrottlerStorage,
   ],
-  exports: [REDIS, CacheService],
+  exports: [REDIS, CacheService, RedisThrottlerStorage],
 })
 export class RedisModule {}

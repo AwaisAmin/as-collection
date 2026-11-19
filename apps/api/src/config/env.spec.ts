@@ -2,6 +2,18 @@ import { InvalidEnvironmentError, parseEnv } from './env.js';
 
 const DATABASE_URL = 'postgresql://u:p@localhost:5440/db';
 const REDIS_URL = 'redis://:p@localhost:6390/0';
+const AUTH_SECRET = 'x'.repeat(48);
+const PROD = {
+  DATABASE_URL,
+  REDIS_URL,
+  NODE_ENV: 'production',
+  CORS_ORIGINS: 'https://example.com',
+  AUTH_SECRET,
+  OTP_CHANNELS: 'sms',
+  TWILIO_ACCOUNT_SID: 'AC123',
+  TWILIO_AUTH_TOKEN: 'secret',
+  TWILIO_FROM: '+15005550006',
+};
 
 describe('parseEnv', () => {
   it('applies safe defaults for local development', () => {
@@ -59,13 +71,50 @@ describe('parseEnv', () => {
     expect(() => parseEnv({ DATABASE_URL, REDIS_URL, NODE_ENV: 'production' })).toThrow(
       InvalidEnvironmentError,
     );
+    const env = parseEnv(PROD);
+    expect(env.SWAGGER_ENABLED).toBe(false);
+  });
+
+  it('uses a development auth secret and logged OTPs outside production', () => {
+    const env = parseEnv({ DATABASE_URL, REDIS_URL });
+    expect(env.AUTH_SECRET.length).toBeGreaterThanOrEqual(32);
+    expect(env.OTP_CHANNELS).toEqual(['log']);
+    expect(env.OTP_DEV_ECHO).toBe(false);
+    expect(env.GOOGLE_CLIENT_IDS).toEqual([]);
+  });
+
+  it('enforces production auth settings', () => {
+    const issuesOf = (raw: Record<string, string | undefined>) => {
+      try {
+        parseEnv(raw);
+        return [];
+      } catch (error) {
+        return (error as InvalidEnvironmentError).issues;
+      }
+    };
+    expect(issuesOf({ ...PROD, AUTH_SECRET: undefined })).toEqual([
+      'AUTH_SECRET: is required in production',
+    ]);
+    expect(issuesOf({ ...PROD, OTP_CHANNELS: 'log' })[0]).toMatch(/^OTP_CHANNELS: "log"/);
+    expect(issuesOf({ ...PROD, OTP_DEV_ECHO: 'true' })[0]).toMatch(/^OTP_DEV_ECHO/);
+    expect(issuesOf({ ...PROD, AUTH_SECRET: 'short' })[0]).toMatch(/^AUTH_SECRET/);
+  });
+
+  it('requires provider credentials for each OTP channel', () => {
+    expect(() => parseEnv({ DATABASE_URL, REDIS_URL, OTP_CHANNELS: 'whatsapp,sms' })).toThrow(
+      /whatsapp needs/,
+    );
     const env = parseEnv({
       DATABASE_URL,
       REDIS_URL,
-      NODE_ENV: 'production',
-      CORS_ORIGINS: 'https://example.com',
+      OTP_CHANNELS: 'whatsapp, sms, whatsapp',
+      WHATSAPP_PHONE_NUMBER_ID: '123',
+      WHATSAPP_ACCESS_TOKEN: 'token',
+      TWILIO_ACCOUNT_SID: 'AC1',
+      TWILIO_AUTH_TOKEN: 't',
+      TWILIO_FROM: 'MG1',
     });
-    expect(env.SWAGGER_ENABLED).toBe(false);
+    expect(env.OTP_CHANNELS).toEqual(['whatsapp', 'sms']);
   });
 
   it('reports every invalid variable at once', () => {
