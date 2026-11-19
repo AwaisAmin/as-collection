@@ -26,7 +26,7 @@ export function RatingStars({ value, count, size = 16, className }: RatingStarsP
         aria-hidden
         size={size}
         strokeWidth={1.5}
-        className={filled ? 'fill-gold text-gold' : 'text-gold/45'}
+        className={cn('shrink-0', filled ? 'fill-gold text-gold' : 'text-gold/45')}
       />
     ));
 

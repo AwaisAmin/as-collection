@@ -162,6 +162,16 @@ const templates: Record<CategorySlug, readonly Template[]> = {
 /** Products with no reviews yet (to exercise the empty state). */
 const noReviews = new Set(['unst-006']);
 
+/** Seeded Fisher–Yates shuffle of indices 0..n-1. */
+function shuffle(n: number, rand: () => number): number[] {
+  const a = Array.from({ length: n }, (_, i) => i);
+  for (let i = n - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    [a[i], a[j]] = [a[j]!, a[i]!];
+  }
+  return a;
+}
+
 function generate(): Review[] {
   const reviews: Review[] = [];
 
@@ -172,13 +182,16 @@ function generate(): Review[] {
     const count = 3 + Math.floor(rand() * 7); // 3–9
     const start = Date.parse(product.createdAt);
     const span = Math.max(MOCK_NOW - start, 86_400_000);
+    // Shuffle (seeded) and cycle so a product repeats a template/name only after using them all.
+    const order = shuffle(pool.length, rand);
+    const authorOrder = shuffle(names.length, rand);
 
     for (let i = 0; i < count; i++) {
-      const t = pool[Math.floor(rand() * pool.length)] ?? pool[0]!;
+      const t = pool[order[i % order.length]!]!;
       reviews.push({
         id: `${product.id}-r${i + 1}`,
         productId: product.id,
-        author: names[Math.floor(rand() * names.length)]!,
+        author: names[authorOrder[i % authorOrder.length]!]!,
         city: cities[Math.floor(rand() * cities.length)],
         rating: t.rating,
         title: t.title,

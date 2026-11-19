@@ -10,16 +10,18 @@ export function formatPrice(amount: number): string {
   return pkr.format(amount).replace(/ /g, ' ');
 }
 
-const dateFormat = new Intl.DateTimeFormat('en-PK', {
-  day: 'numeric',
-  month: 'short',
-  year: 'numeric',
-  timeZone: 'Asia/Karachi',
-});
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+/** Pakistan Standard Time (UTC+5, no DST). */
+const PKT_OFFSET_MS = 5 * 60 * 60 * 1000;
 
-/** ISO date → "12 Nov 2026" */
+/**
+ * ISO date → "12 Nov 2026" in Pakistan time.
+ * Hand-rolled (not Intl) so server and browser always render identical text — no hydration
+ * mismatches from differing ICU/locale data.
+ */
 export function formatDate(iso: string): string {
-  return dateFormat.format(new Date(iso));
+  const d = new Date(Date.parse(iso) + PKT_OFFSET_MS);
+  return `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
 }
 
 /** 1 → "1 review", 3 → "3 reviews" */

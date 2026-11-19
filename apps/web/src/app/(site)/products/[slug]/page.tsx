@@ -15,6 +15,7 @@ import { DeliveryPerks } from '@/features/product/components/delivery-perks';
 import { ProductDetailsTabs } from '@/features/product/components/product-details-tabs';
 import { ProductGallery } from '@/features/product/components/product-gallery';
 import { PurchasePanel } from '@/features/product/components/purchase-panel';
+import { ProductReviews } from '@/features/reviews/components/product-reviews';
 import { ShopProductGrid } from '@/features/shop/components/shop-product-grid';
 import { pluralize } from '@/lib/utils/format';
 
@@ -110,8 +111,9 @@ async function ProductContent({ params }: Pick<PageProps<'/products/[slug]'>, 'p
           <ProductDetailsTabs product={product} />
         </section>
 
-        {/* Reviews section (summary, list, write a review) is added in F5. */}
-        <div id="reviews" />
+        <Suspense fallback={<ReviewsSkeleton />}>
+          <ProductReviews productId={product.id} productName={product.name} />
+        </Suspense>
 
         {related.length > 0 ? (
           <section aria-labelledby="related-title" className="mt-20">
@@ -123,6 +125,19 @@ async function ProductContent({ params }: Pick<PageProps<'/products/[slug]'>, 'p
         ) : null}
       </Container>
     </>
+  );
+}
+
+function ReviewsSkeleton() {
+  return (
+    <div id="reviews" className="mt-20 grid gap-10 lg:grid-cols-[320px_1fr]">
+      <Skeleton className="h-64 w-full rounded-card" />
+      <div className="flex flex-col gap-4">
+        {Array.from({ length: 3 }, (_, i) => (
+          <Skeleton key={i} className="h-28 w-full" />
+        ))}
+      </div>
+    </div>
   );
 }
 
