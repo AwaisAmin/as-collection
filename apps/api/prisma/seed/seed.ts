@@ -356,22 +356,7 @@ async function seedReviews(
       })),
     });
   }
-
-  // Denormalised rating per product, from approved reviews only.
-  const totals = await prisma.review.groupBy({
-    by: ['productId'],
-    where: { status: 'APPROVED' },
-    _count: { _all: true },
-    _sum: { rating: true },
-  });
-  await prisma.$transaction(
-    totals.map((t) =>
-      prisma.product.update({
-        where: { id: t.productId },
-        data: { ratingCount: t._count._all, ratingSum: t._sum.rating ?? 0 },
-      }),
-    ),
-  );
+  // product rating_count / rating_sum / rating_average are maintained by a database trigger.
 }
 
 async function seedCollections(

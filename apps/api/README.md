@@ -17,12 +17,13 @@ docker build -f apps/api/Dockerfile -t as-collection-api .   # from the repo roo
 
 ## Routes
 
-| Path                | What                                              |
-| ------------------- | ------------------------------------------------- |
-| `/api/v1/...`       | Versioned API (URI versioning)                    |
-| `/api/health/live`  | Liveness — process is up (no dependencies)        |
-| `/api/health/ready` | Readiness — dependencies healthy (load balancer)  |
-| `/api/docs`         | Swagger UI + `/api/docs/json` (off in production) |
+| Path                | What                                                                                                                                            |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/api/v1/...`       | Versioned API (URI versioning)                                                                                                                  |
+| `/api/health/live`  | Liveness — process is up (no dependencies)                                                                                                      |
+| `/api/health/ready` | Readiness — dependencies healthy (load balancer)                                                                                                |
+| `/api/docs`         | Swagger UI + `/api/docs/json` (off in production)                                                                                               |
+| `/api/v1/catalog/*` | Public catalog: categories, collections, products (search, `f.<code>` filters, sort, pagination), facets, product page, related, variant lookup |
 
 ## Structure
 
@@ -68,6 +69,16 @@ Rules:
 - **Integrity in the database**: CHECK constraints are hand-written at the end of migrations (prices ≥ 0, compare-at > price, stock, ratings 1–5, E.164 phones, order totals add up). CI fails if the schema drifts from the migrations.
 - **Admin-editable content** (`page_sections.settings`, `menu_items.settings`, `settings.value`) is JSON validated by Zod in the API, so new section types need no migration.
 - **Production**: run the `migrator` image target before starting new API instances.
+
+## Catalog reads & caching
+
+- **Listing summary columns**: `products.price_min_minor`, `compare_at_minor`, `is_on_sale`, `in_stock` and `rating_*` are maintained by **database triggers** on variants, inventory and reviews, so listings filter and sort without aggregating, and every write path stays consistent. Never write them from the app.
+- **Redis read-through cache** (`CacheService`), namespace `catalog`:
+  - **Invalidation:** `CatalogService.invalidate()` bumps a version, so every entry goes stale at once in O(1).
+  - **No stampedes:** concurrent misses share one query.
+  - **Fail-open:** if Redis is down the API serves from Postgres, and readiness reports `degraded` but still returns 200.
+- **Uncached by design**: `GET /catalog/variants`, the price and stock checks for cart and checkout.
+- **Stock privacy**: customers see `availableQuantity` capped at 10, never exact stock.
 
 ## Conventions
 

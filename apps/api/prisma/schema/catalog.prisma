@@ -169,6 +169,18 @@ model Product {
   /// Denormalised from APPROVED reviews (average = sum / count) so listings never aggregate.
   ratingCount       Int           @default(0) @map("rating_count")
   ratingSum         Int           @default(0) @map("rating_sum")
+  ratingAverage     Float         @default(0) @map("rating_average")
+  // ── Listing summary, maintained by DATABASE TRIGGERS from variants + inventory (read-only for
+  //    the app). Lets listings filter and sort by price / stock without aggregating variants.
+  /// Cheapest / dearest active variant price.
+  priceMinMinor     Int?          @map("price_min_minor")
+  priceMaxMinor     Int?          @map("price_max_minor")
+  /// Compare-at price of the cheapest variant(s), when it is a real discount.
+  compareAtMinor    Int?          @map("compare_at_minor")
+  /// Any active variant is discounted.
+  isOnSale          Boolean       @default(false) @map("is_on_sale")
+  /// Any active variant can be bought now (stock − reservations > 0, untracked, or backorder).
+  inStock           Boolean       @default(false) @map("in_stock")
   seoTitle          String?       @map("seo_title") @db.VarChar(160)
   seoDescription    String?       @map("seo_description") @db.VarChar(320)
   publishedAt       DateTime?     @map("published_at") @db.Timestamptz(3)
@@ -187,6 +199,9 @@ model Product {
   orderItems      OrderItem[]
 
   @@index([status, publishedAt(sort: Desc)])
+  @@index([status, priceMinMinor])
+  @@index([status, ratingAverage(sort: Desc)])
+  @@index([status, isFeatured, isBestseller, inStock, publishedAt(sort: Desc)])
   @@index([primaryCategoryId, status])
   @@index([brandId])
   // Fuzzy / typo-tolerant name search (pg_trgm).

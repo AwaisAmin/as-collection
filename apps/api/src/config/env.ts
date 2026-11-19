@@ -50,6 +50,16 @@ export const envSchema = z
     /** Cancel any single query running longer than this (protects the pool from runaway queries). */
     DATABASE_STATEMENT_TIMEOUT_MS: z.coerce.number().int().positive().default(15_000),
     DATABASE_CONNECT_TIMEOUT_MS: z.coerce.number().int().positive().default(5_000),
+
+    /** redis://:password@host:port/db — cache now; rate limits, queues and sessions later. */
+    REDIS_URL: z.url({ protocol: /^rediss?$/ }),
+    /** How long catalog reads stay cached. Admin edits invalidate immediately regardless. */
+    CATALOG_CACHE_TTL_SECONDS: z.coerce.number().int().min(0).max(86_400).default(300),
+    /** Public base URL of stored media (CDN in production); keys are appended: <base>/<key>. */
+    MEDIA_PUBLIC_BASE_URL: z
+      .url({ protocol: /^https?$/ })
+      .default('http://localhost:3000')
+      .transform((url) => url.replace(/\/+$/, '')),
   })
   .superRefine((env, ctx) => {
     if (env.NODE_ENV === 'production' && env.CORS_ORIGINS.length === 0) {

@@ -40,6 +40,7 @@ export async function createTestApp(
   loadEnvFiles(); // DATABASE_URL from apps/api/.env locally; CI sets it directly
   const env = parseEnv({
     DATABASE_URL: process.env.DATABASE_URL,
+    REDIS_URL: process.env.REDIS_URL,
     NODE_ENV: 'test',
     LOG_LEVEL: 'fatal',
     CORS_ORIGINS: TRUSTED_ORIGIN,

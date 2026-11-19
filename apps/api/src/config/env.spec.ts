@@ -1,10 +1,11 @@
 import { InvalidEnvironmentError, parseEnv } from './env.js';
 
 const DATABASE_URL = 'postgresql://u:p@localhost:5440/db';
+const REDIS_URL = 'redis://:p@localhost:6390/0';
 
 describe('parseEnv', () => {
   it('applies safe defaults for local development', () => {
-    const env = parseEnv({ DATABASE_URL });
+    const env = parseEnv({ DATABASE_URL, REDIS_URL });
     expect(env).toMatchObject({
       NODE_ENV: 'development',
       PORT: 4000,
@@ -17,30 +18,50 @@ describe('parseEnv', () => {
   });
 
   it('requires a PostgreSQL DATABASE_URL', () => {
-    expect(() => parseEnv({})).toThrow(/DATABASE_URL/);
-    expect(() => parseEnv({ DATABASE_URL: 'mysql://u:p@localhost/db' })).toThrow(/DATABASE_URL/);
+    expect(() => parseEnv({ REDIS_URL })).toThrow(/DATABASE_URL/);
+    expect(() => parseEnv({ REDIS_URL, DATABASE_URL: 'mysql://u:p@localhost/db' })).toThrow(
+      /DATABASE_URL/,
+    );
+  });
+
+  it('requires a Redis REDIS_URL', () => {
+    expect(() => parseEnv({ DATABASE_URL })).toThrow(/REDIS_URL/);
+    expect(() => parseEnv({ DATABASE_URL, REDIS_URL: 'http://localhost:6379' })).toThrow(
+      /REDIS_URL/,
+    );
+  });
+
+  it('normalises the media base URL (no trailing slash)', () => {
+    const env = parseEnv({
+      DATABASE_URL,
+      REDIS_URL,
+      MEDIA_PUBLIC_BASE_URL: 'https://cdn.example.com//',
+    });
+    expect(env.MEDIA_PUBLIC_BASE_URL).toBe('https://cdn.example.com');
   });
 
   it('parses a comma-separated origin list', () => {
     const env = parseEnv({
       DATABASE_URL,
+      REDIS_URL,
       CORS_ORIGINS: 'http://localhost:3000, https://admin.example.com',
     });
     expect(env.CORS_ORIGINS).toEqual(['http://localhost:3000', 'https://admin.example.com']);
   });
 
   it('rejects origins with a path or trailing slash', () => {
-    expect(() => parseEnv({ DATABASE_URL, CORS_ORIGINS: 'https://example.com/' })).toThrow(
-      /CORS_ORIGINS/,
-    );
+    expect(() =>
+      parseEnv({ DATABASE_URL, REDIS_URL, CORS_ORIGINS: 'https://example.com/' }),
+    ).toThrow(/CORS_ORIGINS/);
   });
 
   it('requires CORS origins and disables API docs by default in production', () => {
-    expect(() => parseEnv({ DATABASE_URL, NODE_ENV: 'production' })).toThrow(
+    expect(() => parseEnv({ DATABASE_URL, REDIS_URL, NODE_ENV: 'production' })).toThrow(
       InvalidEnvironmentError,
     );
     const env = parseEnv({
       DATABASE_URL,
+      REDIS_URL,
       NODE_ENV: 'production',
       CORS_ORIGINS: 'https://example.com',
     });
@@ -49,7 +70,7 @@ describe('parseEnv', () => {
 
   it('reports every invalid variable at once', () => {
     try {
-      parseEnv({ DATABASE_URL, PORT: 'abc', LOG_LEVEL: 'loud' });
+      parseEnv({ DATABASE_URL, REDIS_URL, PORT: 'abc', LOG_LEVEL: 'loud' });
       expect.unreachable();
     } catch (error) {
       expect(error).toBeInstanceOf(InvalidEnvironmentError);

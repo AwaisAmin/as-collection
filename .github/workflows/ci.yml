@@ -30,8 +30,15 @@ jobs:
         options: >-
           --health-cmd "pg_isready -U as_ci -d as_collection"
           --health-interval 5s --health-timeout 3s --health-retries 10
+      redis:
+        image: redis:8.8.4-alpine
+        ports: ['6379:6379']
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s --health-timeout 3s --health-retries 10
     env:
       DATABASE_URL: postgresql://as_ci:as_ci_password@localhost:5432/as_collection?schema=public
+      REDIS_URL: redis://localhost:6379/0
       PRISMA_HIDE_UPDATE_MESSAGE: '1'
     steps:
       - uses: actions/checkout@v5
