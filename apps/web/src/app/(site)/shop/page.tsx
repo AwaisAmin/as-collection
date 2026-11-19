@@ -1,21 +1,18 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 
 import { PageHeader } from '@/components/layout/page-header';
 import { Container } from '@/components/ui/container';
-import { parseCatalogQuery } from '@/features/catalog/schemas';
-import { catalogService } from '@/features/catalog/services/catalog.service';
-import { ShopProductGrid } from '@/features/shop/components/shop-product-grid';
-import { pluralize } from '@/lib/utils/format';
+import { CatalogBrowser } from '@/features/shop/components/catalog/catalog-browser';
+import { CatalogBrowserSkeleton } from '@/features/shop/components/catalog/catalog-browser-skeleton';
 
 export const metadata: Metadata = {
   title: 'Shop',
   description: 'Shop unstitched & stitched dresses and makeup at AS Collection Hub.',
+  alternates: { canonical: '/shop' },
 };
 
-// Filters, sorting and pagination arrive in the next step (F3).
-export default async function ShopPage() {
-  const { items, total } = await catalogService.listProducts(parseCatalogQuery({}), 48);
-
+export default function ShopPage({ searchParams }: PageProps<'/shop'>) {
   return (
     <main id="main-content" className="flex-1">
       <PageHeader
@@ -24,8 +21,9 @@ export default async function ShopPage() {
         breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Shop' }]}
       />
       <Container className="py-10">
-        <p className="mb-6 text-[17px] text-muted">{pluralize(total, 'product')}</p>
-        <ShopProductGrid products={items} />
+        <Suspense fallback={<CatalogBrowserSkeleton />}>
+          <CatalogBrowser searchParams={searchParams} basePath="/shop" categoryMode="path" />
+        </Suspense>
       </Container>
     </main>
   );

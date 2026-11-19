@@ -9,12 +9,15 @@ interface SearchFormProps {
   className?: string;
   /** Unique id so multiple instances (desktop + drawer) don't clash. */
   inputId: string;
+  /** Prefill (search results page). */
+  defaultValue?: string;
+  size?: 'md' | 'lg';
 }
 
-/** GET search → /shop?q=… (progressively enhanced with client navigation by next/form). */
-export function SearchForm({ className, inputId }: SearchFormProps) {
+/** GET search → /search?q=… (progressively enhanced with client navigation by next/form). */
+export function SearchForm({ className, inputId, defaultValue, size = 'md' }: SearchFormProps) {
   return (
-    <Form action="/shop" role="search" className={cn('relative', className)}>
+    <Form action="/search" role="search" className={cn('relative', className)}>
       <label htmlFor={inputId} className="sr-only">
         Search products
       </label>
@@ -25,6 +28,8 @@ export function SearchForm({ className, inputId }: SearchFormProps) {
         placeholder="Search here..."
         autoComplete="off"
         maxLength={100}
+        defaultValue={defaultValue}
+        size={size}
         className="pr-12"
       />
       <IconButton

@@ -6,11 +6,8 @@ import { PageHeader } from '@/components/layout/page-header';
 import { Container } from '@/components/ui/container';
 import { Skeleton } from '@/components/ui/skeleton';
 import { categories, getCategory } from '@/config/catalog';
-import { ProductGridSkeleton } from '@/features/catalog/components/product-card-skeleton';
-import { parseCatalogQuery } from '@/features/catalog/schemas';
-import { catalogService } from '@/features/catalog/services/catalog.service';
-import { ShopProductGrid } from '@/features/shop/components/shop-product-grid';
-import { pluralize } from '@/lib/utils/format';
+import { CatalogBrowser } from '@/features/shop/components/catalog/catalog-browser';
+import { CatalogBrowserSkeleton } from '@/features/shop/components/catalog/catalog-browser-skeleton';
 
 export function generateStaticParams() {
   return categories.map(({ slug }) => ({ category: slug }));
@@ -24,28 +21,24 @@ export async function generateMetadata({
   return {
     title: category.name,
     description: `Shop ${category.name.toLowerCase()} at AS Collection Hub — free shipping on orders above 2500 and cash on delivery.`,
+    alternates: { canonical: category.href },
   };
 }
 
 /** Shell renders instantly; URL-dependent content streams in (Cache Components pattern). */
-export default function CategoryPage({ params }: PageProps<'/shop/[category]'>) {
+export default function CategoryPage({ params, searchParams }: PageProps<'/shop/[category]'>) {
   return (
     <main id="main-content" className="flex-1">
       <Suspense fallback={<CategoryFallback />}>
-        <CategoryContent params={params} />
+        <CategoryContent params={params} searchParams={searchParams} />
       </Suspense>
     </main>
   );
 }
 
-async function CategoryContent({ params }: Pick<PageProps<'/shop/[category]'>, 'params'>) {
+async function CategoryContent({ params, searchParams }: PageProps<'/shop/[category]'>) {
   const category = getCategory((await params).category);
   if (!category) notFound();
-
-  const { items, total } = await catalogService.listProducts(
-    parseCatalogQuery({}, { category: category.slug }),
-    48,
-  );
 
   return (
     <>
@@ -58,8 +51,14 @@ async function CategoryContent({ params }: Pick<PageProps<'/shop/[category]'>, '
         ]}
       />
       <Container className="py-10">
-        <p className="mb-6 text-[17px] text-muted">{pluralize(total, 'product')}</p>
-        <ShopProductGrid products={items} />
+        <Suspense fallback={<CatalogBrowserSkeleton />}>
+          <CatalogBrowser
+            searchParams={searchParams}
+            basePath={category.href}
+            category={category.slug}
+            categoryMode="path"
+          />
+        </Suspense>
       </Container>
     </>
   );
@@ -75,8 +74,7 @@ function CategoryFallback() {
         </Container>
       </div>
       <Container className="py-10">
-        <Skeleton className="mb-6 h-5 w-24" />
-        <ProductGridSkeleton />
+        <CatalogBrowserSkeleton />
       </Container>
     </>
   );
