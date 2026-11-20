@@ -19,6 +19,8 @@ if (!process.env.DATABASE_URL && existsSync(apiEnvFile)) process.loadEnvFile(api
 
 const API_PORT = 4100;
 const WEB_PORT = 3100;
+const ADMIN_PORT = 3101;
+const ADMIN_URL = `http://localhost:${String(ADMIN_PORT)}`;
 const WEB_URL = `http://localhost:${String(WEB_PORT)}`;
 const API_URL = `http://127.0.0.1:${String(API_PORT)}/api/v1`;
 
@@ -43,6 +45,20 @@ const webEnv = {
   MOCK_API: 'false',
   NEXT_TELEMETRY_DISABLED: '1',
 };
+
+const adminEnv = {
+  NODE_ENV: 'production',
+  API_URL,
+  STOREFRONT_URL: WEB_URL,
+  NEXT_TELEMETRY_DISABLED: '1',
+};
+
+const adminCommand = [
+  process.env.E2E_SKIP_WEB_BUILD ? null : 'pnpm --filter @as/admin build',
+  `pnpm --filter @as/admin exec next start --port ${String(ADMIN_PORT)}`,
+]
+  .filter(Boolean)
+  .join(' && ');
 
 const webCommand = [
   process.env.E2E_SKIP_WEB_BUILD ? null : 'pnpm --filter @as/web build',
@@ -69,8 +85,13 @@ export default defineConfig({
     timezoneId: 'Asia/Karachi',
   },
   projects: [
-    { name: 'desktop', use: { ...devices['Desktop Chrome'] } },
+    { name: 'desktop', use: { ...devices['Desktop Chrome'] }, testIgnore: /admin\// },
     { name: 'mobile', use: { ...devices['Pixel 7'] }, testMatch: /browse\.spec\.ts/ },
+    {
+      name: 'admin',
+      use: { ...devices['Desktop Chrome'], baseURL: ADMIN_URL },
+      testMatch: /admin\/.*\.spec\.ts/,
+    },
   ],
   webServer: [
     {
@@ -81,6 +102,17 @@ export default defineConfig({
       env: { ...process.env, ...apiEnv } as Record<string, string>,
       reuseExistingServer: !process.env.CI,
       timeout: 60_000,
+      stdout: 'ignore',
+      stderr: 'pipe',
+    },
+    {
+      name: 'admin',
+      command: adminCommand,
+      cwd: root,
+      url: `${ADMIN_URL}/login`,
+      env: { ...process.env, ...adminEnv } as Record<string, string>,
+      reuseExistingServer: !process.env.CI,
+      timeout: 6 * 60_000,
       stdout: 'ignore',
       stderr: 'pipe',
     },

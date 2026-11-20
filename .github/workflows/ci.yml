@@ -79,9 +79,9 @@ jobs:
         run: pnpm --filter @as/api build
       - name: Install Chromium for Playwright
         run: pnpm --filter @as/e2e exec playwright install --with-deps chromium
-      # Starts the API, builds the storefront against it (pages are prerendered from API data),
-      # then drives it in a browser: browsing, checkout, sign-in, account, contact.
-      - name: Browser tests (storefront + API)
+      # Starts the API, builds the storefront (prerendered from API data) and the admin panel,
+      # then drives them in a browser: browsing, checkout, sign-in, account, contact, staff sign-in.
+      - name: Browser tests (storefront + admin + API)
         run: pnpm --filter @as/e2e test:browser
       - name: Upload the Playwright report
         if: failure()
