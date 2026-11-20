@@ -1,3 +1,10 @@
+import type {
+  AdminCollectionDetailDto,
+  AdminCollectionDto,
+  CollectionPreviewDto,
+  CollectionProductDto,
+  CollectionRulesDto,
+} from '@as/contracts';
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
@@ -92,7 +99,7 @@ export class AdminCollectionsService {
     this.baseUrl = config.get('MEDIA_PUBLIC_BASE_URL', { infer: true });
   }
 
-  async list() {
+  async list(): Promise<AdminCollectionDto[]> {
     const rows = await this.prisma.collection.findMany({
       orderBy: [{ position: 'asc' }, { name: 'asc' }],
       select: collectionSelect,
@@ -101,7 +108,7 @@ export class AdminCollectionsService {
     return Promise.all(rows.map(async (row) => this.toDto(row, await this.productCount(row), now)));
   }
 
-  async get(id: string) {
+  async get(id: string): Promise<AdminCollectionDetailDto> {
     const row = await this.prisma.collection.findUnique({
       where: { id },
       select: collectionSelect,
@@ -122,7 +129,7 @@ export class AdminCollectionsService {
   }
 
   /** Which live products the rules match (count and the first few), without saving. */
-  async preview(rules: CollectionRules) {
+  async preview(rules: CollectionRules): Promise<CollectionPreviewDto> {
     const errors = await this.checkRules(this.prisma, rules);
     if (errors.length) throw new ValidationFailedException(errors);
     const where: Prisma.ProductWhereInput = {
@@ -384,19 +391,19 @@ export class AdminCollectionsService {
     return result;
   }
 
-  private toDto(row: CollectionRow, productCount: number, now: Date) {
+  private toDto(row: CollectionRow, productCount: number, now: Date): AdminCollectionDto {
     return {
       id: row.id,
       slug: row.slug,
       name: row.name,
       description: row.description,
       type: row.type,
-      rules: row.rules as CollectionRules | null,
+      rules: row.rules as CollectionRulesDto | null,
       isActive: row.isActive,
       state: collectionState(row, now),
       position: row.position,
-      startsAt: row.startsAt,
-      endsAt: row.endsAt,
+      startsAt: row.startsAt?.toISOString() ?? null,
+      endsAt: row.endsAt?.toISOString() ?? null,
       seoTitle: row.seoTitle,
       seoDescription: row.seoDescription,
       image: row.image
@@ -408,11 +415,13 @@ export class AdminCollectionsService {
         : null,
       /** Manual: products in the list; automated: live products matching the rules now. */
       productCount,
-      updatedAt: row.updatedAt,
+      updatedAt: row.updatedAt.toISOString(),
     };
   }
 
-  private previewItem(p: Prisma.ProductGetPayload<{ select: typeof productPreviewSelect }>) {
+  private previewItem(
+    p: Prisma.ProductGetPayload<{ select: typeof productPreviewSelect }>,
+  ): CollectionProductDto {
     const image = p.media[0]?.media;
     return {
       id: p.id,

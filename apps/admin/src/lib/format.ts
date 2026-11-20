@@ -47,3 +47,26 @@ export function formatBytes(bytes: number): string {
   if (bytes < 1024 * 1024) return `${String(Math.round(bytes / 1024))} KB`;
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
+
+/** ISO time → `2026-11-20T15:45` for a `datetime-local` input, in Pakistan time. */
+export function toPktInput(iso: string | null): string {
+  if (!iso) return '';
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: STORE_TIME_ZONE,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+  }).formatToParts(new Date(iso));
+  const get = (type: string) => parts.find((p) => p.type === type)?.value ?? '00';
+  return `${get('year')}-${get('month')}-${get('day')}T${get('hour')}:${get('minute')}`;
+}
+
+/** A `datetime-local` value read as Pakistan time (UTC+5, no daylight saving) → ISO. */
+export function fromPktInput(value: string): string | null {
+  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(value)) return null;
+  const date = new Date(`${value}:00+05:00`);
+  return Number.isNaN(date.getTime()) ? null : date.toISOString();
+}

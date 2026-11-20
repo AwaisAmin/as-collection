@@ -277,3 +277,62 @@ export interface StockMovementListDto {
   items: StockMovementDto[];
   nextCursor: string | null;
 }
+
+// ─── Collections (`/admin/collections`) ───
+
+export type CollectionType = 'MANUAL' | 'AUTOMATED';
+/** Whether shoppers see it now (inactive, before its start, after its end, or live). */
+export type CollectionState = 'live' | 'scheduled' | 'ended' | 'hidden';
+
+/** One condition of an automated collection. Slugs: tags, attribute codes and value slugs. */
+export type CollectionRuleDto =
+  | { field: 'onSale' | 'inStock' | 'featured'; op: 'eq'; value: boolean }
+  | { field: 'tag'; op: 'in'; value: string[] }
+  | { field: 'attribute'; op: 'in'; code: string; value: string[] }
+  | { field: 'priceMinor'; op: 'lte' | 'gte'; value: number }
+  | { field: 'publishedWithinDays'; op: 'lte'; value: number };
+
+/** Every rule must match (`all`) or at least one (`any`). */
+export type CollectionRulesDto = { all: CollectionRuleDto[] } | { any: CollectionRuleDto[] };
+
+export interface AdminCollectionDto {
+  id: string;
+  slug: string;
+  name: string;
+  description: string | null;
+  type: CollectionType;
+  rules: CollectionRulesDto | null;
+  isActive: boolean;
+  state: CollectionState;
+  position: number;
+  startsAt: string | null;
+  endsAt: string | null;
+  seoTitle: string | null;
+  seoDescription: string | null;
+  image: AdminImageRefDto | null;
+  /** Hand-picked: products in the list; automated: live products matching the rules now. */
+  productCount: number;
+  updatedAt: string;
+}
+
+/** A product as collections list it (picked products, rule previews). */
+export interface CollectionProductDto {
+  id: string;
+  slug: string;
+  name: string;
+  status: ProductStatus;
+  priceMinMinor: number | null;
+  image: { url: string; alt: string | null } | null;
+}
+
+export interface AdminCollectionDetailDto extends AdminCollectionDto {
+  /** Hand-picked collections: the products in display order (empty for automated). */
+  products: CollectionProductDto[];
+}
+
+/** `POST /admin/collections/preview` — what the rules match right now. */
+export interface CollectionPreviewDto {
+  count: number;
+  /** The newest few. */
+  sample: CollectionProductDto[];
+}

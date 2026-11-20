@@ -48,6 +48,15 @@ on stdin). Everyone else is added from the panel.
   category moves its subcategories), description, visibility, picture, banner (image, small
   heading, text, which part stays in view on phones), the filters shown on the page (attributes,
   optionally required for products there) and search-engine text. Empty categories can be deleted.
+- **Attributes** (`/attributes`): product details / shop filters and variant options. The editor
+  sets name, use (product detail or variant option), type (one choice, several, text, number,
+  yes/no), unit, filter and visibility; type and use lock once in use, and the filter code never
+  changes. Values: add (one per line on create), rename, colour swatch, reorder, delete unused.
+- **Collections** (`/collections`): occasions and edits in display order with live / scheduled /
+  ended / hidden state. Hand-picked collections get a searchable product picker and ordering
+  (saved as one list); automatic ones a rule builder (on sale, in stock, featured, tag, detail,
+  price range, recently added; all or any) with a preview of what matches now. Start and end
+  times are entered in Pakistan time.
 - **Brands** (`/brands`): add and edit in dialogs (name, web address, description, logo, shown);
   brands without products can be deleted; the product count links to those products.
 - **Images** (`/media`): the library, newest first, with an Unused view and search; upload several
@@ -63,6 +72,8 @@ on stdin). Everyone else is added from the panel.
   `lib/api/admin-call.ts` (`adminCall`, `parsePayload`, `saveFailure`).
 - The image picker never renders a `<form>`, so it can open inside other forms' dialogs.
 - Errors inside a modal are shown in the modal (toasts sit behind it).
+- Constants used by server pages live in plain modules (`labels.ts`), never in `'use client'` files
+  (a server import of those gets a client reference, not the value).
 - Horizontal scroll containers are `relative`, so screen-reader-only labels inside them can't
   widen the page on phones.
 

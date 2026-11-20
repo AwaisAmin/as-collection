@@ -10,6 +10,7 @@ export type NavIcon =
   | 'media'
   | 'categories'
   | 'brands'
+  | 'attributes'
   | 'collections'
   | 'discounts'
   | 'reviews'
@@ -54,6 +55,13 @@ export const NAVIGATION: readonly NavGroup[] = [
       { label: 'Stock', href: '/stock', icon: 'inventory', anyOf: ['catalog.read'] },
       { label: 'Images', href: '/media', icon: 'media', anyOf: ['catalog.read'] },
       { label: 'Categories', href: '/categories', icon: 'categories', anyOf: ['catalog.read'] },
+      {
+        label: 'Collections',
+        href: '/collections',
+        icon: 'collections',
+        anyOf: ['catalog.read'],
+      },
+      { label: 'Attributes', href: '/attributes', icon: 'attributes', anyOf: ['catalog.read'] },
       { label: 'Brands', href: '/brands', icon: 'brands', anyOf: ['catalog.read'] },
     ],
   },
