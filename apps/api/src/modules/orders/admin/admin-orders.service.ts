@@ -1,3 +1,4 @@
+import type { AdminOrderCountsDto, AdminOrderListDto, SignedUrlDto } from '@as/contracts';
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 
 import { DomainException } from '../../../common/http/problem-details.js';
@@ -70,7 +71,7 @@ export class AdminOrdersService {
 
   // ─── Reads ───
 
-  async list(query: AdminOrdersQuery) {
+  async list(query: AdminOrdersQuery): Promise<AdminOrderListDto> {
     const where: Prisma.OrderWhereInput = {
       status: query.status?.length ? { in: query.status } : undefined,
       paymentStatus: query.paymentStatus?.length ? { in: query.paymentStatus } : undefined,
@@ -104,14 +105,14 @@ export class AdminOrdersService {
   }
 
   /** Badge counts for the admin navigation. */
-  async counts() {
+  async counts(): Promise<AdminOrderCountsDto> {
     const [byStatus, awaitingPaymentReview] = await Promise.all([
       this.prisma.order.groupBy({ by: ['status'], _count: { _all: true } }),
       this.prisma.order.count({ where: { paymentStatus: 'AWAITING_VERIFICATION' } }),
     ]);
-    const counts = Object.fromEntries(byStatus.map((g) => [g.status, g._count._all])) as Partial<
-      Record<string, number>
-    >;
+    const counts: AdminOrderCountsDto['byStatus'] = Object.fromEntries(
+      byStatus.map((g) => [g.status, g._count._all]),
+    );
     return {
       byStatus: counts,
       awaitingPaymentReview,
@@ -289,7 +290,7 @@ export class AdminOrdersService {
   // ─── Payment proofs ───
 
   /** Short-lived link to the screenshot; every view is audited (it is personal data). */
-  async proofUrl(number: string, proofId: string, actor: AuditActor) {
+  async proofUrl(number: string, proofId: string, actor: AuditActor): Promise<SignedUrlDto> {
     const id = await this.idOf(number);
     const proof = await this.prisma.paymentProof.findFirst({
       where: { id: proofId, orderId: id },

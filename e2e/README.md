@@ -3,8 +3,9 @@
 Playwright drives production builds of `apps/web` and `apps/admin` against a real `apps/api`,
 PostgreSQL, Redis and storage, on the seeded catalog. It covers browsing (desktop and mobile), guest
 checkout (place → track → cancel, with stock held and released), phone-code sign-in with the
-account pages, the contact and newsletter forms, and staff sign-in to the admin panel (password +
-first-time authenticator setup → dashboard → sign out).
+account pages, the contact and newsletter forms, and the admin panel: staff sign-in (password +
+first-time authenticator setup → dashboard → sign out) and order handling (a bank-transfer order
+with a payment screenshot is verified, shipped and delivered; stock moves from reserved to sold).
 
 ```bash
 pnpm services:up                                  # Docker: PostgreSQL, Redis, storage
@@ -17,7 +18,7 @@ pnpm --filter @as/e2e test:browser --project=admin        # only the admin panel
 ```
 
 - **Data:** test customers and orders use 0396… phone numbers and `@e2e-browser.example.test` emails. Every
-  test removes its own data and releases any stock it held (`tests/db.ts`).
+  test removes its own data, releases any stock it held and reverses stock its orders sold (`tests/db.ts`).
 - **Login codes:** the API runs with `OTP_DEV_ECHO=true` (refused in production), so the storefront shows the
   code in a toast and the test reads it.
 - **Staff:** admin tests create a super admin with the real `staff:create` CLI (`@e2e-admin.example.test`),

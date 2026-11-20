@@ -1,5 +1,6 @@
 import { Boxes, ClipboardCheck, Inbox, type LucideIcon, Receipt, Star, Truck } from 'lucide-react';
-import type { Metadata } from 'next';
+import type { Metadata, Route } from 'next';
+import Link from 'next/link';
 
 import { Alert } from '@/components/ui/alert';
 import { Card } from '@/components/ui/card';
@@ -15,6 +16,8 @@ interface Tile {
   icon: LucideIcon;
   /** null: could not be loaded right now. */
   value: number | null;
+  /** The list where this work is done (once that area exists). */
+  href?: Route;
 }
 
 /** A count from the API; a failed call shows "—" instead of breaking the dashboard. */
@@ -47,18 +50,21 @@ export default async function DashboardPage({ searchParams }: PageProps<'/'>) {
         hint: 'Placed, waiting for a call or check',
         icon: ClipboardCheck,
         value: orders?.toConfirm ?? null,
+        href: '/orders?view=to-confirm' as Route,
       },
       {
         label: 'Payments to verify',
         hint: 'Transfer screenshots waiting',
         icon: Receipt,
         value: orders?.awaitingPaymentReview ?? null,
+        href: '/orders?view=payments' as Route,
       },
       {
         label: 'Orders to ship',
         hint: 'Confirmed or being packed',
         icon: Truck,
         value: orders?.toShip ?? null,
+        href: '/orders?view=to-ship' as Route,
       },
     );
   }
@@ -105,18 +111,16 @@ export default async function DashboardPage({ searchParams }: PageProps<'/'>) {
         <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {tiles.map((tile) => (
             <li key={tile.label}>
-              <Card className="flex items-start gap-4 p-5">
-                <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-gold/15 text-gold-dark">
-                  <tile.icon aria-hidden size={20} />
-                </span>
-                <div className="min-w-0">
-                  <p className="text-[13px] font-medium text-muted">{tile.label}</p>
-                  <p className="text-[28px] leading-tight font-semibold tabular-nums">
-                    {tile.value ?? '—'}
-                  </p>
-                  <p className="text-[13px] text-muted">{tile.hint}</p>
-                </div>
-              </Card>
+              {tile.href ? (
+                <Link
+                  href={tile.href}
+                  className="block rounded-card transition-shadow hover:shadow-md"
+                >
+                  <TileCard tile={tile} />
+                </Link>
+              ) : (
+                <TileCard tile={tile} />
+              )}
             </li>
           ))}
         </ul>
@@ -124,5 +128,20 @@ export default async function DashboardPage({ searchParams }: PageProps<'/'>) {
         <Alert>Your role doesn&apos;t include any dashboard areas yet. Ask an administrator.</Alert>
       )}
     </div>
+  );
+}
+
+function TileCard({ tile }: { tile: Tile }) {
+  return (
+    <Card className="flex items-start gap-4 p-5">
+      <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-gold/15 text-gold-dark">
+        <tile.icon aria-hidden size={20} />
+      </span>
+      <div className="min-w-0">
+        <p className="text-[13px] font-medium text-muted">{tile.label}</p>
+        <p className="text-[28px] leading-tight font-semibold tabular-nums">{tile.value ?? '—'}</p>
+        <p className="text-[13px] text-muted">{tile.hint}</p>
+      </div>
+    </Card>
   );
 }

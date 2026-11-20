@@ -38,6 +38,22 @@ export async function cleanupTestData(): Promise<void> {
         WHERE i.variant_id = t.variant_id AND i.track_inventory`,
         [`${PHONE_PREFIX}%`],
       );
+      // Shipped / returned test orders moved stock in the ledger: undo those movements.
+      await client.query(
+        `UPDATE inventory_items i
+           SET on_hand = i.on_hand - t.delta, version = version + 1
+         FROM (SELECT m.variant_id, sum(m.delta)::int AS delta
+                 FROM inventory_movements m JOIN orders o ON o.number = m.reference
+                WHERE o.phone LIKE $1
+                GROUP BY m.variant_id) t
+        WHERE i.variant_id = t.variant_id`,
+        [`${PHONE_PREFIX}%`],
+      );
+      await client.query(
+        `DELETE FROM inventory_movements m USING orders o
+          WHERE o.number = m.reference AND o.phone LIKE $1`,
+        [`${PHONE_PREFIX}%`],
+      );
       const proofs = await client.query<{ media_id: string }>(
         `SELECT p.media_id FROM payment_proofs p JOIN orders o ON o.id = p.order_id WHERE o.phone LIKE $1`,
         [`${PHONE_PREFIX}%`],
@@ -59,6 +75,23 @@ export async function cleanupTestData(): Promise<void> {
       await client.query('ROLLBACK');
       throw error;
     }
+  });
+}
+
+/** A variant's id and stock (units on the shelf, units held by open orders). */
+export async function variantStock(
+  sku: string,
+): Promise<{ variantId: string; onHand: number; reserved: number }> {
+  return withClient(async (client) => {
+    const result = await client.query<{ variant_id: string; on_hand: number; reserved: number }>(
+      `SELECT v.id AS variant_id, i.on_hand, i.reserved
+         FROM product_variants v JOIN inventory_items i ON i.variant_id = v.id
+        WHERE v.sku = $1`,
+      [sku],
+    );
+    const row = result.rows[0];
+    if (!row) throw new Error(`No variant ${sku}`);
+    return { variantId: row.variant_id, onHand: row.on_hand, reserved: row.reserved };
   });
 }
 

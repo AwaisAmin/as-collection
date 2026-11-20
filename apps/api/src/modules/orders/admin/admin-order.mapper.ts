@@ -1,3 +1,9 @@
+import type {
+  AdminOrderCountsDto,
+  AdminOrderDto as AdminOrderContract,
+  AdminOrderListItemDto,
+} from '@as/contracts';
+
 import type { Prisma } from '../../../generated/prisma/client.js';
 import { availableActions, canReviewPayment } from './order-workflow.js';
 
@@ -84,7 +90,7 @@ export type AdminOrderRow = Prisma.OrderGetPayload<{ select: typeof adminOrderSe
 
 const iso = (d: Date | null) => d?.toISOString() ?? null;
 
-export function toAdminOrderDto(row: AdminOrderRow) {
+export function toAdminOrderDto(row: AdminOrderRow): AdminOrderContract {
   return {
     id: row.id,
     number: row.number,
@@ -150,7 +156,8 @@ export function toAdminOrderDto(row: AdminOrderRow) {
   };
 }
 
-export type AdminOrderDto = ReturnType<typeof toAdminOrderDto>;
+export type AdminOrderDto = AdminOrderContract;
+export type { AdminOrderCountsDto };
 
 export const adminOrderListSelect = {
   id: true,
@@ -169,7 +176,7 @@ export const adminOrderListSelect = {
 
 type AdminOrderListRow = Prisma.OrderGetPayload<{ select: typeof adminOrderListSelect }>;
 
-export const toAdminOrderListItem = (row: AdminOrderListRow) => ({
+export const toAdminOrderListItem = (row: AdminOrderListRow): AdminOrderListItemDto => ({
   id: row.id,
   number: row.number,
   status: row.status,

@@ -42,6 +42,10 @@ export const NAVIGATION: readonly NavGroup[] = [
     label: 'Overview',
     items: [{ label: 'Dashboard', href: '/', icon: 'dashboard', anyOf: [] }],
   },
+  {
+    label: 'Sales',
+    items: [{ label: 'Orders', href: '/orders', icon: 'orders', anyOf: ['orders.read'] }],
+  },
 ];
 
 /** The navigation a staff member may see (groups with nothing left are dropped). */

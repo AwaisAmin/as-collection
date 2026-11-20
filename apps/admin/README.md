@@ -24,6 +24,14 @@ on stdin). Everyone else is added from the panel.
 - **Headers:** a CSP that forbids framing, plugins and posting forms elsewhere; `noindex`; no
   referrer sent to other sites.
 
+## Areas
+
+- **Orders** (`/orders`): work queues (to confirm, payments to check, to ship…), search by number,
+  phone or name, filters by payment method and date. The order page shows the next allowed steps
+  (confirm, pack, ship with courier + tracking, deliver, cancel, return, refund), transfer
+  screenshots to accept or reject, and the timeline with internal or customer-visible notes.
+  Screenshots are streamed through the admin (`/orders/[number]/proof/[id]`), never linked directly.
+
 ## Layout
 
 - `src/app/(auth)` — sign-in and password change; `src/app/(panel)` — the signed-in panel
