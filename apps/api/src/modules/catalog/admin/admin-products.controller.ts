@@ -151,6 +151,14 @@ export class AdminInventoryController {
     return this.inventory.list(query);
   }
 
+  @Get(':variantId')
+  @Staff('catalog.read')
+  @Header('Cache-Control', 'no-store')
+  @ApiOperation({ summary: 'Stock of one variant' })
+  get(@Param('variantId', idParam) variantId: string) {
+    return this.inventory.get(variantId);
+  }
+
   @Post('adjustments')
   @HttpCode(HttpStatus.OK)
   @Staff('inventory.write')

@@ -195,3 +195,59 @@ export interface AdminBrandDto {
   products: number;
   updatedAt: string;
 }
+
+// ─── Stock (`/admin/inventory`) ───
+
+export type StockFilter = 'all' | 'low' | 'out' | 'backorder';
+
+export interface AdminStockItemDto {
+  variantId: string;
+  sku: string;
+  title: string | null;
+  isActive: boolean;
+  product: { id: string; name: string; status: ProductStatus };
+  onHand: number;
+  /** Held by open orders. */
+  reserved: number;
+  /** onHand − reserved (negative when backordered). */
+  available: number;
+  lowStockThreshold: number;
+  trackInventory: boolean;
+  allowBackorder: boolean;
+  updatedAt: string;
+}
+
+export type AdminStockListDto = AdminPage<AdminStockItemDto>;
+
+/** `POST /admin/inventory/adjustments` — all lines applied, or none (422). */
+export interface StockAdjustResultDto {
+  changed: { variantId: string; sku: string; onHand: number; delta: number; available: number }[];
+  /** Lines that asked for no change. */
+  unchanged: number;
+}
+
+export interface StockSettingsResultDto {
+  variantId: string;
+  onHand: number;
+  reserved: number;
+  available: number;
+  lowStockThreshold: number;
+  trackInventory: boolean;
+  allowBackorder: boolean;
+}
+
+export interface StockMovementDto {
+  id: string;
+  delta: number;
+  reason: InventoryReason;
+  /** e.g. the order number of a sale, or a supplier invoice. */
+  reference: string | null;
+  note: string | null;
+  createdAt: string;
+  by: StaffRefDto | null;
+}
+
+export interface StockMovementListDto {
+  items: StockMovementDto[];
+  nextCursor: string | null;
+}

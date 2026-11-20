@@ -6,7 +6,9 @@ checkout (place → track → cancel, with stock held and released), phone-code 
 account pages, the contact and newsletter forms, and the admin panel: staff sign-in (password +
 first-time authenticator setup → dashboard → sign out) and order handling (a bank-transfer order
 with a payment screenshot is verified, shipped and delivered; stock moves from reserved to sold) and
-products (create with an uploaded photo and two sizes, publish, edit a variant, delete).
+products (create with an uploaded photo and two sizes, publish, edit a variant, delete), stock
+(receive, refused removal, stock count, history, alert level) and the image library (upload,
+describe, delete). Stock tests undo their own changes afterwards.
 
 ```bash
 pnpm services:up                                  # Docker: PostgreSQL, Redis, storage

@@ -311,12 +311,13 @@ export function ProductEditor({
               description={
                 isNew
                   ? 'What customers choose between, each with its own SKU, price and stock.'
-                  : 'Stock is changed through stock adjustments.'
+                  : 'What customers choose between, each with its own SKU and price.'
               }
             >
               {product ? (
                 <VariantTable
                   productId={product.id}
+                  productName={product.name}
                   variants={product.variants}
                   attributes={attributes}
                   canWrite={canWrite}

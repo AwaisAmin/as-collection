@@ -13,7 +13,7 @@ const href = (order: AdminOrderListItemDto) => `/orders/${order.number}` as Rout
 export function OrderTable({ orders }: { orders: readonly AdminOrderListItemDto[] }) {
   return (
     <>
-      <div className="border-line bg-surface shadow-card hidden overflow-x-auto rounded-card border md:block">
+      <div className="border-line bg-surface shadow-card relative hidden overflow-x-auto rounded-card border md:block">
         <table className="w-full text-left text-[14px]">
           <thead className="border-line bg-canvas/60 border-b text-[12px] font-semibold tracking-wide text-muted uppercase">
             <tr>

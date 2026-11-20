@@ -412,6 +412,16 @@ describe('admin catalog (e2e)', () => {
         expect.objectContaining({ sku: 'E2E-CAT-001-M', available: 1 }),
       ]);
 
+      const one = await http()
+        .get(api(`/admin/inventory/${s?.id ?? ''}`))
+        .set(as('catalog-manager'))
+        .expect(200);
+      expect(one.body).toMatchObject({ variantId: s?.id, onHand: 15, trackInventory: true });
+      await http()
+        .get(api('/admin/inventory/00000000-0000-7000-8000-000000000000'))
+        .set(as('catalog-manager'))
+        .expect(404);
+
       const history = await http()
         .get(api(`/admin/inventory/${s?.id ?? ''}/movements`))
         .set(as('catalog-manager'))

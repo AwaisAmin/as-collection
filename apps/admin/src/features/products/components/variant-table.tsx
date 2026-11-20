@@ -2,6 +2,7 @@
 
 import type { AdminAttributeDto, AdminVariantDto } from '@as/contracts';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
+import Link from 'next/link';
 import { useId, useTransition } from 'react';
 import { toast } from 'sonner';
 
@@ -215,12 +216,14 @@ function DeleteVariant({ productId, variant }: { productId: string; variant: Adm
  */
 export function VariantTable({
   productId,
+  productName,
   variants,
   attributes,
   canWrite,
   locked,
 }: {
   productId: string;
+  productName: string;
   variants: readonly AdminVariantDto[];
   attributes: readonly AdminAttributeDto[];
   canWrite: boolean;
@@ -235,12 +238,22 @@ export function VariantTable({
 
   return (
     <div className="flex flex-col gap-3">
+      <p className="text-[13px] text-muted">
+        Stock is changed on the{' '}
+        <Link
+          href={`/stock?q=${encodeURIComponent(productName)}`}
+          className="text-gold-dark hover:underline"
+        >
+          Stock page
+        </Link>
+        , where every change is recorded.
+      </p>
       {locked && canWrite ? (
         <p className="text-warning text-[13px]">
           Save or undo your product changes to edit variants.
         </p>
       ) : null}
-      <div className="border-line overflow-x-auto rounded-lg border">
+      <div className="border-line relative overflow-x-auto rounded-lg border">
         <table className="w-full text-left text-[14px]">
           <thead className="bg-canvas/60 text-[12px] font-semibold tracking-wide text-muted uppercase">
             <tr>

@@ -1,3 +1,11 @@
+import type {
+  AdminStockItemDto,
+  AdminStockListDto,
+  ProductStatus,
+  StockAdjustResultDto,
+  StockMovementListDto,
+  StockSettingsResultDto,
+} from '@as/contracts';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import type { z } from 'zod';
 
@@ -46,6 +54,21 @@ const STOCK_FILTERS = {
 /** `50%_off` → `50\%\_off` for LIKE patterns. */
 const escapeLike = (text: string) => text.replace(/[\\%_]/g, (c) => `\\${c}`);
 
+const toStockItem = (r: InventoryRow): AdminStockItemDto => ({
+  variantId: r.variant_id,
+  sku: r.sku,
+  title: r.title,
+  isActive: r.is_active,
+  product: { id: r.product_id, name: r.product_name, status: r.product_status as ProductStatus },
+  onHand: r.on_hand,
+  reserved: r.reserved,
+  available: r.on_hand - r.reserved,
+  lowStockThreshold: r.low_stock_threshold,
+  trackInventory: r.track_inventory,
+  allowBackorder: r.allow_backorder,
+  updatedAt: r.updated_at.toISOString(),
+});
+
 const variantNotFound = () =>
   new DomainException(HttpStatus.NOT_FOUND, 'VARIANT_NOT_FOUND', 'Variant not found.');
 
@@ -63,7 +86,7 @@ export class AdminInventoryService {
     private readonly catalog: CatalogService,
   ) {}
 
-  async list(query: AdminInventoryQuery) {
+  async list(query: AdminInventoryQuery): Promise<AdminStockListDto> {
     const search = query.q
       ? Prisma.sql`AND (v.sku LIKE ${`${escapeLike(query.q.toUpperCase())}%`}
           OR p.name ILIKE ${`%${escapeLike(query.q)}%`})`
@@ -72,33 +95,15 @@ export class AdminInventoryService {
       query.stock === 'all'
         ? Prisma.sql`p.name ASC, v.position ASC, v.id ASC`
         : Prisma.sql`${AVAILABLE} ASC, v.sku ASC`;
-    const rows = await this.prisma.$queryRaw<InventoryRow[]>`
-      SELECT v.id AS variant_id, v.sku, v.title, v.is_active,
-             p.id AS product_id, p.name AS product_name, p.status::text AS product_status,
-             i.on_hand, i.reserved, i.low_stock_threshold, i.track_inventory, i.allow_backorder,
-             i.updated_at, count(*) OVER () AS total
-      FROM product_variants v
-      JOIN products p ON p.id = v.product_id
-      JOIN inventory_items i ON i.variant_id = v.id
-      WHERE TRUE ${search} ${STOCK_FILTERS[query.stock]}
-      ORDER BY ${order}
-      LIMIT ${query.pageSize} OFFSET ${(query.page - 1) * query.pageSize}`;
+    const rows = await this.rows(
+      Prisma.sql`${search} ${STOCK_FILTERS[query.stock]}`,
+      order,
+      query.pageSize,
+      (query.page - 1) * query.pageSize,
+    );
     const total = Number(rows[0]?.total ?? 0);
     return {
-      items: rows.map((r) => ({
-        variantId: r.variant_id,
-        sku: r.sku,
-        title: r.title,
-        isActive: r.is_active,
-        product: { id: r.product_id, name: r.product_name, status: r.product_status },
-        onHand: r.on_hand,
-        reserved: r.reserved,
-        available: r.on_hand - r.reserved,
-        lowStockThreshold: r.low_stock_threshold,
-        trackInventory: r.track_inventory,
-        allowBackorder: r.allow_backorder,
-        updatedAt: r.updated_at,
-      })),
+      items: rows.map(toStockItem),
       page: query.page,
       pageSize: query.pageSize,
       total,
@@ -106,8 +111,34 @@ export class AdminInventoryService {
     };
   }
 
+  /** One variant's stock (the stock history page's header). */
+  async get(variantId: string): Promise<AdminStockItemDto> {
+    const [row] = await this.rows(
+      Prisma.sql`AND v.id = ${variantId}::uuid`,
+      Prisma.sql`v.id`,
+      1,
+      0,
+    );
+    if (!row) throw variantNotFound();
+    return toStockItem(row);
+  }
+
+  private rows(filter: Prisma.Sql, order: Prisma.Sql, limit: number, offset: number) {
+    return this.prisma.$queryRaw<InventoryRow[]>`
+      SELECT v.id AS variant_id, v.sku, v.title, v.is_active,
+             p.id AS product_id, p.name AS product_name, p.status::text AS product_status,
+             i.on_hand, i.reserved, i.low_stock_threshold, i.track_inventory, i.allow_backorder,
+             i.updated_at, count(*) OVER () AS total
+      FROM product_variants v
+      JOIN products p ON p.id = v.product_id
+      JOIN inventory_items i ON i.variant_id = v.id
+      WHERE TRUE ${filter}
+      ORDER BY ${order}
+      LIMIT ${limit} OFFSET ${offset}`;
+  }
+
   /** Applies all changes or none (422 with the failing lines). */
-  async adjust(input: AdjustStockInput, actor: AuditActor) {
+  async adjust(input: AdjustStockInput, actor: AuditActor): Promise<StockAdjustResultDto> {
     const result = await this.prisma.$transaction(
       async (tx) => {
         const ids = input.items.map((i) => i.variantId);
@@ -227,7 +258,7 @@ export class AdminInventoryService {
     variantId: string,
     input: z.infer<typeof inventorySettingsSchema>,
     actor: AuditActor,
-  ) {
+  ): Promise<StockSettingsResultDto> {
     const updated = await this.prisma.$transaction(async (tx) => {
       const locked = await tx.$executeRaw`
         SELECT 1 FROM inventory_items WHERE variant_id = ${variantId}::uuid FOR UPDATE`;
@@ -277,7 +308,10 @@ export class AdminInventoryService {
     return { variantId, ...updated, available: updated.onHand - updated.reserved };
   }
 
-  async movements(variantId: string, query: z.infer<typeof movementsQuerySchema>) {
+  async movements(
+    variantId: string,
+    query: z.infer<typeof movementsQuerySchema>,
+  ): Promise<StockMovementListDto> {
     const exists = await this.prisma.productVariant.findUnique({
       where: { id: variantId },
       select: { id: true },
@@ -299,7 +333,11 @@ export class AdminInventoryService {
     });
     const page = rows.slice(0, query.limit);
     return {
-      items: page.map(({ actorStaff, ...m }) => ({ ...m, by: actorStaff })),
+      items: page.map(({ actorStaff, createdAt, ...m }) => ({
+        ...m,
+        createdAt: createdAt.toISOString(),
+        by: actorStaff,
+      })),
       nextCursor: rows.length > query.limit ? (page.at(-1)?.id ?? null) : null,
     };
   }

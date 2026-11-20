@@ -37,7 +37,14 @@ on stdin). Everyone else is added from the panel.
   for shown first), specifications, SEO, status, categories, brand, tags and highlights. Saving
   sends the version that was loaded; if someone else saved meanwhile, nothing is overwritten.
   Variants of a saved product are edited one by one (paused while the form has unsaved changes);
-  stock is shown but changed only through stock adjustments.
+  stock is shown but changed only on the Stock page.
+- **Stock** (`/stock`): every variant's on-hand, held-by-orders and available units, with All /
+  Low / Out of stock / Backorders views and search. Add, remove or set stock with a reason and an
+  optional reference; alert level, tracking and backorders per variant; a stock-count mode saves
+  many counted rows at once (all or nothing). `/stock/[variant]` shows the full history (sales
+  link to their orders).
+- **Images** (`/media`): the library, newest first, with an Unused view and search; upload several
+  at once, edit descriptions, see where an image is used, delete unused ones.
 
 ## Conventions
 
@@ -46,6 +53,8 @@ on stdin). Everyone else is added from the panel.
 - Forms that can fail keep what was typed: `ActionDialog` submits by hand, because a React form
   `action` resets every field after each attempt.
 - Errors inside a modal are shown in the modal (toasts sit behind it).
+- Horizontal scroll containers are `relative`, so screen-reader-only labels inside them can't
+  widen the page on phones.
 
 ## Layout
 

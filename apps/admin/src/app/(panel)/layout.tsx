@@ -62,7 +62,7 @@ async function Shell({ children }: { children: React.ReactNode }) {
         </header>
 
         {/* Below lg: the sections as a scrollable strip. */}
-        <div className="overflow-x-auto bg-ink px-2 py-2 lg:hidden">
+        <div className="relative overflow-x-auto bg-ink px-2 py-2 lg:hidden">
           <Sidebar groups={groups} className="flex-row gap-4 [&_ul]:flex-row [&>div>p]:hidden" />
         </div>
 

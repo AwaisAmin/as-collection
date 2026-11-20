@@ -1,6 +1,6 @@
 'use server';
 
-import type { AdminMediaDto, AdminMediaListDto, AdminProductDto } from '@as/contracts';
+import type { AdminProductDto } from '@as/contracts';
 import type { Route } from 'next';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
@@ -225,71 +225,4 @@ export async function deleteVariant(
   }
   refresh(productId.data);
   return { done: 'Variant deleted.', at: Date.now() };
-}
-
-// ─── Images ───
-
-const MAX_FILES = 12;
-const MAX_FILE_BYTES = 20 * 1024 * 1024;
-const IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
-
-export interface UploadResult {
-  uploaded: AdminMediaDto[];
-  /** Per file that failed: its name and why. */
-  failed: { name: string; error: string }[];
-}
-
-/** Uploads images to the library (each is converted to WebP by the API). */
-export async function uploadImages(formData: FormData): Promise<UploadResult> {
-  const files = formData.getAll('files').filter((f): f is File => f instanceof File);
-  const result: UploadResult = { uploaded: [], failed: [] };
-  for (const [index, file] of files.entries()) {
-    if (index >= MAX_FILES) {
-      result.failed.push({
-        name: file.name,
-        error: `Upload at most ${String(MAX_FILES)} at once.`,
-      });
-      continue;
-    }
-    if (!IMAGE_TYPES.has(file.type)) {
-      result.failed.push({ name: file.name, error: 'Use JPG, PNG or WEBP.' });
-      continue;
-    }
-    if (file.size > MAX_FILE_BYTES) {
-      result.failed.push({ name: file.name, error: 'Larger than 20 MB.' });
-      continue;
-    }
-    const body = new FormData();
-    body.set('file', file, file.name);
-    try {
-      result.uploaded.push(
-        await call<AdminMediaDto>('/admin/media', { method: 'POST', body, timeoutMs: 60_000 }),
-      );
-    } catch (error) {
-      result.failed.push({ name: file.name, error: failure(error).error ?? 'Upload failed.' });
-    }
-  }
-  if (result.uploaded.length) revalidatePath('/media');
-  return result;
-}
-
-const librarySchema = z.object({
-  q: z.string().trim().max(100).optional(),
-  before: z.uuid().optional(),
-});
-
-/** A page of the image library for the picker. */
-export async function browseImages(input: {
-  q?: string;
-  before?: string;
-}): Promise<AdminMediaListDto | null> {
-  const parsed = librarySchema.safeParse(input);
-  if (!parsed.success) return null;
-  try {
-    return await call<AdminMediaListDto>('/admin/media', {
-      query: { q: parsed.data.q || undefined, before: parsed.data.before, limit: 30 },
-    });
-  } catch {
-    return null;
-  }
 }

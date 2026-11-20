@@ -8,14 +8,9 @@ import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Dialog } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { browseImages, uploadImages } from '@/features/media/actions';
+import { thumbUrl } from '@/features/media/thumb';
 import { cn } from '@/lib/utils/cn';
-
-import { browseImages, uploadImages } from '../actions';
-
-/** The smallest copy at least `width` wide (falls back to the original). */
-export function thumbUrl(media: Pick<AdminMediaDto, 'url' | 'variants'>, width = 320): string {
-  return media.variants.find((v) => v.width >= width)?.url ?? media.url;
-}
 
 /**
  * Pick images for a product: upload new ones (several at once) or choose from the library.

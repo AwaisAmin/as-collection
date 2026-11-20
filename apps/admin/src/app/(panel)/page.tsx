@@ -94,6 +94,7 @@ export default async function DashboardPage({ searchParams }: PageProps<'/'>) {
       hint: 'Variants at or below their alert level',
       icon: Boxes,
       value: lowStock,
+      href: '/stock?view=low' as Route,
     });
 
   return (

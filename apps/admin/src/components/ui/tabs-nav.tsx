@@ -16,7 +16,7 @@ export function TabsNav({ label, tabs }: { label: string; tabs: readonly TabLink
   return (
     <nav
       aria-label={label}
-      className="border-line -mx-4 overflow-x-auto border-b px-4 lg:mx-0 lg:px-0"
+      className="border-line relative -mx-4 overflow-x-auto border-b px-4 lg:mx-0 lg:px-0"
     >
       <ul className="flex gap-1">
         {tabs.map((tab) => (
