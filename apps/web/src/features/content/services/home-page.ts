@@ -3,7 +3,6 @@ import 'server-only';
 import type { PageDto, TypedSectionDto } from '@as/contracts';
 import { cacheLife, cacheTag } from 'next/cache';
 
-import { serverEnv } from '@/config/env.server';
 import { defaultHomeSections } from '@/features/home/lib/default-sections';
 import { apiFindOrNull } from '@/lib/api/http-client';
 import { reportError } from '@/lib/errors/report-error';
@@ -19,7 +18,6 @@ export async function getHomeSections(): Promise<readonly TypedSectionDto[]> {
   'use cache';
   cacheLife('minutes');
   cacheTag(CONTENT_TAG);
-  if (serverEnv.MOCK_API) return defaultHomeSections;
   try {
     const page = await apiFindOrNull<PageDto>('/content/pages/home');
     if (!page) return defaultHomeSections;

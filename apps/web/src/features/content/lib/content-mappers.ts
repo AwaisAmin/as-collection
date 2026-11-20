@@ -15,7 +15,7 @@ import type { StoreMenus, StoreSettings } from '../types';
  * checkout always have something sensible. Pure, unit-tested.
  */
 
-/** The bundled defaults (also the offline `MOCK_API` content). */
+/** The bundled defaults: used for anything the store has not configured or that fails to load. */
 export const defaultSettings: StoreSettings = {
   profile: {
     name: siteConfig.name,

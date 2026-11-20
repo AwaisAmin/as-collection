@@ -1,7 +1,5 @@
 import 'server-only';
 
-import { serverEnv } from '@/config/env.server';
-
 import type {
   Address,
   AddressInput,
@@ -13,7 +11,6 @@ import type {
   VerifyOtpResult,
 } from '../types';
 import { apiAuthService } from './auth.api';
-import { mockAuthService } from './auth.mock';
 
 /**
  * Port: sign-in and the customer's account. Everything after sign-in is addressed by the
@@ -38,5 +35,5 @@ export interface AuthService {
   revokeOtherSessions(token: string): Promise<number>;
 }
 
-/** The NestJS API, or in-memory mocks for offline development (`MOCK_API=true`). */
-export const authService: AuthService = serverEnv.MOCK_API ? mockAuthService : apiAuthService;
+/** The NestJS customer-auth and account API. */
+export const authService: AuthService = apiAuthService;

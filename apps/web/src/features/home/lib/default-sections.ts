@@ -9,8 +9,8 @@ import { activePromotion } from '@/config/promotions';
 import { brandStory } from '../content/brand-story';
 
 /**
- * The home page as designed, from the bundled config: shown in offline development
- * (`MOCK_API`) and whenever the store's home page cannot be loaded.
+ * The home page as designed, from the bundled config: shown whenever the store's home page is
+ * missing or cannot be loaded.
  */
 export const defaultHomeSections: readonly TypedSectionDto[] = [
   { id: 'hero', type: 'hero', settings: { variant: 'reference-design' }, endsAt: null },

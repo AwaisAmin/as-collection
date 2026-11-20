@@ -1,11 +1,8 @@
 import 'server-only';
 
-import { serverEnv } from '@/config/env.server';
-
 import type { ReviewInput, ReviewSort } from '../schemas';
 import type { FeaturedReview, Paginated, Review, ReviewSummary } from '../types';
 import { apiReviewsService } from './reviews.api';
-import { mockReviewsService } from './reviews.mock';
 
 export { REVIEWS_PAGE_SIZE, REVIEWS_TAG, reviewsTag } from './tags';
 
@@ -31,7 +28,5 @@ export interface ReviewsService {
   markHelpful(reviewId: string, client: { ip: string | null }): Promise<{ helpfulCount: number }>;
 }
 
-/** The NestJS API, or in-memory mocks for offline development (`MOCK_API=true`). */
-export const reviewsService: ReviewsService = serverEnv.MOCK_API
-  ? mockReviewsService
-  : apiReviewsService;
+/** The NestJS reviews API. */
+export const reviewsService: ReviewsService = apiReviewsService;

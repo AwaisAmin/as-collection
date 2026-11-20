@@ -19,21 +19,10 @@ import {
 } from '../actions';
 import { GoogleButton } from './google-button';
 
-/** Which Google sign-in to offer: the real button, the offline demo, or none. */
-export type GoogleOption = { mode: 'google'; clientId: string } | { mode: 'mock' } | null;
+/** Google sign-in: offered when the store has a Google client id. */
+export type GoogleOption = { mode: 'google'; clientId: string } | null;
 
 type Step = 'phone' | 'code' | 'name';
-
-function GoogleIcon() {
-  return (
-    <svg aria-hidden viewBox="0 0 24 24" className="size-5">
-      <path
-        fill="#EA4335"
-        d="M12 10.2v3.9h5.5c-.2 1.3-1.6 3.8-5.5 3.8-3.3 0-6-2.7-6-6.1s2.7-6.1 6-6.1c1.9 0 3.1.8 3.8 1.5l2.6-2.5C16.8 3.1 14.6 2 12 2 6.5 2 2 6.5 2 12s4.5 10 10 10c5.8 0 9.6-4.1 9.6-9.8 0-.7-.1-1.2-.2-1.7H12z"
-      />
-    </svg>
-  );
-}
 
 /** Phone → 6-digit code (WhatsApp/SMS) → name (first time only). Google as a one-tap alternative. */
 export function LoginFlow({ next, google }: { next: Route; google: GoogleOption }) {
@@ -184,19 +173,7 @@ export function LoginFlow({ next, google }: { next: Route; google: GoogleOption 
                 <span className="h-px flex-1 bg-gold/50" />
               </div>
 
-              {google.mode === 'google' ? (
-                <GoogleButton clientId={google.clientId} onCredential={signInWithGoogle} />
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => signInWithGoogle('mock-credential')}
-                  disabled={isPending}
-                  className="inline-flex h-13 w-full items-center justify-center gap-3 rounded-full border-[1.5px] border-gold bg-white font-display text-[18px] text-ink transition-colors hover:bg-cream disabled:opacity-60"
-                >
-                  <GoogleIcon />
-                  Continue with Google
-                </button>
-              )}
+              <GoogleButton clientId={google.clientId} onCredential={signInWithGoogle} />
             </>
           ) : null}
 

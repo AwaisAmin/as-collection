@@ -2,7 +2,6 @@
 
 import type { ContactReceivedDto, ContactTopic } from '@as/contracts';
 
-import { serverEnv } from '@/config/env.server';
 import { clientIp } from '@/lib/api/client-ip';
 import { ApiError, apiRequest } from '@/lib/api/http-client';
 import { reportError } from '@/lib/errors/report-error';
@@ -27,9 +26,6 @@ const TOPICS: Record<(typeof contactTopics)[number], ContactTopic> = {
   'Bulk / wholesale': 'WHOLESALE',
   Other: 'OTHER',
 };
-
-/* Offline development (`MOCK_API=true`): messages are kept in memory. */
-const inbox: unknown[] = ((globalThis as { __asInbox?: unknown[] }).__asInbox ??= []);
 
 export async function sendContactMessage(
   _prev: ContactState,
@@ -64,10 +60,6 @@ export async function sendContactMessage(
   }
 
   try {
-    if (serverEnv.MOCK_API) {
-      inbox.push({ ...parsed.data, receivedAt: new Date().toISOString() });
-      return { status: 'success' };
-    }
     const { topic, ...fields } = parsed.data;
     await apiRequest<ContactReceivedDto>('/contact', {
       method: 'POST',

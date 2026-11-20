@@ -4,11 +4,17 @@ Next.js 16 (App Router, Cache Components) · React 19 · TypeScript (strict) · 
 
 ## Run
 
+The storefront reads everything from the API, which must be running (also for `build`: pages are
+prerendered from API data).
+
 ```bash
-cp .env.example .env.local     # MOCK_API=true works offline (in-memory data, no API needed)
-pnpm --filter @as/web dev      # http://localhost:3000
-pnpm --filter @as/web test     # unit tests (Vitest)
-pnpm --filter @as/web build    # production build
+pnpm services:up                     # PostgreSQL, Redis, storage (Docker)
+pnpm --filter @as/api dev            # API on http://localhost:4000 (see apps/api/README.md)
+cp .env.example .env.local
+pnpm --filter @as/web dev            # http://localhost:3000
+pnpm --filter @as/web test           # unit tests (Vitest)
+pnpm --filter @as/web build          # production build (API must be reachable at API_URL)
+pnpm --filter @as/e2e test:browser   # browser tests across web + API (see e2e/README.md)
 ```
 
 ## Pages
@@ -50,9 +56,8 @@ Lower features expose slots (e.g. `ProductCard` `actions`) instead of importing 
 
 ## Conventions
 
-- **Data access** goes through `features/*/services/*.service.ts` (a port). Each port has an API adapter (`*.api.ts`)
-  and an in-memory mock (`*.mock.ts`, `MOCK_API=true`); pages never know which one runs.
-  - **Live on the API:**
+- **Data access** goes through `features/*/services/*.service.ts` (a port) backed by an API adapter (`*.api.ts`).
+  - **Moved to the API, step by step** (the in-memory mocks were removed in B8d-3):
     - **B8a:** catalog, filters, product pages, reviews (with store replies and votes), newsletter and contact.
     - **B8b:** phone-code and Google sign-in, profile, address book and signed-in devices.
     - **B8c:** cart prices and stock, checkout, order confirmation, tracking, my orders, cancelling, payment
@@ -96,8 +101,7 @@ Lower features expose slots (e.g. `ProductCard` `actions`) instead of importing 
   - **Account calls:** take the token, never a user id (`requireSession()`).
   - **Forwarded details:** sign-in forwards the shopper's IP and browser, so "Signed-in devices" names each device.
 - **Google sign-in:** Google's own button, shown only when `NEXT_PUBLIC_GOOGLE_CLIENT_ID` is set (the API must list the same
-  id in `GOOGLE_CLIENT_IDS`). The ID token goes to the API, which verifies it. With `MOCK_API=true` a demo button signs in a
-  demo customer.
+  id in `GOOGLE_CLIENT_IDS`). The ID token goes to the API, which verifies it.
 - **API client** (`lib/api/http-client.ts`): server-only, typed with `@as/contracts` (the API's response types,
   shared). Errors arrive as RFC 9457 problems mapped to `ApiError` (`code`, `fieldErrors`). The shopper's IP is
   forwarded (`X-Forwarded-For`) so the API's per-IP limits apply to them, not to this server.

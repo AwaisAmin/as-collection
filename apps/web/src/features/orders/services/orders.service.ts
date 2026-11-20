@@ -1,7 +1,5 @@
 import 'server-only';
 
-import { serverEnv } from '@/config/env.server';
-
 import type {
   Order,
   OrderAccess,
@@ -11,7 +9,6 @@ import type {
   TrackedOrder,
 } from '../types';
 import { apiOrdersService } from './orders.api';
-import { mockOrdersService } from './orders.mock';
 
 /** Who is asking (signed-in session, IP and browser for the API's limits). */
 export interface RequestContext {
@@ -43,7 +40,5 @@ export interface OrdersService {
   ): Promise<OrderActionResult>;
 }
 
-/** The NestJS API, or in-memory mocks for offline development (`MOCK_API=true`). */
-export const ordersService: OrdersService = serverEnv.MOCK_API
-  ? mockOrdersService
-  : apiOrdersService;
+/** The NestJS checkout and orders API. */
+export const ordersService: OrdersService = apiOrdersService;

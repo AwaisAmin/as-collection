@@ -6,7 +6,6 @@ import { Container } from '@/components/ui/container';
 import { SectionHeading } from '@/components/ui/section-heading';
 import { Skeleton } from '@/components/ui/skeleton';
 import { env } from '@/config/env';
-import { serverEnv } from '@/config/env.server';
 import { type GoogleOption, LoginFlow } from '@/features/auth/components/login-flow';
 import { safeRedirectPath } from '@/features/auth/lib/safe-redirect';
 import { getCurrentUser } from '@/features/auth/session';
@@ -41,9 +40,8 @@ async function LoginGate({ searchParams }: Pick<PageProps<'/login'>, 'searchPara
   return <LoginFlow next={next} google={googleOption()} />;
 }
 
-/** Real Google sign-in needs a client id; offline development shows a demo button. */
+/** Google sign-in is offered once the store has a Google client id. */
 function googleOption(): GoogleOption {
-  if (serverEnv.MOCK_API) return { mode: 'mock' };
   const clientId = env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
   return clientId ? { mode: 'google', clientId } : null;
 }

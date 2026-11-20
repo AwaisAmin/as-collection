@@ -1,0 +1,21 @@
+{
+  "name": "@as/e2e",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Browser tests across the storefront (apps/web) and the API (apps/api), on real data",
+  "type": "module",
+  "scripts": {
+    "test:browser": "playwright test",
+    "test:browser:ui": "playwright test --ui",
+    "install-browsers": "playwright install chromium",
+    "typecheck": "tsc --noEmit",
+    "lint": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.65.0",
+    "@types/node": "^24.19.2",
+    "@types/pg": "^8.23.1",
+    "pg": "^8.23.1",
+    "typescript": "6.0.3"
+  }
+}

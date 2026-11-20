@@ -2,7 +2,6 @@ import 'server-only';
 
 import type { NewsletterSource, SubscribeResultDto } from '@as/contracts';
 
-import { serverEnv } from '@/config/env.server';
 import { apiRequest } from '@/lib/api/http-client';
 
 export type SubscribeResult = SubscribeResultDto;
@@ -25,17 +24,5 @@ const httpNewsletterService: NewsletterService = {
     }),
 };
 
-/** Adapter: in-memory mock for offline development (`MOCK_API=true`). */
-const subscribed = new Set<string>();
-const mockNewsletterService: NewsletterService = {
-  async subscribe(email) {
-    await new Promise((resolve) => setTimeout(resolve, 600));
-    const alreadySubscribed = subscribed.has(email);
-    subscribed.add(email);
-    return { alreadySubscribed };
-  },
-};
-
-export const newsletterService: NewsletterService = serverEnv.MOCK_API
-  ? mockNewsletterService
-  : httpNewsletterService;
+/** The NestJS newsletter API. */
+export const newsletterService: NewsletterService = httpNewsletterService;

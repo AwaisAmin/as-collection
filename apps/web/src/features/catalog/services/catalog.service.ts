@@ -3,7 +3,6 @@ import 'server-only';
 import type { ProductSource } from '@as/contracts';
 
 import type { CategorySlug } from '@/config/catalog';
-import { serverEnv } from '@/config/env.server';
 
 import type { CatalogQuery } from '../schemas';
 import type {
@@ -15,7 +14,6 @@ import type {
   VariantSnapshot,
 } from '../types';
 import { apiCatalogService } from './catalog.api';
-import { mockCatalogService } from './catalog.mock';
 
 export { CATALOG_TAG } from './tags';
 
@@ -43,7 +41,5 @@ export interface CatalogService {
   getVariantDetails(variantIds: readonly string[]): Promise<VariantDetail[]>;
 }
 
-/** The NestJS API, or in-memory mocks for offline development (`MOCK_API=true`). */
-export const catalogService: CatalogService = serverEnv.MOCK_API
-  ? mockCatalogService
-  : apiCatalogService;
+/** The NestJS catalog API. */
+export const catalogService: CatalogService = apiCatalogService;

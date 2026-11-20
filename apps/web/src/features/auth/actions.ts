@@ -4,7 +4,6 @@ import { refresh } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 
-import { serverEnv } from '@/config/env.server';
 import { clientInfo } from '@/lib/api/client-ip';
 import { ApiError } from '@/lib/api/http-client';
 import { reportError } from '@/lib/errors/report-error';
@@ -44,8 +43,8 @@ export async function requestOtpAction(rawPhone: string): Promise<RequestOtpStat
       phone: phone.data,
       displayPhone: formatPkMobile(phone.data),
       resendIn: result.resendIn,
-      // Only ever present in development (mocks, or the API's OTP_DEV_ECHO, refused in production).
-      devCode: process.env.NODE_ENV === 'production' ? undefined : result.devCode,
+      // Only present when the API echoes codes (OTP_DEV_ECHO), which it refuses in production.
+      devCode: result.devCode,
     };
   } catch (error) {
     reportError(error, { action: 'auth.requestOtp' });
@@ -107,15 +106,12 @@ export async function completeProfileAction(
 
 const googleCredentialSchema = z.string().min(20).max(4096);
 
-/**
- * Google sign-in: `credential` is the ID token from Google's button (verified by the API). In
- * offline development (`MOCK_API=true`) any value signs in a demo customer.
- */
+/** Google sign-in: `credential` is the ID token from Google's button (verified by the API). */
 export async function googleSignInAction(
   credential: string,
 ): Promise<{ ok: true; needsName: boolean } | { ok: false; error: string }> {
   const parsed = googleCredentialSchema.safeParse(credential);
-  if (!parsed.success && !serverEnv.MOCK_API) {
+  if (!parsed.success) {
     return { ok: false, error: 'Google sign-in failed. Please try again.' };
   }
   try {

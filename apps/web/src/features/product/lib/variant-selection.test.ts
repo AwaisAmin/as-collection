@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { mockProducts } from '@/features/catalog/data';
+import { kurta, lipstick } from '@/features/catalog/lib/test-fixtures';
 
 import {
   initialSelection,
@@ -9,16 +9,7 @@ import {
   stockStatus,
 } from './variant-selection';
 
-const bySlug = (slug: string) => {
-  const p = mockProducts.find((x) => x.slug === slug);
-  if (!p) throw new Error(slug);
-  return p;
-};
-
 describe('variant selection', () => {
-  const kurta = bySlug('maroon-ruby-embroidered-kurta'); // XL stock 0
-  const lipstick = bySlug('velvet-matte-lipstick'); // Nude Petal stock 0
-
   it('requires sizes to be chosen explicitly', () => {
     expect(initialSelection(kurta)).toEqual({});
     expect(missingOptions(kurta, {})).toEqual(['Size']);
