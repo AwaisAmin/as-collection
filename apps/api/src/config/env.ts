@@ -152,6 +152,13 @@ export const envSchema = z
     /** …and in any case this long after sign-in. */
     STAFF_SESSION_MAX_HOURS: z.coerce.number().int().min(1).max(72).default(12),
 
+    /**
+     * Storefront cache refresh after staff edits: the Next.js `POST /api/revalidate` URL and the
+     * shared secret (≥ 32 chars, the storefront's REVALIDATE_SECRET). Both or neither.
+     */
+    STOREFRONT_REVALIDATE_URL: z.url({ protocol: /^https?$/ }).optional(),
+    STOREFRONT_REVALIDATE_SECRET: z.string().min(32).optional(),
+
     /** Background jobs (auto-cancel, cleanup). Off in tests; run them explicitly there. */
     JOBS_ENABLED: booleanFlag.default(true),
     /** Unpaid bank/wallet transfer orders are cancelled (stock released) after this many hours. */
@@ -180,6 +187,9 @@ export const envSchema = z
     if (production && !env.STAFF_TOTP_KEY) issue('STAFF_TOTP_KEY', 'is required in production');
     if (production && env.STAFF_TOTP_KEY === DEV_STAFF_TOTP_KEY) {
       issue('STAFF_TOTP_KEY', 'must not be the development key');
+    }
+    if (!env.STOREFRONT_REVALIDATE_URL !== !env.STOREFRONT_REVALIDATE_SECRET) {
+      issue('STOREFRONT_REVALIDATE_URL', 'needs STOREFRONT_REVALIDATE_SECRET too (or neither)');
     }
     if (env.S3_PUBLIC_BUCKET === env.S3_PRIVATE_BUCKET) {
       issue('S3_PUBLIC_BUCKET', 'must differ from S3_PRIVATE_BUCKET (one is public, one never is)');

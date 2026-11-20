@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 
 import { LegalPage } from '@/components/shared/legal-page';
 import { siteConfig } from '@/config/site';
+import { getStoreSettings } from '@/features/content/services/store-content';
 
 export const metadata: Metadata = {
   title: 'Privacy Policy',
@@ -9,10 +10,9 @@ export const metadata: Metadata = {
   alternates: { canonical: '/privacy-policy' },
 };
 
-const { email, phone } = siteConfig.contact;
-
 /* Template policy — have it reviewed for your business before launch. */
-export default function PrivacyPolicyPage() {
+export default async function PrivacyPolicyPage() {
+  const { email, phone } = (await getStoreSettings()).contact;
   return (
     <LegalPage
       title="Privacy Policy"

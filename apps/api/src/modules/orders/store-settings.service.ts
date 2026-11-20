@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { DomainException } from '../../common/http/problem-details.js';
 import { PrismaService } from '../../database/prisma.service.js';
 import { CacheService } from '../../redis/cache.service.js';
+import { StorefrontRevalidator } from '../../storefront/storefront-revalidator.js';
 import type { ShippingRules } from './pricing.js';
 
 export const SETTINGS_CACHE = 'settings';
@@ -19,6 +20,7 @@ export class StoreSettingsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly cache: CacheService,
+    private readonly storefront: StorefrontRevalidator,
   ) {}
 
   async shipping(): Promise<ShippingRules> {
@@ -39,6 +41,7 @@ export class StoreSettingsService {
   }
 
   invalidate(): Promise<void> {
+    this.storefront.revalidate('settings');
     return this.cache.invalidate(SETTINGS_CACHE);
   }
 }

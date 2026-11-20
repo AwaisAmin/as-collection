@@ -1,23 +1,25 @@
 import { RotateCcw, ShieldCheck, Truck } from 'lucide-react';
 
-import { siteConfig } from '@/config/site';
+import type { StoreSettings } from '@/features/content/types';
 import { formatPrice } from '@/lib/utils/format';
 
-const perks = [
-  {
-    icon: Truck,
-    title: 'Free delivery',
-    text: `On orders above ${formatPrice(siteConfig.freeShippingThreshold)}`,
-  },
-  { icon: ShieldCheck, title: 'Cash on delivery', text: 'Pay when your order arrives' },
-  {
-    icon: RotateCcw,
-    title: 'Easy returns',
-    text: `${siteConfig.returnWindowDays}-day returns & exchange`,
-  },
-] as const;
+const perksFor = ({ shipping }: StoreSettings) =>
+  [
+    {
+      icon: Truck,
+      title: 'Free delivery',
+      text: `On orders above ${formatPrice(shipping.freeShippingThreshold)}`,
+    },
+    { icon: ShieldCheck, title: 'Cash on delivery', text: 'Pay when your order arrives' },
+    {
+      icon: RotateCcw,
+      title: 'Easy returns',
+      text: `${shipping.returnWindowDays}-day returns & exchange`,
+    },
+  ] as const;
 
-export function DeliveryPerks() {
+export function DeliveryPerks({ settings }: { settings: StoreSettings }) {
+  const perks = perksFor(settings);
   return (
     <ul className="grid gap-3 rounded-card border border-gold/60 bg-sand/60 p-4 sm:grid-cols-3 lg:grid-cols-1">
       {perks.map(({ icon: Icon, title, text }) => (

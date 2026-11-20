@@ -1,10 +1,25 @@
+import type { AnnouncementIcon } from '@as/contracts';
+import { Gift, Headset, type LucideIcon, ShieldCheck, Sparkles, Tag, Truck } from 'lucide-react';
 import { Fragment } from 'react';
 
 import { Container } from '@/components/ui/container';
 import { SocialLinks } from '@/components/ui/social-links';
 import { VerticalDivider } from '@/components/ui/vertical-divider';
-import { type Announcement, announcements } from '@/config/announcements';
+import type { SocialLink } from '@/config/socials';
+import type { StoreSettings } from '@/features/content/types';
 import { cn } from '@/lib/utils/cn';
+
+/** Icon names the admin can choose → icons. */
+const ICONS: Record<AnnouncementIcon, LucideIcon> = {
+  truck: Truck,
+  'shield-check': ShieldCheck,
+  headset: Headset,
+  gift: Gift,
+  sparkles: Sparkles,
+  tag: Tag,
+};
+
+type Announcement = StoreSettings['announcements'][number];
 
 interface AnnouncementItemProps extends Announcement {
   className?: string;
@@ -13,12 +28,13 @@ interface AnnouncementItemProps extends Announcement {
 }
 
 function AnnouncementItem({
-  icon: Icon,
+  icon,
   text,
   href,
   className,
   focusable = true,
 }: AnnouncementItemProps) {
+  const Icon = ICONS[icon];
   const classes = cn('inline-flex items-center gap-3 whitespace-nowrap', className);
   const content = (
     <>
@@ -41,7 +57,13 @@ function AnnouncementItem({
 }
 
 /** Black announcement bar. Static row on desktop, auto-scrolling marquee below `lg`. */
-export function TopBar() {
+export function TopBar({
+  announcements,
+  socials,
+}: {
+  announcements: readonly Announcement[];
+  socials: readonly SocialLink[];
+}) {
   return (
     <aside
       aria-label="Store announcements"
@@ -61,7 +83,7 @@ export function TopBar() {
             </Fragment>
           ))}
         </ul>
-        <SocialLinks />
+        <SocialLinks links={socials} />
       </Container>
 
       {/* Mobile / tablet marquee */}

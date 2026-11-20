@@ -1,7 +1,8 @@
 import { type TabItem, Tabs } from '@/components/ui/tabs';
 import type { Product } from '@/features/catalog/types';
+import type { StoreSettings } from '@/features/content/types';
 
-import { shippingPolicy } from '../content/policies';
+import { shippingPolicyFor } from '../content/policies';
 
 function PolicyList({ items }: { items: readonly string[] }) {
   return (
@@ -14,7 +15,14 @@ function PolicyList({ items }: { items: readonly string[] }) {
 }
 
 /** Server-rendered tab content passed into the client Tabs shell. */
-export function ProductDetailsTabs({ product }: { product: Product }) {
+export function ProductDetailsTabs({
+  product,
+  settings,
+}: {
+  product: Product;
+  settings: StoreSettings;
+}) {
+  const shippingPolicy = shippingPolicyFor(settings);
   const items: TabItem[] = [
     {
       id: 'description',

@@ -7,7 +7,7 @@ import { ButtonLink } from '@/components/ui/button';
 import { Container } from '@/components/ui/container';
 import { CopyButton } from '@/components/ui/copy-button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { siteConfig } from '@/config/site';
+import { getStoreSettings } from '@/features/content/services/store-content';
 import { CancelOrderButton, PaymentProofForm } from '@/features/orders/components/order-actions';
 import { OrderDetails } from '@/features/orders/components/order-details';
 import { ORDER_NUMBER_PATTERN } from '@/features/orders/lib/order-number';
@@ -50,6 +50,7 @@ async function Confirmation({
 
   // Private: requires the secret key from the checkout redirect (not cached).
   const order = await ordersService.getOrder(orderNumber, { accessKey: key });
+  const { contact } = await getStoreSettings();
   if (!order) notFound();
   const needsScreenshot =
     order.actions?.canUploadPaymentProof === true &&
@@ -130,7 +131,7 @@ async function Confirmation({
       </div>
 
       <p className="mt-8 text-center text-[15px] text-muted">
-        Questions? Call us on {siteConfig.contact.phone} or email {siteConfig.contact.email}.
+        Questions? Call us on {contact.phone} or email {contact.email}.
       </p>
     </Container>
   );

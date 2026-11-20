@@ -6,7 +6,12 @@ import { useId } from 'react';
 import { CopyButton } from '@/components/ui/copy-button';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
-import { transferAccounts, type TransferChannel, transferChannels } from '@/config/payments';
+import {
+  transferAccounts as defaultAccounts,
+  type TransferChannel,
+  transferChannels,
+} from '@/config/payments';
+import { useStoreSettings } from '@/features/content/components/store-content-provider';
 import type { PaymentMethod } from '@/features/orders/types';
 import { cn } from '@/lib/utils/cn';
 import { formatPrice } from '@/lib/utils/format';
@@ -49,6 +54,8 @@ export function PaymentSection({
   clearError,
 }: PaymentSectionProps) {
   const base = useId();
+  // The store's accounts (admin settings); a channel it hasn't set up keeps the bundled entry.
+  const transferAccounts = { ...defaultAccounts, ...useStoreSettings().transferAccounts };
   const account = transferAccounts[channel];
 
   return (

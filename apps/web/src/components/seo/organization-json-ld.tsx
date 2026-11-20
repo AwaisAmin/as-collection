@@ -1,26 +1,27 @@
 import { siteConfig } from '@/config/site';
-import { socialLinks } from '@/config/socials';
+import { getStoreSettings } from '@/features/content/services/store-content';
 
 /**
  * schema.org Organization/OnlineStore data so search engines can show the brand's
  * contact details and social profiles. `<` is escaped to prevent script injection.
  */
-export function OrganizationJsonLd() {
+export async function OrganizationJsonLd() {
+  const { profile, contact, socials } = await getStoreSettings();
   const data = {
     '@context': 'https://schema.org',
     '@type': 'OnlineStore',
-    name: siteConfig.name,
+    name: profile.name,
     url: siteConfig.url,
     logo: new URL('/images/brand/logo-512.png', siteConfig.url).toString(),
-    description: siteConfig.description,
-    email: siteConfig.contact.email,
-    telephone: siteConfig.contact.phoneE164,
-    sameAs: socialLinks.map((s) => s.href),
+    description: profile.description,
+    email: contact.email,
+    telephone: contact.phoneE164,
+    sameAs: socials.map((s) => s.href),
     contactPoint: {
       '@type': 'ContactPoint',
       contactType: 'customer support',
-      telephone: siteConfig.contact.phoneE164,
-      email: siteConfig.contact.email,
+      telephone: contact.phoneE164,
+      email: contact.email,
       areaServed: 'PK',
       availableLanguage: ['en', 'ur'],
     },

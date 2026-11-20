@@ -28,6 +28,7 @@ import { StaffModule } from './modules/staff/staff.module.js';
 import { RedisModule } from './redis/redis.module.js';
 import { RedisThrottlerStorage } from './redis/redis-throttler.storage.js';
 import { StorageModule } from './storage/storage.module.js';
+import { StorefrontModule } from './storefront/storefront.module.js';
 
 /** Typed access to the validated environment: `config.get('PORT', { infer: true })`. */
 export type AppConfig = ConfigService<Env, true>;
@@ -51,6 +52,7 @@ export class AppModule implements NestModule {
         DatabaseModule,
         RedisModule,
         StorageModule,
+        StorefrontModule,
         // Per client IP, counted in Redis so the limit holds across every API instance.
         ThrottlerModule.forRootAsync({
           inject: [RedisThrottlerStorage],

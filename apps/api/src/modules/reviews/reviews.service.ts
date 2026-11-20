@@ -10,6 +10,7 @@ import { windowRetryAfterSeconds } from '../../common/rate-window.js';
 import { PrismaService } from '../../database/prisma.service.js';
 import type { Prisma } from '../../generated/prisma/client.js';
 import { CacheService } from '../../redis/cache.service.js';
+import { StorefrontRevalidator } from '../../storefront/storefront-revalidator.js';
 import { visibleProduct } from '../catalog/product-query.js';
 import {
   reviewOrderBy,
@@ -46,6 +47,7 @@ export class ReviewsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly cache: CacheService,
+    private readonly storefront: StorefrontRevalidator,
     @Inject(ConfigService) config: AppConfig,
   ) {
     this.secret = config.get('AUTH_SECRET', { infer: true });
@@ -54,6 +56,7 @@ export class ReviewsService {
 
   /** Every public review read becomes stale at once (after moderation or product edits). */
   invalidate(): Promise<void> {
+    this.storefront.revalidate('reviews');
     return this.cache.invalidate(REVIEWS_CACHE);
   }
 

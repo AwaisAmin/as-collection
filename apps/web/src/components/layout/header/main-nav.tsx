@@ -3,12 +3,14 @@
 import Link from 'next/link';
 
 import { WithPathname } from '@/components/routing/with-pathname';
-import { isActivePath, mainNav } from '@/config/navigation';
+import { isActivePath } from '@/config/navigation';
+import { useStoreContent } from '@/features/content/components/store-content-provider';
 
 import { navLinkClasses } from './nav-link-classes';
 import { ShopMegaMenu } from './shop-mega-menu';
 
 export function MainNav({ className }: { className?: string }) {
+  const mainNav = useStoreContent().menus.main;
   return (
     <nav aria-label="Main" className={className}>
       <WithPathname>

@@ -331,6 +331,14 @@ Rules:
   - **Edit:** name, marketing consent and an internal note, with `updatedAt` conflict checks.
   - **Block:** stores the reason and date (a DB check keeps them consistent with the status) and revokes every session after commit. Sign-in flows already refuse blocked accounts.
 
+## Storefront refresh
+
+- **`StorefrontRevalidator`** (`src/storefront`, global): every cache clear also tells the storefront which tags to
+  drop. `CatalogService.invalidate()` → `catalog`, `ContentService.invalidate()` → `content`, settings saves →
+  `settings`, review moderation → `reviews`.
+- **Never blocks an edit:** it posts in the background (3 s timeout) to `STOREFRONT_REVALIDATE_URL` with
+  `X-Revalidate-Secret`. A failure is only logged; the storefront then refreshes when its cache expires (minutes).
+
 ## Conventions
 
 - **Errors**: always RFC 9457 Problem Details (`application/problem+json`) with a stable `code`,

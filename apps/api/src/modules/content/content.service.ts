@@ -1,3 +1,4 @@
+import type { MenuDto, MenuItemDto, PageDto, PublicSettingsDto, SectionDto } from '@as/contracts';
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { z } from 'zod';
@@ -6,6 +7,7 @@ import type { AppConfig } from '../../app.module.js';
 import { DomainException } from '../../common/http/problem-details.js';
 import { PrismaService } from '../../database/prisma.service.js';
 import { CacheService } from '../../redis/cache.service.js';
+import { StorefrontRevalidator } from '../../storefront/storefront-revalidator.js';
 import { SETTINGS_CACHE } from '../orders/store-settings.service.js';
 import {
   hrefSchema,
@@ -21,45 +23,20 @@ import {
 /** Cache namespace for pages and menus. Admin content edits call `invalidate()` (B7). */
 export const CONTENT_CACHE = 'content';
 
-export interface SectionDto {
-  id: string;
-  type: string;
-  settings: unknown;
-  /** Campaign end (ISO), so the storefront can hide the block at the exact moment. */
-  endsAt: string | null;
-}
-
 interface CachedSection extends SectionDto {
   startsAt: string | null;
-}
-
-export interface PageDto {
-  slug: string;
-  title: string;
-  seo: { title: string | null; description: string | null };
-  sections: SectionDto[];
 }
 
 interface CachedPage extends Omit<PageDto, 'sections'> {
   sections: CachedSection[];
 }
 
-export interface MenuItemDto {
-  id: string;
-  label: string;
-  url: string | null;
-  openInNewTab: boolean;
-  settings: z.infer<typeof menuItemSettingsSchema> | null;
-  children: MenuItemDto[];
-}
-
-export interface MenuDto {
-  key: string;
-  name: string;
-  items: MenuItemDto[];
-}
-
 export type PublicSettings = { [K in PublicSettingKey]?: z.infer<(typeof PUBLIC_SETTINGS)[K]> };
+
+export type { MenuDto, MenuItemDto, PageDto, SectionDto };
+
+/** Compile-time guarantee that public settings match the shared contract the storefront reads. */
+export const settingsMatchContract = (settings: PublicSettings): PublicSettingsDto => settings;
 
 export type PromotionDto = z.infer<typeof promotionSchema>;
 
@@ -84,6 +61,7 @@ export class ContentService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly cache: CacheService,
+    private readonly storefront: StorefrontRevalidator,
     @Inject(ConfigService) config: AppConfig,
   ) {
     this.ttl = config.get('CATALOG_CACHE_TTL_SECONDS', { infer: true });
@@ -91,6 +69,7 @@ export class ContentService {
 
   /** Pages and menus become stale at once. Settings edits call `StoreSettingsService.invalidate`. */
   invalidate(): Promise<void> {
+    this.storefront.revalidate('content');
     return this.cache.invalidate(CONTENT_CACHE);
   }
 

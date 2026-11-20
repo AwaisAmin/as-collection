@@ -10,6 +10,11 @@ const serverEnvSchema = z.object({
   API_URL: z.url().default('http://localhost:4000/api/v1'),
   API_TIMEOUT_MS: z.coerce.number().int().positive().default(8000),
   /** Dev-only switch: serve API features from in-memory mocks until the backend is running. */
+  /**
+   * Shared secret the API sends to `POST /api/revalidate` after staff edits (≥ 32 chars;
+   * the API's STOREFRONT_REVALIDATE_SECRET). Unset: the endpoint is disabled.
+   */
+  REVALIDATE_SECRET: z.string().min(32).optional(),
   MOCK_API: z
     .enum(['true', 'false'])
     .default('false')
@@ -20,6 +25,7 @@ const parsed = serverEnvSchema.safeParse({
   API_URL: process.env.API_URL,
   API_TIMEOUT_MS: process.env.API_TIMEOUT_MS,
   MOCK_API: process.env.MOCK_API,
+  REVALIDATE_SECRET: process.env.REVALIDATE_SECRET || undefined,
 });
 
 if (!parsed.success) {

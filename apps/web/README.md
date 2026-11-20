@@ -57,7 +57,18 @@ Lower features expose slots (e.g. `ProductCard` `actions`) instead of importing 
     - **B8b:** phone-code and Google sign-in, profile, address book and signed-in devices.
     - **B8c:** cart prices and stock, checkout, order confirmation, tracking, my orders, cancelling, payment
       screenshots.
-  - **Still from config files (B8d):** home-page sections, menus, announcement bar, contact details.
+    - **B8d-1:** store settings (contact, socials, announcements, delivery, transfer accounts) and menus (main,
+      Shop mega menu, footer).
+  - **Still from config files (B8d-2):** the home-page sections.
+- **Store content** (`features/content`):
+  - **Loading:** `getStoreContent()` (cached, tags `settings` and `content`) loads settings and menus once.
+  - **Server components** call it; client components use `useStoreContent()` from the provider in the site layout.
+  - **Fallbacks:** a setting or menu the store hasn't configured (or that fails to load) uses the bundled defaults in
+    `config/*`, so the header, footer and checkout always render.
+- **Instant refresh:**
+  - **How:** the API calls `POST /api/revalidate` (secret `REVALIDATE_SECRET`, compared in constant time; tags
+    `catalog`, `content`, `settings`, `reviews` only) right after staff edits, expiring those cache tags immediately.
+  - **Without it:** reads refresh on their own after a few minutes.
 - **Checkout on the API:**
   - **Placing:** `POST /orders` with the checkout id as `Idempotency-Key`, so a double click or retry returns the same
     order.

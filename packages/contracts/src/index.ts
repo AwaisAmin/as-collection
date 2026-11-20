@@ -10,3 +10,4 @@ export type * from './catalog.js';
 export type * from './engagement.js';
 export type * from './account.js';
 export type * from './orders.js';
+export type * from './content.js';

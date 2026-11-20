@@ -5,6 +5,7 @@ import type { AppConfig } from '../../app.module.js';
 import { PrismaService } from '../../database/prisma.service.js';
 import { Prisma } from '../../generated/prisma/client.js';
 import { CacheService, hashKey } from '../../redis/cache.service.js';
+import { StorefrontRevalidator } from '../../storefront/storefront-revalidator.js';
 import {
   productDetailSelect,
   productSummarySelect,
@@ -75,6 +76,7 @@ export class CatalogService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly cache: CacheService,
+    private readonly storefront: StorefrontRevalidator,
     @Inject(ConfigService) config: AppConfig,
   ) {
     this.ttl = config.get('CATALOG_CACHE_TTL_SECONDS', { infer: true });
@@ -83,6 +85,7 @@ export class CatalogService {
 
   /** Every catalog cache entry becomes stale at once (call after any catalog write). */
   invalidate(): Promise<void> {
+    this.storefront.revalidate('catalog');
     return this.cache.invalidate(CATALOG_CACHE);
   }
 

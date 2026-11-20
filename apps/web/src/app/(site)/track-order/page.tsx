@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Container } from '@/components/ui/container';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
-import { siteConfig } from '@/config/site';
+import { getStoreSettings } from '@/features/content/services/store-content';
 import { paymentStatusLabel } from '@/features/orders/components/order-details';
 import { OrderStatusBadge } from '@/features/orders/components/order-status-badge';
 import { OrderTimeline } from '@/features/orders/components/order-timeline';
@@ -44,6 +44,7 @@ export default function TrackOrderPage({ searchParams }: PageProps<'/track-order
 
 async function Tracker({ searchParams }: Pick<PageProps<'/track-order'>, 'searchParams'>) {
   const params = await searchParams;
+  const { contact } = await getStoreSettings();
   const orderNumber = first(params.order).toUpperCase();
   const rawPhone = first(params.phone);
   const normalized = normalizePkMobile(rawPhone);
@@ -105,7 +106,7 @@ async function Tracker({ searchParams }: Pick<PageProps<'/track-order'>, 'search
           <p className="font-display text-[22px]">We couldn&apos;t find that order</p>
           <p className="max-w-md text-[17px] text-muted">
             Please check the order number and the mobile number you used at checkout. Need help?
-            Call {siteConfig.contact.phone}.
+            Call {contact.phone}.
           </p>
         </div>
       ) : null}

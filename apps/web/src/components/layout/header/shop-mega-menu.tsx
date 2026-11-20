@@ -8,8 +8,9 @@ import { useEffect, useId, useRef } from 'react';
 
 import { Container } from '@/components/ui/container';
 import { images } from '@/config/assets';
-import { type NavLink, shopMegaMenu } from '@/config/navigation';
+import type { NavLink } from '@/config/navigation';
 import { activePromotion } from '@/config/promotions';
+import { useStoreContent } from '@/features/content/components/store-content-provider';
 import { useClickOutside } from '@/hooks/use-click-outside';
 import { useDisclosure } from '@/hooks/use-disclosure';
 import { useEscapeKey } from '@/hooks/use-escape-key';
@@ -107,6 +108,7 @@ function FeatureCard({ onNavigate }: { onNavigate: () => void }) {
  * the `relative` <header>), not the trigger.
  */
 export function ShopMegaMenu({ label, active }: { label: string; active: boolean }) {
+  const shopMegaMenu = useStoreContent().menus.shopMega;
   const { isOpen, open, close, toggle } = useDisclosure();
   const rootRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);

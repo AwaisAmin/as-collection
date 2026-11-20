@@ -9,7 +9,8 @@ import { WithPathname } from '@/components/routing/with-pathname';
 import { Drawer } from '@/components/ui/drawer';
 import { IconButton } from '@/components/ui/icon-button';
 import { SocialLinks } from '@/components/ui/social-links';
-import { isActivePath, mainNav, shopMegaMenu } from '@/config/navigation';
+import { isActivePath } from '@/config/navigation';
+import { useStoreContent } from '@/features/content/components/store-content-provider';
 import { useDisclosure } from '@/hooks/use-disclosure';
 
 import { navLinkClasses } from './nav-link-classes';
@@ -17,6 +18,9 @@ import { SearchForm } from './search-form';
 
 /** Hamburger trigger + slide-in navigation drawer (below `lg`). */
 export function MobileNav() {
+  const { menus, settings } = useStoreContent();
+  const mainNav = menus.main;
+  const shopMegaMenu = menus.shopMega;
   const { isOpen, open, close } = useDisclosure();
   const drawerId = useId();
 
@@ -39,7 +43,7 @@ export function MobileNav() {
         header={<Logo size="sm" onClick={close} />}
         footer={
           <div className="bg-ink px-5 py-4">
-            <SocialLinks />
+            <SocialLinks links={settings.socials} />
           </div>
         }
       >

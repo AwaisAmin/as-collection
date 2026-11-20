@@ -11,6 +11,7 @@ import { SectionHeading } from '@/components/ui/section-heading';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getCategory } from '@/config/catalog';
 import { catalogService } from '@/features/catalog/services/catalog.service';
+import { getStoreSettings } from '@/features/content/services/store-content';
 import { DeliveryPerks } from '@/features/product/components/delivery-perks';
 import { ProductDetailsTabs } from '@/features/product/components/product-details-tabs';
 import { ProductGallery } from '@/features/product/components/product-gallery';
@@ -57,6 +58,7 @@ export default function ProductPage({ params }: PageProps<'/products/[slug]'>) {
 
 async function ProductContent({ params }: Pick<PageProps<'/products/[slug]'>, 'params'>) {
   const product = await catalogService.getProductBySlug((await params).slug);
+  const settings = await getStoreSettings();
   if (!product) notFound();
 
   const category = getCategory(product.category);
@@ -102,7 +104,7 @@ async function ProductContent({ params }: Pick<PageProps<'/products/[slug]'>, 'p
             <p className="text-[19px] leading-relaxed text-text">{product.shortDescription}</p>
             <OrnamentDivider width={110} />
             <PurchasePanel product={product} />
-            <DeliveryPerks />
+            <DeliveryPerks settings={settings} />
             <p className="font-body text-[15px] text-muted">
               SKU: {product.variants[0]?.sku.replace(/-[A-Z0-9]+$/, '') ?? product.id.toUpperCase()}
             </p>
@@ -110,7 +112,7 @@ async function ProductContent({ params }: Pick<PageProps<'/products/[slug]'>, 'p
         </div>
 
         <section aria-label="Product information" className="mt-14">
-          <ProductDetailsTabs product={product} />
+          <ProductDetailsTabs product={product} settings={settings} />
         </section>
 
         <Suspense fallback={<ReviewsSkeleton />}>

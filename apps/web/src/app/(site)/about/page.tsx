@@ -7,7 +7,7 @@ import { Container } from '@/components/ui/container';
 import { OrnamentDivider } from '@/components/ui/ornament-divider';
 import { SectionHeading } from '@/components/ui/section-heading';
 import { images } from '@/config/assets';
-import { siteConfig } from '@/config/site';
+import { getStoreSettings } from '@/features/content/services/store-content';
 import { brandStory, brandValues } from '@/features/home/content/brand-story';
 
 export const metadata: Metadata = {
@@ -17,7 +17,8 @@ export const metadata: Metadata = {
   alternates: { canonical: '/about' },
 };
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const { profile } = await getStoreSettings();
   return (
     <main id="main-content" className="flex-1">
       {/* Intro */}
@@ -28,9 +29,7 @@ export default function AboutPage() {
             <h1 id="about-title" className="font-display text-[40px]/[1.1] sm:text-[52px]/[1.1]">
               {brandStory.title}
             </h1>
-            <p className="font-caps text-[14px] tracking-[0.35em] uppercase">
-              {siteConfig.tagline}
-            </p>
+            <p className="font-caps text-[14px] tracking-[0.35em] uppercase">{profile.tagline}</p>
             <p className="font-script text-[34px] leading-tight">{brandStory.script}</p>
             <p className="max-w-xl text-[19px] leading-relaxed text-text">{brandStory.intro}</p>
           </div>

@@ -3,6 +3,7 @@ import Link from 'next/link';
 
 import { LegalPage } from '@/components/shared/legal-page';
 import { siteConfig } from '@/config/site';
+import { getStoreSettings } from '@/features/content/services/store-content';
 import { formatPrice } from '@/lib/utils/format';
 
 export const metadata: Metadata = {
@@ -11,10 +12,10 @@ export const metadata: Metadata = {
   alternates: { canonical: '/terms' },
 };
 
-const { email, phone } = siteConfig.contact;
-
 /* Template terms — have them reviewed for your business before launch. */
-export default function TermsPage() {
+export default async function TermsPage() {
+  const { contact, shipping } = await getStoreSettings();
+  const { email, phone } = contact;
   return (
     <LegalPage
       title="Terms & Conditions"
@@ -60,8 +61,8 @@ export default function TermsPage() {
           body: (
             <ul>
               <li>
-                Free delivery on orders above {formatPrice(siteConfig.freeShippingThreshold)}; a
-                flat {formatPrice(siteConfig.shippingFee)} applies below that.
+                Free delivery on orders above {formatPrice(shipping.freeShippingThreshold)}; a flat{' '}
+                {formatPrice(shipping.shippingFee)} applies below that.
               </li>
               <li>Usual delivery time: 2–5 working days depending on your city.</li>
               <li>
@@ -77,7 +78,7 @@ export default function TermsPage() {
           body: (
             <ul>
               <li>
-                Returns and exchanges are accepted within {siteConfig.returnWindowDays} days of
+                Returns and exchanges are accepted within {shipping.returnWindowDays} days of
                 delivery.
               </li>
               <li>Items must be unused, unwashed and in original packaging with tags attached.</li>

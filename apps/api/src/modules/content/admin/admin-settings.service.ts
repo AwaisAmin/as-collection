@@ -6,6 +6,7 @@ import { formatIssuePath } from '../../../common/http/validation.js';
 import { PrismaService } from '../../../database/prisma.service.js';
 import type { Prisma } from '../../../generated/prisma/client.js';
 import { CacheService } from '../../../redis/cache.service.js';
+import { StorefrontRevalidator } from '../../../storefront/storefront-revalidator.js';
 import { type AuditActor, AuditService } from '../../audit/audit.service.js';
 import { SETTINGS_CACHE } from '../../orders/store-settings.service.js';
 import { isPublicSettingKey, PUBLIC_SETTINGS, type PublicSettingKey } from '../content.schemas.js';
@@ -39,6 +40,7 @@ export class AdminSettingsService {
     private readonly prisma: PrismaService,
     private readonly audit: AuditService,
     private readonly cache: CacheService,
+    private readonly storefront: StorefrontRevalidator,
   ) {}
 
   async list() {
@@ -112,6 +114,7 @@ export class AdminSettingsService {
     });
     // Public settings, the announcement bar and checkout's delivery fee all live here.
     await this.cache.invalidate(SETTINGS_CACHE);
+    this.storefront.revalidate('settings');
     return this.get(key);
   }
 }

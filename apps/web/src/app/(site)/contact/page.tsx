@@ -4,26 +4,39 @@ import type { Metadata } from 'next';
 import { PageHeader } from '@/components/layout/page-header';
 import { Container } from '@/components/ui/container';
 import { SectionHeading } from '@/components/ui/section-heading';
-import { siteConfig } from '@/config/site';
 import { ContactForm } from '@/features/contact/components/contact-form';
-import { faqs } from '@/features/contact/content/faqs';
+import { faqsFor } from '@/features/contact/content/faqs';
+import { getStoreSettings } from '@/features/content/services/store-content';
+import type { StoreSettings } from '@/features/content/types';
 
-export const metadata: Metadata = {
-  title: 'Contact Us',
-  description: `Contact ${siteConfig.name} — call or WhatsApp ${siteConfig.contact.phone} or email ${siteConfig.contact.email}.`,
-  alternates: { canonical: '/contact' },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { profile, contact } = await getStoreSettings();
+  return {
+    title: 'Contact Us',
+    description: `Contact ${profile.name} — call or WhatsApp ${contact.phone} or email ${contact.email}.`,
+    alternates: { canonical: '/contact' },
+  };
+}
 
-const { phone, phoneHref, whatsappHref, email, emailHref, hours } = siteConfig.contact;
+const channelsFor = ({
+  phone,
+  phoneHref,
+  whatsappHref,
+  email,
+  emailHref,
+  hours,
+}: StoreSettings['contact']) =>
+  [
+    { icon: MessageCircle, title: 'WhatsApp', value: phone, href: whatsappHref, external: true },
+    { icon: Phone, title: 'Call us', value: phone, href: phoneHref, external: false },
+    { icon: Mail, title: 'Email', value: email, href: emailHref, external: false },
+    { icon: Clock, title: 'Hours', value: hours, href: undefined, external: false },
+  ] as const;
 
-const channels = [
-  { icon: MessageCircle, title: 'WhatsApp', value: phone, href: whatsappHref, external: true },
-  { icon: Phone, title: 'Call us', value: phone, href: phoneHref, external: false },
-  { icon: Mail, title: 'Email', value: email, href: emailHref, external: false },
-  { icon: Clock, title: 'Hours', value: hours, href: undefined, external: false },
-] as const;
-
-export default function ContactPage() {
+export default async function ContactPage() {
+  const settings = await getStoreSettings();
+  const channels = channelsFor(settings.contact);
+  const faqs = faqsFor(settings);
   // FAQ structured data (eligible for rich results).
   const faqJsonLd = {
     '@context': 'https://schema.org',

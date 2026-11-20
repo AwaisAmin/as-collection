@@ -4,17 +4,27 @@ import { FaWhatsapp } from 'react-icons/fa6';
 
 import { WithPathname } from '@/components/routing/with-pathname';
 import { siteConfig } from '@/config/site';
+import { useStoreSettings } from '@/features/content/components/store-content-provider';
 
 /** Pre-filled chat message — on a product page it carries the product link. */
-export function whatsappMessage(pathname: string | null): string {
+export function whatsappMessage(
+  pathname: string | null,
+  storeName: string = siteConfig.name,
+): string {
   if (pathname?.startsWith('/products/')) {
-    return `Hi ${siteConfig.name}! I'm interested in this product: ${siteConfig.url}${pathname}`;
+    return `Hi ${storeName}! I'm interested in this product: ${siteConfig.url}${pathname}`;
   }
-  return `Hi ${siteConfig.name}! I have a question.`;
+  return `Hi ${storeName}! I have a question.`;
 }
 
-export function whatsappChatHref(pathname: string | null): string {
-  return `${siteConfig.contact.whatsappHref}?text=${encodeURIComponent(whatsappMessage(pathname))}`;
+export function whatsappChatHref(
+  pathname: string | null,
+  store: { whatsappHref: string; name: string } = {
+    whatsappHref: siteConfig.contact.whatsappHref,
+    name: siteConfig.name,
+  },
+): string {
+  return `${store.whatsappHref}?text=${encodeURIComponent(whatsappMessage(pathname, store.name))}`;
 }
 
 /**
@@ -22,12 +32,14 @@ export function whatsappChatHref(pathname: string | null): string {
  * dialogs (z-40 vs z-50); the label slides out on hover / focus on larger screens.
  */
 export function WhatsAppButton() {
+  const { contact, profile } = useStoreSettings();
+  const store = { whatsappHref: contact.whatsappHref, name: profile.name };
   return (
     <aside aria-label="Chat support">
       <WithPathname>
         {(pathname) => (
           <a
-            href={whatsappChatHref(pathname)}
+            href={whatsappChatHref(pathname, store)}
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Chat with us on WhatsApp (opens in a new tab)"

@@ -5,7 +5,7 @@ import type { ReactNode } from 'react';
 
 import { Button, ButtonLink } from '@/components/ui/button';
 import { OrnamentDivider } from '@/components/ui/ornament-divider';
-import { siteConfig } from '@/config/site';
+import { useStoreSettings } from '@/features/content/components/store-content-provider';
 
 function Shell({
   icon: Icon,
@@ -55,12 +55,14 @@ export function NotFoundView() {
 }
 
 export function ErrorView({ onRetry }: { onRetry: () => void }) {
+  // Outside the storefront layout (global error) this is the bundled default number.
+  const { contact } = useStoreSettings();
   return (
     <Shell icon={TriangleAlert} title="Something went wrong">
       <div role="alert" className="flex flex-col items-center gap-5">
         <p className="max-w-md text-[19px] text-muted">
           We couldn&apos;t load this page. Please try again — if it keeps happening, contact us on{' '}
-          {siteConfig.contact.phone}.
+          {contact.phone}.
         </p>
         <div className="flex flex-wrap justify-center gap-3">
           <Button onClick={onRetry}>
