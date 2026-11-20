@@ -8,7 +8,12 @@ import { S3ObjectStorage } from '../src/storage/s3-object-storage.js';
 /** Real S3 round trip against the local RustFS (docker compose) or the CI storage service. */
 describe('S3 object storage (e2e)', () => {
   loadEnvFiles();
-  const env = parseEnv({ ...process.env, NODE_ENV: 'test', S3_PRIVATE_BUCKET: 'as-e2e-private' });
+  const env = parseEnv({
+    ...process.env,
+    NODE_ENV: 'test',
+    S3_PRIVATE_BUCKET: 'as-e2e-private',
+    S3_PUBLIC_BUCKET: 'as-e2e-media',
+  });
   const storage = new S3ObjectStorage(env);
   const client = new S3Client({
     region: env.S3_REGION,
@@ -82,6 +87,28 @@ describe('S3 object storage (e2e)', () => {
       expect([401, 403]).toContain(res.status);
     } finally {
       await storage.deletePrivate(key);
+    }
+  });
+
+  it('serves public images anonymously, cached forever, without listing the bucket', async () => {
+    const keys = [`e2e/${randomUUID()}/full.webp`, `e2e/${randomUUID()}/w320.webp`];
+    const body = Buffer.from('webp-bytes');
+    for (const key of keys) await storage.putPublic({ key, body, contentType: 'image/webp' });
+    try {
+      const res = await fetch(`${env.S3_ENDPOINT ?? ''}/as-e2e-media/${keys[0] ?? ''}`);
+      expect(res.status).toBe(200);
+      expect(res.headers.get('content-type')).toBe('image/webp');
+      expect(res.headers.get('cache-control')).toBe('public, max-age=31536000, immutable');
+      expect(Buffer.from(await res.arrayBuffer()).equals(body)).toBe(true);
+      const listing = await fetch(`${env.S3_ENDPOINT ?? ''}/as-e2e-media/?list-type=2`);
+      expect([401, 403]).toContain(listing.status);
+    } finally {
+      await storage.deletePublic(keys);
+    }
+    for (const key of keys) {
+      await expect(
+        client.send(new HeadObjectCommand({ Bucket: 'as-e2e-media', Key: key })),
+      ).rejects.toMatchObject({ $metadata: { httpStatusCode: 404 } });
     }
   });
 });

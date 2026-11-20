@@ -1,4 +1,4 @@
-import { cleanText, optionalPlainText, plainText } from './text.js';
+import { cleanText, clearableText, optionalPlainText, plainText } from './text.js';
 
 describe('cleanText', () => {
   it('collapses whitespace on single-line text and drops invisible characters', () => {
@@ -29,5 +29,17 @@ describe('plainText', () => {
     expect(city.parse(undefined)).toBeUndefined();
     expect(city.safeParse('Lahore').success).toBe(false);
     expect(city.parse(' Swat ')).toBe('Swat');
+  });
+});
+
+describe('clearableText', () => {
+  const field = clearableText({ max: 10 });
+
+  it('tells "unchanged", "clear" and a new value apart', () => {
+    expect(field.parse(undefined)).toBeUndefined();
+    expect(field.parse(null)).toBeNull();
+    expect(field.parse('   ')).toBeNull();
+    expect(field.parse('  Ruby  Red ')).toBe('Ruby Red');
+    expect(field.safeParse('x'.repeat(11)).success).toBe(false);
   });
 });

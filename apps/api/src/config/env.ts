@@ -92,6 +92,14 @@ export const envSchema = z
       .string()
       .regex(/^[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$/)
       .default('as-private'),
+    /**
+     * Bucket for public images (products, categories, banners), readable anonymously and served
+     * through `MEDIA_PUBLIC_BASE_URL` (a CDN in front of this bucket). Keys are immutable.
+     */
+    S3_PUBLIC_BUCKET: z
+      .string()
+      .regex(/^[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$/)
+      .default('as-media'),
 
     /**
      * Server secret (≥ 32 chars) keying the OTP and IP hashes. Rotating it invalidates pending login
@@ -172,6 +180,9 @@ export const envSchema = z
     if (production && !env.STAFF_TOTP_KEY) issue('STAFF_TOTP_KEY', 'is required in production');
     if (production && env.STAFF_TOTP_KEY === DEV_STAFF_TOTP_KEY) {
       issue('STAFF_TOTP_KEY', 'must not be the development key');
+    }
+    if (env.S3_PUBLIC_BUCKET === env.S3_PRIVATE_BUCKET) {
+      issue('S3_PUBLIC_BUCKET', 'must differ from S3_PRIVATE_BUCKET (one is public, one never is)');
     }
     if (production && !env.STAFF_REQUIRE_2FA) {
       issue('STAFF_REQUIRE_2FA', 'cannot be disabled in production');

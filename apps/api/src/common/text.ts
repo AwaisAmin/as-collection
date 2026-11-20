@@ -67,3 +67,21 @@ export const optionalPlainText = (options: TextOptions) =>
         .optional()
         .transform((v) => (v === '' ? undefined : v)),
     );
+
+/**
+ * Admin edit field: missing → `undefined` (leave unchanged), null or blank → `null` (clear it),
+ * anything else → cleaned text.
+ */
+export const clearableText = (options: TextOptions) =>
+  z
+    .union([z.string(), z.null()])
+    .optional()
+    .transform((v) => (v == null ? v : cleanText(v, options)))
+    .pipe(
+      z
+        .string()
+        .max(options.max, options.tooLong ?? `Must be at most ${String(options.max)} characters.`)
+        .nullable()
+        .optional()
+        .transform((v) => (v === '' ? null : v)),
+    );

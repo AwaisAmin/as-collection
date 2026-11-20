@@ -352,6 +352,9 @@ model Media {
   width             Int?
   height            Int?
   alt               String?         @db.VarChar(300)
+  /// Smaller copies for responsive images: [{ width, height, key }] (same bucket, ascending width).
+  variants          Json            @default("[]")
+  /// SHA-256 of the uploaded bytes: re-uploading the same file returns the existing image.
   checksumSha256    String?         @map("checksum_sha256") @db.Char(64)
   uploadedByStaffId String?         @map("uploaded_by_staff_id") @db.Uuid
   createdAt         DateTime        @default(now()) @map("created_at") @db.Timestamptz(3)
@@ -365,6 +368,7 @@ model Media {
   paymentProofs    PaymentProof[]
 
   @@index([createdAt(sort: Desc)])
+  @@index([checksumSha256])
   @@map("media")
 }
 

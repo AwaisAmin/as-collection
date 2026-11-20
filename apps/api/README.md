@@ -35,6 +35,9 @@ docker build -f apps/api/Dockerfile -t as-collection-api .   # from the repo roo
 | `/api/v1/admin/auth/*`                                                | Staff sign-in: `login` → `totp/enrol` / `totp/verify` → session; `session`, `logout`, `password`, `permissions`                                 |
 | `/api/v1/admin/staff`, `/admin/roles`, `/admin/audit-logs`            | Staff accounts (create, roles, disable, reset password/2FA, unlock, sign out), roles, audit trail                                               |
 | `/api/v1/admin/orders/*`                                              | Staff orders: search, counts, confirm → process → ship → deliver, cancel, return, refund, notes, payment-proof review (signed URLs)             |
+| `/api/v1/admin/media`                                                 | Staff image library: upload (WebP + responsive copies, de-duplicated), alt text, delete unused                                                  |
+| `/api/v1/admin/products/*`                                            | Staff products: search, create with variants, edit (conflict-safe), variants, delete never-ordered                                              |
+| `/api/v1/admin/inventory/*`                                           | Stock list (low / out / backorder), ledgered adjustments, stock settings, history                                                               |
 
 ## Structure
 
@@ -227,6 +230,34 @@ Rules:
   - `cancel-unpaid-transfers`, every 5 minutes: transfer orders unpaid after `TRANSFER_PAYMENT_WINDOW_HOURS` are cancelled as SYSTEM, which frees their stock. Orders with a screenshot awaiting review are skipped, re-checked under the row lock.
   - `cleanup-auth`, hourly: deletes OTP challenges older than a day, sessions that ended more than 30 days ago, and expired stock holds, in 5,000-row batches.
 - **To do:** customer notifications (WhatsApp/SMS on confirm, ship and reject); partial refunds.
+
+## Staff catalog: images, products & stock
+
+- **Images** (`modules/media`, `media.write`):
+  - **Checks:** the upload must be JPG, PNG or WEBP by its magic bytes, at most 20 MB and at least 64 px. Anything over ~50 MP is refused before decoding.
+  - **Processing** (`image-processing.ts`, at most two at a time per instance):
+    - applies the EXIF rotation, converts to sRGB and drops all metadata (GPS, camera serials);
+    - re-encodes as WebP: the full image fits in 2560 px, plus 320/640/960/1280/1920 px copies smaller than it.
+  - **Storage:** keys are `media/<uuidv7>/full.webp` and `…/w640.webp` in `S3_PUBLIC_BUCKET`, cached `immutable`.
+  - **Duplicates:** uploading the same file again returns the existing image (200).
+  - **Deleting** is refused while the image is used (409 `MEDIA_IN_USE`, with where it is used).
+  - **Dev:** seed images are still served by the storefront (`/images/*`). Uploads (`/media/*`) need the web app's `/media` proxy to the bucket (B8).
+- **Products** (`catalog/admin`, `catalog.write`):
+  - **Create:** a product and its variants in one transaction, together with categories, tags (created on the fly), attributes and the gallery (images can be pinned to a variant by SKU).
+  - **Slug:** generated from the name when omitted (`-2`, `-3` if taken). It never changes when the name does.
+  - **Validation rules** (`product-validation.ts`, pure and unit-tested):
+    - Attributes must match their type: SELECT takes one value, MULTI_SELECT one or more, and TEXT, NUMBER and BOOLEAN their own type.
+    - Variants are told apart by the same variant-scope options, and no two may share a combination.
+    - A product can only be ACTIVE with an active variant.
+    - Errors come back as 422 with a `path` per field.
+  - **Edit:** `PATCH` needs the `updatedAt` from the last read; if someone saved in between it returns 409 `STALE_UPDATE`. List fields replace the whole list. Variant changes also bump `updatedAt`, and every write returns the full product.
+  - **Deleting:** only never-ordered products or variants can be deleted (otherwise `PRODUCT_HAS_ORDERS` / `VARIANT_HAS_ORDERS`: archive or deactivate instead), and never while stock is reserved.
+- **Stock** (`inventory.write`):
+  - **Adjustments:** `add` (±) or `set` per line, applied all-or-nothing. Rows are locked in variant-id order (like checkout). Every change gets a movement (reason, note, who) and an audit entry.
+  - **Limits:** stock never drops below units reserved by open orders, unless backorders are on. Backorders can't be turned off while they're in use.
+  - **List:** filters `stock=low|out|backorder`, SKU or name search; plus per-variant history.
+- **Caching:** every write refreshes the storefront cache after commit. Listing prices and stock flags are kept up to date by the existing database triggers.
+- **Docker:** sharp's musl bindings (libvips) are copied into the image, and the build fails if sharp doesn't load.
 
 ## Conventions
 

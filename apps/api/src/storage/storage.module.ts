@@ -22,6 +22,7 @@ import { S3ObjectStorage } from './s3-object-storage.js';
           S3_SECRET_ACCESS_KEY: config.get('S3_SECRET_ACCESS_KEY', { infer: true }),
           S3_FORCE_PATH_STYLE: config.get('S3_FORCE_PATH_STYLE', { infer: true }),
           S3_PRIVATE_BUCKET: config.get('S3_PRIVATE_BUCKET', { infer: true }),
+          S3_PUBLIC_BUCKET: config.get('S3_PUBLIC_BUCKET', { infer: true }),
         }),
     },
   ],

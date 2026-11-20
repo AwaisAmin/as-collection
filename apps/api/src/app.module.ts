@@ -19,6 +19,7 @@ import { CatalogModule } from './modules/catalog/catalog.module.js';
 import { ContactModule } from './modules/contact/contact.module.js';
 import { ContentModule } from './modules/content/content.module.js';
 import { HealthModule } from './modules/health/health.module.js';
+import { MediaModule } from './modules/media/media.module.js';
 import { NewsletterModule } from './modules/newsletter/newsletter.module.js';
 import { OrdersModule } from './modules/orders/orders.module.js';
 import { ReviewsModule } from './modules/reviews/reviews.module.js';
@@ -75,6 +76,7 @@ export class AppModule implements NestModule {
         ContactModule,
         ContentModule,
         StaffModule,
+        MediaModule,
         JobsModule,
       ],
       providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],

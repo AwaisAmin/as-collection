@@ -1,8 +1,10 @@
 import {
   CreateBucketCommand,
   DeleteObjectCommand,
+  DeleteObjectsCommand,
   GetObjectCommand,
   HeadBucketCommand,
+  PutBucketPolicyCommand,
   PutObjectCommand,
   S3Client,
   S3ServiceException,
@@ -23,7 +25,22 @@ type StorageEnv = Pick<
   | 'S3_SECRET_ACCESS_KEY'
   | 'S3_FORCE_PATH_STYLE'
   | 'S3_PRIVATE_BUCKET'
+  | 'S3_PUBLIC_BUCKET'
 >;
+
+/** Anonymous read of objects (never listing) — applied to the public bucket outside production. */
+const publicReadPolicy = (bucket: string) =>
+  JSON.stringify({
+    Version: '2012-10-17',
+    Statement: [
+      {
+        Effect: 'Allow',
+        Principal: { AWS: ['*'] },
+        Action: ['s3:GetObject'],
+        Resource: [`arn:aws:s3:::${bucket}/*`],
+      },
+    ],
+  });
 
 /**
  * S3 implementation. Objects are written without any public ACL; the private bucket must never
@@ -36,9 +53,11 @@ export class S3ObjectStorage implements ObjectStorage, OnModuleInit, OnApplicati
   /** Signs URLs for the endpoint browsers can reach (may differ from the internal one). */
   private readonly signer: S3Client;
   private readonly bucket: string;
+  private readonly publicBucket: string;
 
   constructor(private readonly env: StorageEnv) {
     this.bucket = env.S3_PRIVATE_BUCKET;
+    this.publicBucket = env.S3_PUBLIC_BUCKET;
     this.client = new S3Client({
       region: env.S3_REGION,
       endpoint: env.S3_ENDPOINT,
@@ -66,17 +85,35 @@ export class S3ObjectStorage implements ObjectStorage, OnModuleInit, OnApplicati
   async onModuleInit(): Promise<void> {
     if (this.env.NODE_ENV === 'production') return;
     try {
-      await this.client.send(new HeadBucketCommand({ Bucket: this.bucket }));
-    } catch (error) {
-      if (error instanceof S3ServiceException && error.$metadata.httpStatusCode === 404) {
-        await this.client.send(new CreateBucketCommand({ Bucket: this.bucket }));
-        this.logger.log(`Created bucket ${this.bucket}`);
-        return;
+      await this.ensureBucket(this.bucket);
+      if (await this.ensureBucket(this.publicBucket)) {
+        await this.client.send(
+          new PutBucketPolicyCommand({
+            Bucket: this.publicBucket,
+            Policy: publicReadPolicy(this.publicBucket),
+          }),
+        );
       }
+    } catch (error) {
       // Storage down in development: uploads fail with 503, everything else keeps working.
       this.logger.warn(
         `Storage unavailable: ${error instanceof Error ? error.message : String(error)}`,
       );
+    }
+  }
+
+  /** Creates the bucket if missing; true when it was created. */
+  private async ensureBucket(bucket: string): Promise<boolean> {
+    try {
+      await this.client.send(new HeadBucketCommand({ Bucket: bucket }));
+      return false;
+    } catch (error) {
+      if (!(error instanceof S3ServiceException && error.$metadata.httpStatusCode === 404)) {
+        throw error;
+      }
+      await this.client.send(new CreateBucketCommand({ Bucket: bucket }));
+      this.logger.log(`Created bucket ${bucket}`);
+      return true;
     }
   }
 
@@ -128,5 +165,43 @@ export class S3ObjectStorage implements ObjectStorage, OnModuleInit, OnApplicati
       }),
       { expiresIn: expiresInSeconds },
     );
+  }
+
+  async putPublic({
+    key,
+    body,
+    contentType,
+  }: {
+    key: string;
+    body: Buffer;
+    contentType: string;
+  }): Promise<void> {
+    await this.client.send(
+      new PutObjectCommand({
+        Bucket: this.publicBucket,
+        Key: key,
+        Body: body,
+        ContentType: contentType,
+        ContentLength: body.length,
+        CacheControl: 'public, max-age=31536000, immutable',
+      }),
+    );
+  }
+
+  async deletePublic(keys: readonly string[]): Promise<void> {
+    for (let i = 0; i < keys.length; i += 1_000) {
+      const batch = keys.slice(i, i + 1_000);
+      const result = await this.client.send(
+        new DeleteObjectsCommand({
+          Bucket: this.publicBucket,
+          Delete: { Objects: batch.map((Key) => ({ Key })), Quiet: true },
+        }),
+      );
+      if (result.Errors?.length) {
+        throw new Error(
+          `Could not delete ${String(result.Errors.length)} object(s): ${result.Errors[0]?.Message ?? ''}`,
+        );
+      }
+    }
   }
 }
