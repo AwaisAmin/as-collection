@@ -16,6 +16,7 @@ import {
   Settings,
   Shapes,
   Star,
+  Tag,
   UserCog,
   Users,
 } from 'lucide-react';
@@ -32,6 +33,7 @@ const ICONS: Record<NavIcon, LucideIcon> = {
   inventory: Boxes,
   media: ImageIcon,
   categories: FolderTree,
+  brands: Tag,
   collections: Shapes,
   discounts: Percent,
   reviews: Star,

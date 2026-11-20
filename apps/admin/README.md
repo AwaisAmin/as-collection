@@ -43,6 +43,13 @@ on stdin). Everyone else is added from the panel.
   optional reference; alert level, tracking and backorders per variant; a stock-count mode saves
   many counted rows at once (all or nothing). `/stock/[variant]` shows the full history (sales
   link to their orders).
+- **Categories** (`/categories`): the tree in shop order, moved up/down in place; subcategories
+  added from their parent. The editor covers name, web address (`/shop/<slug>`), parent (moving a
+  category moves its subcategories), description, visibility, picture, banner (image, small
+  heading, text, which part stays in view on phones), the filters shown on the page (attributes,
+  optionally required for products there) and search-engine text. Empty categories can be deleted.
+- **Brands** (`/brands`): add and edit in dialogs (name, web address, description, logo, shown);
+  brands without products can be deleted; the product count links to those products.
 - **Images** (`/media`): the library, newest first, with an Unused view and search; upload several
   at once, edit descriptions, see where an image is used, delete unused ones.
 
@@ -52,6 +59,9 @@ on stdin). Everyone else is added from the panel.
 - Lists keep their state in the URL (GET forms), so filtered views can be shared and bookmarked.
 - Forms that can fail keep what was typed: `ActionDialog` submits by hand, because a React form
   `action` resets every field after each attempt.
+- JSON editors (product, category) share `SaveBar` / `StaleAlert` and the server helpers in
+  `lib/api/admin-call.ts` (`adminCall`, `parsePayload`, `saveFailure`).
+- The image picker never renders a `<form>`, so it can open inside other forms' dialogs.
 - Errors inside a modal are shown in the modal (toasts sit behind it).
 - Horizontal scroll containers are `relative`, so screen-reader-only labels inside them can't
   widen the page on phones.

@@ -17,11 +17,18 @@ import { cn } from '@/lib/utils/cn';
  * Images already on the product are shown as chosen and can't be added twice.
  */
 export function ImagePicker({
+  single = false,
+  title = 'Add images',
+  confirmLabel = 'Add to product',
   onClose,
   onAdd,
   chosen,
   canUpload,
 }: {
+  /** Choose exactly one image (a category picture, a brand logo). */
+  single?: boolean;
+  title?: string;
+  confirmLabel?: string;
   onClose: () => void;
   onAdd: (images: AdminMediaDto[]) => void;
   chosen: ReadonlySet<string>;
@@ -58,6 +65,7 @@ export function ImagePicker({
 
   const toggle = (media: AdminMediaDto) =>
     setSelected((current) => {
+      if (single) return current.has(media.id) ? new Map() : new Map([[media.id, media]]);
       const next = new Map(current);
       if (next.has(media.id)) next.delete(media.id);
       else next.set(media.id, media);
@@ -78,8 +86,13 @@ export function ImagePicker({
           ...current.filter((m) => !result.uploaded.some((u) => u.id === m.id)),
         ]);
         setSelected((current) => {
+          const fresh = result.uploaded.filter((media) => !chosen.has(media.id));
+          if (single) {
+            const last = fresh.at(-1);
+            return last ? new Map([[last.id, last]]) : current;
+          }
           const next = new Map(current);
-          for (const media of result.uploaded) if (!chosen.has(media.id)) next.set(media.id, media);
+          for (const media of fresh) next.set(media.id, media);
           return next;
         });
       }
@@ -91,19 +104,13 @@ export function ImagePicker({
     <Dialog
       open
       onClose={onClose}
-      title="Add images"
+      title={title}
       description="Upload new photos or choose from the library. JPG, PNG or WEBP up to 20 MB; they are optimised automatically."
       className="max-w-3xl"
     >
       <div className="flex flex-col gap-3 sm:flex-row">
-        <form
-          className="relative flex-1"
-          role="search"
-          onSubmit={(event) => {
-            event.preventDefault();
-            load(query);
-          }}
-        >
+        {/* Not a <form>: the picker can open inside other forms (brand, category dialogs). */}
+        <div className="relative flex-1" role="search">
           <label htmlFor={searchId} className="sr-only">
             Search images by description
           </label>
@@ -117,18 +124,23 @@ export function ImagePicker({
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key !== 'Enter') return;
+              event.preventDefault();
+              load(query);
+            }}
             placeholder="Search by description"
             maxLength={100}
             className="pl-9"
           />
-        </form>
+        </div>
         {canUpload ? (
           <>
             <input
               ref={fileInput}
               type="file"
               accept="image/jpeg,image/png,image/webp"
-              multiple
+              multiple={!single}
               className="sr-only"
               tabIndex={-1}
               aria-hidden
@@ -223,7 +235,11 @@ export function ImagePicker({
 
       <div className="flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-[13px] text-muted">
-          {selected.size ? `${String(selected.size)} selected` : 'Select one or more images.'}
+          {selected.size
+            ? `${String(selected.size)} selected`
+            : single
+              ? 'Select an image.'
+              : 'Select one or more images.'}
         </p>
         <div className="flex flex-col-reverse gap-2 sm:flex-row">
           <Button variant="ghost" onClick={onClose}>
@@ -236,7 +252,7 @@ export function ImagePicker({
               onClose();
             }}
           >
-            Add to product
+            {confirmLabel}
           </Button>
         </div>
       </div>

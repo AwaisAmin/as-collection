@@ -8,7 +8,8 @@ first-time authenticator setup → dashboard → sign out) and order handling (a
 with a payment screenshot is verified, shipped and delivered; stock moves from reserved to sold) and
 products (create with an uploaded photo and two sizes, publish, edit a variant, delete), stock
 (receive, refused removal, stock count, history, alert level) and the image library (upload,
-describe, delete). Stock tests undo their own changes afterwards.
+describe, delete), categories (create with a picture and filter, subcategory, reorder, move, delete)
+and brands (add, hide, delete). Stock and category tests restore what they change.
 
 ```bash
 pnpm services:up                                  # Docker: PostgreSQL, Redis, storage

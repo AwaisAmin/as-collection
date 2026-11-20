@@ -1,4 +1,4 @@
-import type { AdminCategoryNodeDto } from '@as/contracts';
+import type { AdminCategoryDto, AdminCategoryNodeDto, CategoryBannerDto } from '@as/contracts';
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
@@ -97,7 +97,7 @@ export class AdminCategoriesService {
       orderBy: [{ depth: 'asc' }, { position: 'asc' }, { name: 'asc' }],
       select: categorySelect,
     });
-    type Node = ReturnType<AdminCategoriesService['toDto']> & { children: Node[] };
+    type Node = AdminCategoryNodeDto;
     const nodes = new Map<string, Node>();
     const roots: Node[] = [];
     for (const row of rows) {
@@ -402,7 +402,7 @@ export class AdminCategoriesService {
     return errors;
   }
 
-  private toDto(row: CategoryRow) {
+  private toDto(row: CategoryRow): AdminCategoryDto {
     const image = (m: CategoryRow['image']) =>
       m ? { id: m.id, url: mediaUrl(this.baseUrl, m.storageKey), alt: m.alt } : null;
     return {
@@ -416,7 +416,7 @@ export class AdminCategoriesService {
       isActive: row.isActive,
       image: image(row.image),
       bannerImage: image(row.bannerImage),
-      banner: row.banner as { eyebrow?: string; description?: string; focus?: string } | null,
+      banner: row.banner as CategoryBannerDto | null,
       seoTitle: row.seoTitle,
       seoDescription: row.seoDescription,
       attributes: row.attributes.map((a) => ({
@@ -431,7 +431,7 @@ export class AdminCategoriesService {
         /** Products listed here as an extra category. */
         extraProducts: row._count.productLinks,
       },
-      updatedAt: row.updatedAt,
+      updatedAt: row.updatedAt.toISOString(),
     };
   }
 }

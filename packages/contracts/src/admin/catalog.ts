@@ -147,17 +147,43 @@ export interface AdminMediaListDto {
 
 // ─── Taxonomy ───
 
-export interface AdminCategoryNodeDto {
+/** Text over a category's banner image on its shop page. */
+export interface CategoryBannerDto {
+  eyebrow?: string | null;
+  description?: string | null;
+  /** CSS object-position of the banner image, e.g. "50% 30%". */
+  focus?: string | null;
+}
+
+export interface AdminCategoryDto {
   id: string;
   parentId: string | null;
   slug: string;
   name: string;
+  description: string | null;
+  /** 0 for top-level categories. */
   depth: number;
   position: number;
   isActive: boolean;
   image: AdminImageRefDto | null;
-  /** Attributes products in this category should fill in. */
+  bannerImage: AdminImageRefDto | null;
+  banner: CategoryBannerDto | null;
+  seoTitle: string | null;
+  seoDescription: string | null;
+  /** Filters shown on the category page; `isRequired`: products here must fill it in. */
   attributes: { attributeId: string; name: string; isRequired: boolean }[];
+  counts: {
+    children: number;
+    /** Products whose main category this is. */
+    products: number;
+    /** Products listed here as an extra category. */
+    extraProducts: number;
+  };
+  /** Send back as `updatedAt` when saving (conflict detection). */
+  updatedAt: string;
+}
+
+export interface AdminCategoryNodeDto extends AdminCategoryDto {
   children: AdminCategoryNodeDto[];
 }
 

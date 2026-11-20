@@ -37,7 +37,7 @@ export default async function ProductsPage({ searchParams }: PageProps<'/product
     }).catch(() => null),
     apiRequest<AdminCategoryNodeDto[]>('/admin/categories', { token }).catch(() => []),
   ]);
-  const filtered = Boolean(query.q || query.category || query.low);
+  const filtered = Boolean(query.q || query.category || query.low || query.brand);
 
   return (
     <div className="flex flex-col gap-5">

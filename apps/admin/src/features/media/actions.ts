@@ -5,9 +5,8 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
 import type { ActionState } from '@/lib/action-state';
-import { clientInfo } from '@/lib/api/client-ip';
-import { ApiError, apiRequest, type RequestOptions } from '@/lib/api/http-client';
-import { requireStaff } from '@/lib/session';
+import { adminCall as call } from '@/lib/api/admin-call';
+import { ApiError } from '@/lib/api/http-client';
 
 /*
  * The image library. Uploads are re-encoded by the API (WebP, metadata stripped, responsive
@@ -15,12 +14,6 @@ import { requireStaff } from '@/lib/session';
  */
 
 const idSchema = z.uuid();
-
-async function call<T>(path: string, options: RequestOptions): Promise<T> {
-  const { token } = await requireStaff();
-  const { ip, userAgent } = await clientInfo();
-  return apiRequest<T>(path, { ...options, token, clientIp: ip, userAgent });
-}
 
 function failure(error: unknown): ActionState {
   const at = Date.now();

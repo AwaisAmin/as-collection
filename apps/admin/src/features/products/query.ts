@@ -25,6 +25,8 @@ export interface ProductListQuery {
   tab: ProductTab;
   q?: string;
   category?: string;
+  /** Kept from links (a brand's product count); not in the filter form. */
+  brand?: string;
   low: boolean;
   sort: ProductSort;
   page: number;
@@ -40,6 +42,7 @@ const schema = z.object({
   status: z.preprocess(first, z.enum(['ACTIVE', 'DRAFT', 'ARCHIVED']).optional().catch(undefined)),
   q: optional(z.string().trim().min(1).max(100)),
   category: optional(z.uuid()),
+  brand: optional(z.uuid()),
   low: z.preprocess(first, z.enum(['1']).optional().catch(undefined)),
   sort: z.preprocess(
     first,
@@ -57,6 +60,7 @@ export function parseProductQuery(searchParams: Record<string, unknown>): Produc
     page: p.page,
     ...(p.q ? { q: p.q } : {}),
     ...(p.category ? { category: p.category } : {}),
+    ...(p.brand ? { brand: p.brand } : {}),
   };
 }
 
@@ -65,6 +69,7 @@ export function toProductApiQuery(query: ProductListQuery) {
     status: query.tab === 'all' ? undefined : (query.tab satisfies ProductStatus),
     q: query.q,
     category: query.category,
+    brand: query.brand,
     lowStock: query.low ? 'true' : undefined,
     sort: query.sort,
     page: query.page,
@@ -81,6 +86,7 @@ export function productListHref(
   if (next.tab !== 'all') params.set('status', next.tab);
   if (next.q) params.set('q', next.q);
   if (next.category) params.set('category', next.category);
+  if (next.brand) params.set('brand', next.brand);
   if (next.low) params.set('low', '1');
   if (next.sort !== 'updated') params.set('sort', next.sort);
   if (next.page > 1) params.set('page', String(next.page));

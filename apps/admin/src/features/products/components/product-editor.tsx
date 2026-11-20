@@ -1,7 +1,7 @@
 'use client';
 
 import type { AdminAttributeDto, AdminBrandDto, AdminProductDto } from '@as/contracts';
-import { ExternalLink, Plus, Trash2, X } from 'lucide-react';
+import { ExternalLink, Plus, Trash2 } from 'lucide-react';
 import { type ReactNode, useActionState, useId, useMemo, useState, useTransition } from 'react';
 import { toast } from 'sonner';
 
@@ -12,6 +12,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog } from '@/components/ui/dialog';
 import { Field } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { SaveBar, StaleAlert } from '@/components/ui/save-bar';
 import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 
@@ -65,12 +66,6 @@ const FIELD_LABELS: Record<string, string> = {
   attributes: 'Details',
   media: 'Images',
   variants: 'Variants',
-};
-
-const labelFor = (path: string) => {
-  const [head = '', index] = path.split('.');
-  const base = FIELD_LABELS[head] ?? head;
-  return index !== undefined && /^\d+$/.test(index) ? `${base} ${String(Number(index) + 1)}` : base;
 };
 
 /** Checks that need no server, with plain messages. */
@@ -183,7 +178,6 @@ export function ProductEditor({
     {},
   );
   const errors = { ...(state.errors ?? {}), ...local };
-  const errorList = Object.entries(errors);
 
   const productAttributes = attributes.filter((a) => a.scope === 'PRODUCT');
   const optionAttributes = attributes.filter((a) => a.scope === 'VARIANT' && a.type === 'SELECT');
@@ -210,15 +204,7 @@ export function ProductEditor({
         <input type="hidden" name="payload" value={payload} />
       </form>
       <fieldset disabled={!canWrite} className="contents">
-        {state.stale ? (
-          <Alert tone="error">
-            Someone else saved this product while you were editing.{' '}
-            <a href="" className="font-medium underline">
-              Reload
-            </a>{' '}
-            to see their changes (yours will be lost), then edit again.
-          </Alert>
-        ) : null}
+        {state.stale ? <StaleAlert what="product" /> : null}
 
         <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
           <div className="flex flex-col gap-6">
@@ -561,53 +547,22 @@ export function ProductEditor({
         </div>
 
         {canWrite ? (
-          <div className="border-line bg-surface/95 fixed inset-x-0 bottom-0 z-30 border-t backdrop-blur lg:left-60">
-            <div className="flex flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between lg:px-8">
-              <div className="min-w-0 text-[14px]" role="status" aria-live="polite">
-                {state.error && !state.stale && state.at ? (
-                  <details className="text-danger">
-                    <summary className="cursor-pointer">{state.error}</summary>
-                    {errorList.length ? (
-                      <ul className="mt-1 list-disc pl-5 text-[13px]">
-                        {errorList.map(([path, message]) => (
-                          <li key={path}>
-                            {labelFor(path)}: {message}
-                          </li>
-                        ))}
-                      </ul>
-                    ) : null}
-                  </details>
-                ) : (
-                  <span className="text-muted">
-                    {isNew ? 'New product' : dirty ? 'Unsaved changes' : 'All changes saved'}
-                  </span>
-                )}
-              </div>
-              <div className="flex gap-2">
-                {!isNew && dirty ? (
-                  <Button
-                    variant="ghost"
-                    onClick={() => {
-                      setDraft(initial);
-                      setLocal({});
-                    }}
-                    disabled={pending}
-                  >
-                    <X aria-hidden size={16} />
-                    Undo changes
-                  </Button>
-                ) : null}
-                <Button
-                  type="submit"
-                  form={formId}
-                  disabled={pending || (!isNew && !dirty)}
-                  className="flex-1"
-                >
-                  {pending ? 'Saving…' : isNew ? 'Create product' : 'Save product'}
-                </Button>
-              </div>
-            </div>
-          </div>
+          <SaveBar
+            formId={formId}
+            state={state}
+            errors={errors}
+            labels={FIELD_LABELS}
+            isNew={isNew}
+            dirty={dirty}
+            pending={pending}
+            onUndo={() => {
+              setDraft(initial);
+              setLocal({});
+            }}
+            createLabel="Create product"
+            saveLabel="Save product"
+            newText="New product"
+          />
         ) : null}
       </fieldset>
     </div>

@@ -7,9 +7,9 @@ import { useId, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
+import { ImagePicker } from '@/features/media/components/image-picker';
 
 import type { DraftImage } from '../form-model';
-import { ImagePicker } from './image-picker';
 
 const iconButton =
   'hover:bg-canvas inline-flex size-8 items-center justify-center rounded-md text-muted hover:text-text disabled:pointer-events-none disabled:opacity-40';

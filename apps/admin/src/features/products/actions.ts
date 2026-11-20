@@ -6,10 +6,10 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 
-import type { ActionState } from '@/lib/action-state';
-import { clientInfo } from '@/lib/api/client-ip';
-import { ApiError, apiRequest, type RequestOptions } from '@/lib/api/http-client';
-import { requireStaff } from '@/lib/session';
+import type { ActionState, SaveState } from '@/lib/action-state';
+import { adminCall as call, parsePayload, saveFailure as failure } from '@/lib/api/admin-call';
+
+export type { SaveState };
 
 import { rupeesToMinor } from './form-model';
 
@@ -18,55 +18,7 @@ import { rupeesToMinor } from './form-model';
  * here (size, ids) — the API validates every field, checks permissions and refuses stale saves.
  */
 
-export interface SaveState {
-  done?: string;
-  error?: string;
-  /** API field errors by dotted path (`name`, `variants.0.sku`, `media.2.mediaId`). */
-  errors?: Record<string, string>;
-  /** Someone else saved the product meanwhile. */
-  stale?: boolean;
-  at?: number;
-}
-
-const MAX_PAYLOAD_CHARS = 200_000;
 const idSchema = z.uuid();
-
-async function call<T>(path: string, options: RequestOptions): Promise<T> {
-  const { token } = await requireStaff();
-  const { ip, userAgent } = await clientInfo();
-  return apiRequest<T>(path, { ...options, token, clientIp: ip, userAgent });
-}
-
-function failure(error: unknown): SaveState {
-  const at = Date.now();
-  if (error instanceof ApiError) {
-    if (error.code === 'STALE_UPDATE') {
-      return { stale: true, error: error.message, at };
-    }
-    if (error.status === 422 && error.problem?.errors?.length) {
-      const errors: Record<string, string> = {};
-      for (const { path, message } of error.problem.errors) errors[path] ??= message;
-      return { error: 'Some fields need attention.', errors, at };
-    }
-    if (error.status === 403) return { error: 'Your role does not allow this.', at };
-    if (error.status === 413) return { error: 'That file is too large (20 MB at most).', at };
-    if (error.status >= 400 && error.status < 500) return { error: error.message, at };
-  }
-  return { error: 'Could not save right now. Please try again.', at };
-}
-
-function parsePayload(formData: FormData): Record<string, unknown> | null {
-  const raw = formData.get('payload');
-  if (typeof raw !== 'string' || raw.length > MAX_PAYLOAD_CHARS) return null;
-  try {
-    const value: unknown = JSON.parse(raw);
-    return value && typeof value === 'object' && !Array.isArray(value)
-      ? (value as Record<string, unknown>)
-      : null;
-  } catch {
-    return null;
-  }
-}
 
 function refresh(id?: string) {
   revalidatePath('/products');

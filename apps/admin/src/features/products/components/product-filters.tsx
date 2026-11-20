@@ -17,10 +17,11 @@ export function ProductFilters({
   query: ProductListQuery;
   categories: readonly { id: string; label: string }[];
 }) {
-  const filtered = Boolean(query.q || query.category || query.low);
+  const filtered = Boolean(query.q || query.category || query.low || query.brand);
   return (
     <form action="/products" role="search" className="flex flex-col gap-3 lg:flex-row lg:items-end">
       {query.tab !== 'all' ? <input type="hidden" name="status" value={query.tab} /> : null}
+      {query.brand ? <input type="hidden" name="brand" value={query.brand} /> : null}
       <label className="flex flex-1 flex-col gap-1.5">
         <span className="text-[13px] font-medium">Search</span>
         <span className="relative">
@@ -75,7 +76,7 @@ export function ProductFilters({
           <Link
             href={
               productListHref(
-                { ...query, q: undefined, category: undefined, low: false },
+                { ...query, q: undefined, category: undefined, brand: undefined, low: false },
                 {},
               ) as Route
             }

@@ -5,9 +5,8 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
 import type { ActionState } from '@/lib/action-state';
-import { clientInfo } from '@/lib/api/client-ip';
-import { ApiError, apiRequest, type RequestOptions } from '@/lib/api/http-client';
-import { requireStaff } from '@/lib/session';
+import { adminCall as call } from '@/lib/api/admin-call';
+import { ApiError } from '@/lib/api/http-client';
 
 import { MANUAL_REASONS } from './labels';
 
@@ -19,12 +18,6 @@ import { MANUAL_REASONS } from './labels';
 const idSchema = z.uuid();
 const reasonSchema = z.enum(MANUAL_REASONS);
 const MAX_UNITS = 1_000_000;
-
-async function call<T>(path: string, options: RequestOptions): Promise<T> {
-  const { token } = await requireStaff();
-  const { ip, userAgent } = await clientInfo();
-  return apiRequest<T>(path, { ...options, token, clientIp: ip, userAgent });
-}
 
 const text = (formData: FormData, name: string) => {
   const value = formData.get(name);
