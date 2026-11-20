@@ -1,9 +1,11 @@
 import 'server-only';
 
-import type { MenuDto, PublicSettingsDto } from '@as/contracts';
+import type { MenuDto, PromotionDto, PublicSettingsDto } from '@as/contracts';
+import type { Route } from 'next';
 import { cacheLife, cacheTag } from 'next/cache';
 
 import { serverEnv } from '@/config/env.server';
+import { activePromotion, type Promotion } from '@/config/promotions';
 import { apiFindOrNull, apiRequest } from '@/lib/api/http-client';
 import { reportError } from '@/lib/errors/report-error';
 
@@ -39,19 +41,28 @@ export async function getStoreContent(): Promise<StoreContent> {
   'use cache';
   cacheLife('minutes');
   cacheTag(SETTINGS_TAG, CONTENT_TAG);
-  if (serverEnv.MOCK_API) return { settings: defaultSettings, menus: defaultMenus };
+  if (serverEnv.MOCK_API) {
+    return { settings: defaultSettings, menus: defaultMenus, promotion: activePromotion };
+  }
 
-  const [settings, main, shopMega, footer] = await Promise.all([
+  const [settings, main, shopMega, footer, promo] = await Promise.all([
     safely('settings', () => apiRequest<PublicSettingsDto>('/content/settings')),
     safely('menu.main', () => apiFindOrNull<MenuDto>('/content/menus/main')),
     safely('menu.shop-mega', () => apiFindOrNull<MenuDto>('/content/menus/shop-mega')),
     safely('menu.footer', () => apiFindOrNull<MenuDto>('/content/menus/footer')),
+    safely('promotion', () =>
+      apiRequest<{ promotion: PromotionDto | null }>('/content/promotions/active'),
+    ),
   ]);
   return {
     settings: toStoreSettings(settings),
     menus: { main: toMainNav(main), shopMega: toShopMega(shopMega), footer: toFooterNav(footer) },
+    promotion: toPromotion(promo?.promotion ?? null),
   };
 }
+
+const toPromotion = (dto: PromotionDto | null): Promotion | null =>
+  dto ? { ...dto, cta: { label: dto.cta.label, href: dto.cta.href as Route } } : null;
 
 /** Just the settings (server components). */
 export const getStoreSettings = async () => (await getStoreContent()).settings;

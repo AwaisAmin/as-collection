@@ -83,3 +83,84 @@ export interface PublicSettingsDto {
   'home.trust-features'?: { id: string; lines: string[]; href?: string }[];
   announcements?: { id: string; icon: AnnouncementIcon; text: string; href?: string }[];
 }
+
+// ─── Page sections (settings per `type`, as the API validates them) ───
+
+export interface ContentImage {
+  src: string;
+  alt: string;
+}
+
+export interface ContentLink {
+  label: string;
+  href: string;
+}
+
+interface SectionHeading {
+  title: string;
+  subtitle?: string;
+}
+
+export type ProductSource =
+  | { kind: 'newest' }
+  | { kind: 'bestsellers' }
+  | { kind: 'on-sale' }
+  | { kind: 'top-rated' }
+  | { kind: 'collection'; slug: string }
+  | { kind: 'category'; slug: string };
+
+/** Campaign banner (`sale-banner` section; also `GET /content/promotions/active`). */
+export interface PromotionDto {
+  id: string;
+  eyebrow: string;
+  title: string;
+  highlight: string;
+  description: string;
+  /** ISO with offset: countdown target; the banner hides itself once it passes. */
+  endsAt: string;
+  cta: ContentLink;
+  image: ContentImage;
+}
+
+export interface SectionSettingsMap {
+  hero: { variant: string };
+  'category-grid': { categorySlugs: string[] };
+  'trust-bar': { settingKey: 'home.trust-features' };
+  'product-carousel': SectionHeading & { source: ProductSource; limit: number; cta?: ContentLink };
+  'product-tabs': SectionHeading & {
+    source: ProductSource;
+    tabs: { categorySlug: string }[];
+    limit: number;
+  };
+  'recently-viewed': { minItems: number };
+  'sale-banner': PromotionDto;
+  'collection-grid': SectionHeading & { collectionSlugs: string[] };
+  'shop-the-look': SectionHeading & {
+    look: {
+      id: string;
+      title: string;
+      description: string;
+      image: ContentImage;
+      hotspots: { productSlug: string; x: number; y: number }[];
+    };
+  };
+  testimonials: { title: string; limit: number };
+  'brand-story': { title: string; script: string; image: ContentImage; cta: ContentLink };
+  'instagram-gallery': SectionHeading & {
+    handle: string;
+    profileUrl: string;
+    posts: { id: string; image: ContentImage; href?: string }[];
+  };
+}
+
+export type SectionType = keyof SectionSettingsMap;
+
+/** A section whose settings are typed by its `type`. */
+export type TypedSectionDto = {
+  [K in SectionType]: {
+    id: string;
+    type: K;
+    settings: SectionSettingsMap[K];
+    endsAt: string | null;
+  };
+}[SectionType];

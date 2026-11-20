@@ -59,12 +59,20 @@ Lower features expose slots (e.g. `ProductCard` `actions`) instead of importing 
       screenshots.
     - **B8d-1:** store settings (contact, socials, announcements, delivery, transfer accounts) and menus (main,
       Shop mega menu, footer).
-  - **Still from config files (B8d-2):** the home-page sections.
+    - **B8d-2:** the home page, built from the admin's page sections, and the mega menu's campaign card.
 - **Store content** (`features/content`):
   - **Loading:** `getStoreContent()` (cached, tags `settings` and `content`) loads settings and menus once.
   - **Server components** call it; client components use `useStoreContent()` from the provider in the site layout.
   - **Fallbacks:** a setting or menu the store hasn't configured (or that fails to load) uses the bundled defaults in
     `config/*`, so the header, footer and checkout always render.
+- **Home page** (`features/home/components/home-sections.tsx`):
+  - **Source:** renders `/content/pages/home` section by section, in the order staff set, skipping hidden or ended
+    ones.
+  - **Settings:** each type's settings are typed by `@as/contracts` (`SectionSettingsMap`, checked against the API's
+    schemas at compile time).
+  - **Product carousels:** any source works (newest, bestsellers, on sale, top rated, a collection or a category).
+  - **Fallback:** the bundled design (`features/home/lib/default-sections.ts`) is shown offline or if the page can't
+    load.
 - **Instant refresh:**
   - **How:** the API calls `POST /api/revalidate` (secret `REVALIDATE_SECRET`, compared in constant time; tags
     `catalog`, `content`, `settings`, `reviews` only) right after staff edits, expiring those cache tags immediately.

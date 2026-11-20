@@ -9,7 +9,6 @@ import { useEffect, useId, useRef } from 'react';
 import { Container } from '@/components/ui/container';
 import { images } from '@/config/assets';
 import type { NavLink } from '@/config/navigation';
-import { activePromotion } from '@/config/promotions';
 import { useStoreContent } from '@/features/content/components/store-content-provider';
 import { useClickOutside } from '@/hooks/use-click-outside';
 import { useDisclosure } from '@/hooks/use-disclosure';
@@ -43,6 +42,7 @@ function LinkList({ links, onNavigate }: { links: readonly NavLink[]; onNavigate
 /** Promo card: the live campaign until it ends, otherwise New Arrivals. */
 function FeatureCard({ onNavigate }: { onNavigate: () => void }) {
   const now = useNow();
+  const activePromotion = useStoreContent().promotion;
   const promo =
     activePromotion && (now === null || now < Date.parse(activePromotion.endsAt))
       ? activePromotion

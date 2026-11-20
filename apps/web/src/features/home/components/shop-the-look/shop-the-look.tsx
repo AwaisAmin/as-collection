@@ -8,10 +8,16 @@ import { LookExplorer, type LookItem } from './look-explorer';
 
 interface ShopTheLookProps {
   look?: Look | null;
+  title?: string;
+  subtitle?: string;
 }
 
 /** A styled photo with numbered hotspots; each one reveals the product it points at. */
-export async function ShopTheLook({ look = featuredLook }: ShopTheLookProps) {
+export async function ShopTheLook({
+  look = featuredLook,
+  title = 'Shop the Look',
+  subtitle = 'Tap the dots to see every piece in this look.',
+}: ShopTheLookProps) {
   if (!look) return null;
 
   const products = await catalogService.getProductSummariesBySlug(
@@ -28,11 +34,7 @@ export async function ShopTheLook({ look = featuredLook }: ShopTheLookProps) {
     <section aria-labelledby="look-title" className="bg-ivory py-16 lg:py-20">
       <Container>
         <Reveal>
-          <SectionHeading
-            id="look-title"
-            title="Shop the Look"
-            subtitle="Tap the dots to see every piece in this look."
-          />
+          <SectionHeading id="look-title" title={title} subtitle={subtitle} />
         </Reveal>
         <Reveal delay={120} className="mt-10">
           <LookExplorer

@@ -48,9 +48,12 @@ function TestimonialCard({ review }: { review: FeaturedReview }) {
 }
 
 /** Five-star verified reviews from across the store, with the overall rating. */
-export async function Testimonials() {
+export async function Testimonials({
+  title = 'Loved by Our Customers',
+  limit = 8,
+}: { title?: string; limit?: number } = {}) {
   const [reviews, summary] = await Promise.all([
-    reviewsService.getFeaturedReviews(8),
+    reviewsService.getFeaturedReviews(limit),
     reviewsService.getStoreSummary(),
   ]);
   if (reviews.length === 0) return null;
@@ -59,7 +62,7 @@ export async function Testimonials() {
     <section aria-labelledby="testimonials-title" className="bg-cream py-16 lg:py-20">
       <Container>
         <Reveal className="flex flex-col items-center gap-4">
-          <SectionHeading id="testimonials-title" title="Loved by Our Customers" />
+          <SectionHeading id="testimonials-title" title={title} />
           {summary.count > 0 ? (
             <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[18px] text-muted">
               <RatingStars value={summary.average} size={18} />

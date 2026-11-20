@@ -1,3 +1,4 @@
+import type { SectionSettingsMap, SectionType as ContractSectionType } from '@as/contracts';
 import { z } from 'zod';
 
 /*
@@ -126,6 +127,13 @@ export const SECTION_SCHEMAS = {
 } as const satisfies Record<string, z.ZodType>;
 
 export type SectionType = keyof typeof SECTION_SCHEMAS;
+
+/** Compile-time guarantee: the stored section settings match the storefront's contract. */
+export const sectionsMatchContract = (settings: {
+  [K in SectionType]: z.output<(typeof SECTION_SCHEMAS)[K]>;
+}): SectionSettingsMap => settings;
+/** …and both sides know the same section types. */
+export const sectionTypesMatchContract = (type: ContractSectionType): SectionType => type;
 export const isSectionType = (type: string): type is SectionType =>
   Object.hasOwn(SECTION_SCHEMAS, type);
 

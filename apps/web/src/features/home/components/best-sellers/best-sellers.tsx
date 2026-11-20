@@ -8,11 +8,27 @@ import { catalogService } from '@/features/catalog/services/catalog.service';
 import { ShopProductGrid } from '@/features/shop/components/shop-product-grid';
 
 /** Top products per category behind pill tabs. All panels render on the server (cached). */
-export async function BestSellers() {
+interface BestSellersProps {
+  title?: string;
+  subtitle?: string;
+  /** Tabs in this order (unknown slugs are skipped); default: every category. */
+  categorySlugs?: readonly string[];
+  limit?: number;
+}
+
+export async function BestSellers({
+  title = 'Best Sellers',
+  subtitle = 'The pieces our customers keep coming back for.',
+  categorySlugs,
+  limit = 4,
+}: BestSellersProps = {}) {
+  const tabs = categorySlugs
+    ? categorySlugs.flatMap((slug) => categories.filter((c) => c.slug === slug))
+    : categories;
   const perCategory = await Promise.all(
-    categories.map(async (category) => ({
+    tabs.map(async (category) => ({
       category,
-      products: await catalogService.getBestSellers(category.slug, 4),
+      products: await catalogService.getBestSellers(category.slug, limit),
     })),
   );
 
@@ -37,11 +53,7 @@ export async function BestSellers() {
     <section aria-labelledby="best-sellers-title" className="bg-ivory py-16 lg:py-20">
       <Container>
         <Reveal>
-          <SectionHeading
-            id="best-sellers-title"
-            title="Best Sellers"
-            subtitle="The pieces our customers keep coming back for."
-          />
+          <SectionHeading id="best-sellers-title" title={title} subtitle={subtitle} />
         </Reveal>
         <Reveal delay={120} className="mt-8">
           <Tabs items={items} label="Best sellers by category" variant="pills" />

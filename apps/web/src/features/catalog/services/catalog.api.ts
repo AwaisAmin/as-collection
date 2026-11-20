@@ -4,6 +4,7 @@ import type {
   FacetsDto,
   Paginated as PaginatedDto,
   ProductDetailDto,
+  ProductSource,
   ProductSummaryDto,
   VariantSnapshotDto,
 } from '@as/contracts';
@@ -185,7 +186,34 @@ async function getVariantDetails(variantIds: readonly string[]): Promise<Variant
   return details;
 }
 
+/** A page section's product source → listing parameters. */
+const SOURCE_PARAMS: Record<ProductSource['kind'], Record<string, unknown>> = {
+  newest: { sort: 'newest', inStock: true },
+  bestsellers: { sort: 'featured' },
+  'on-sale': { sort: 'featured', sale: true },
+  'top-rated': { sort: 'rating' },
+  collection: { sort: 'featured' },
+  category: { sort: 'featured' },
+};
+
+async function getProductsBySource(
+  source: ProductSource,
+  limit: number,
+): Promise<ProductSummary[]> {
+  'use cache';
+  cacheLife('minutes');
+  cacheTag(CATALOG_TAG);
+  const page = await list({
+    ...SOURCE_PARAMS[source.kind],
+    ...(source.kind === 'collection' ? { collection: source.slug } : {}),
+    ...(source.kind === 'category' ? { category: source.slug } : {}),
+    pageSize: Math.min(limit, MAX_PAGE),
+  }).catch(() => null); // an unknown collection / category hides the section
+  return page ? page.items.map((p) => toSummary(p, SITE_ORIGIN)) : [];
+}
+
 export const apiCatalogService: CatalogService = {
+  getProductsBySource,
   listProducts,
   getFacets,
   getProductBySlug,

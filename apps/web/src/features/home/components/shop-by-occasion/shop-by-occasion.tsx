@@ -42,19 +42,22 @@ function OccasionCard({ occasion }: { occasion: Occasion }) {
 
 interface ShopByOccasionProps {
   occasions?: readonly Occasion[];
+  title?: string;
+  subtitle?: string;
 }
 
 /** Four occasion tiles linking to the shop's `occasion` filter. */
-export function ShopByOccasion({ occasions = allOccasions }: ShopByOccasionProps) {
+export function ShopByOccasion({
+  occasions = allOccasions,
+  title = 'Shop by Occasion',
+  subtitle = 'From everyday lawn to wedding-season showstoppers.',
+}: ShopByOccasionProps) {
+  if (occasions.length === 0) return null;
   return (
     <section aria-labelledby="occasion-title" className="bg-cream py-16 lg:py-20">
       <Container>
         <Reveal>
-          <SectionHeading
-            id="occasion-title"
-            title="Shop by Occasion"
-            subtitle="From everyday lawn to wedding-season showstoppers."
-          />
+          <SectionHeading id="occasion-title" title={title} subtitle={subtitle} />
         </Reveal>
         <ul className="mt-10 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
           {occasions.map((occasion, i) => (

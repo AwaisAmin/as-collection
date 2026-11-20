@@ -1,5 +1,7 @@
 import 'server-only';
 
+import type { ProductSource } from '@as/contracts';
+
 import type { CategorySlug } from '@/config/catalog';
 import { serverEnv } from '@/config/env.server';
 
@@ -33,6 +35,8 @@ export interface CatalogService {
   /** Bestsellers of a category, topped up with its best-rated products. */
   getBestSellers(category: CategorySlug, limit?: number): Promise<ProductSummary[]>;
   listProductSlugs(): Promise<string[]>;
+  /** Products for a page section's source (newest, bestsellers, on sale, a collection…). */
+  getProductsBySource(source: ProductSource, limit: number): Promise<ProductSummary[]>;
   /** Fresh (uncached) price/stock per variant — for cart re-validation and checkout. */
   getVariantSnapshots(variantIds: readonly string[]): Promise<VariantSnapshot[]>;
   /** Fresh (uncached) snapshot + display data — used to build orders server-side. */

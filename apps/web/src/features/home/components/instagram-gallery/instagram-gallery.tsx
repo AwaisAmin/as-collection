@@ -5,22 +5,28 @@ import { Reveal } from '@/components/motion/reveal';
 import { buttonVariants } from '@/components/ui/button';
 import { Container } from '@/components/ui/container';
 import { SectionHeading } from '@/components/ui/section-heading';
-import { instagram } from '@/config/instagram';
+import { instagram, type InstagramFeed } from '@/config/instagram';
 import { cn } from '@/lib/utils/cn';
 
 /** Six-tile Instagram grid (3 × 2 on phones, one row on desktop) linking out to the profile. */
-export function InstagramGallery() {
-  const { handle, profileUrl, posts } = instagram;
+interface InstagramGalleryProps {
+  feed?: InstagramFeed;
+  title?: string;
+  subtitle?: string;
+}
+
+export function InstagramGallery({
+  feed = instagram,
+  title = 'Follow Us on Instagram',
+  subtitle = 'New drops, styling ideas and behind-the-scenes — every week.',
+}: InstagramGalleryProps = {}) {
+  const { handle, profileUrl, posts } = feed;
 
   return (
     <section aria-labelledby="instagram-title" className="bg-ivory py-16 lg:py-20">
       <Container>
         <Reveal className="flex flex-col items-center gap-3">
-          <SectionHeading
-            id="instagram-title"
-            title="Follow Us on Instagram"
-            subtitle="New drops, styling ideas and behind-the-scenes — every week."
-          />
+          <SectionHeading id="instagram-title" title={title} subtitle={subtitle} />
           <a
             href={profileUrl}
             target="_blank"

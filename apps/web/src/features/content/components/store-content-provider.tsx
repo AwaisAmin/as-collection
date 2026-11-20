@@ -8,6 +8,7 @@ import type { StoreContent } from '../types';
 const StoreContentContext = createContext<StoreContent>({
   settings: defaultSettings,
   menus: defaultMenus,
+  promotion: null,
 });
 
 /** Settings and menus for client components (navigation, WhatsApp button, checkout). */

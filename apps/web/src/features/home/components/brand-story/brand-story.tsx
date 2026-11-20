@@ -1,3 +1,4 @@
+import type { Route } from 'next';
 import Image from 'next/image';
 
 import { Reveal } from '@/components/motion/reveal';
@@ -8,7 +9,22 @@ import { Container } from '@/components/ui/container';
 import { brandStory, brandValues } from '../../content/brand-story';
 
 /** Short brand story with three values and a link to the full About page. */
-export function BrandStory() {
+interface BrandStoryProps {
+  title?: string;
+  script?: string;
+  image?: { src: string; alt: string };
+  cta?: { label: string; href: string };
+}
+
+export function BrandStory({
+  title = brandStory.title,
+  script = brandStory.script,
+  image = {
+    src: '/images/brand/story.jpg',
+    alt: 'Close-up of gold floral embroidery on black fabric',
+  },
+  cta = { label: 'Read our story', href: '/about' },
+}: BrandStoryProps = {}) {
   return (
     <section aria-labelledby="story-title" className="border-y border-gold/50 bg-sand">
       <Container className="grid items-center gap-10 py-16 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16 lg:py-20">
@@ -20,8 +36,8 @@ export function BrandStory() {
           />
           <div className="relative size-full overflow-hidden rounded-card border border-gold/70 shadow-soft">
             <Image
-              src="/images/brand/story.jpg"
-              alt="Close-up of gold floral embroidery on black fabric"
+              src={image.src}
+              alt={image.alt}
               fill
               sizes="(min-width: 1200px) 460px, (min-width: 768px) 40vw, 380px"
               className="object-cover"
@@ -38,9 +54,9 @@ export function BrandStory() {
             id="story-title"
             className="font-display text-[38px]/[1.1] text-ink sm:text-[46px]/[1.1]"
           >
-            {brandStory.title}
+            {title}
           </h2>
-          <p className="font-script text-[32px]/tight text-ink">{brandStory.script}</p>
+          <p className="font-script text-[32px]/tight text-ink">{script}</p>
           <p className="max-w-xl text-[18px] leading-relaxed text-text">{brandStory.intro}</p>
 
           <ul className="grid w-full grid-cols-3 gap-3 pt-2 sm:gap-4">
@@ -59,8 +75,8 @@ export function BrandStory() {
             ))}
           </ul>
 
-          <ButtonLink href="/about" withArrow className="mt-2">
-            Read our story
+          <ButtonLink href={cta.href as Route} withArrow className="mt-2">
+            {cta.label}
           </ButtonLink>
         </Reveal>
       </Container>

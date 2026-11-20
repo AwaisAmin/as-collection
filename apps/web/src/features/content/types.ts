@@ -2,6 +2,7 @@ import type { AnnouncementIcon } from '@as/contracts';
 
 import type { MegaMenuColumn, NavItem, NavLink } from '@/config/navigation';
 import type { TransferAccount, TransferChannel } from '@/config/payments';
+import type { Promotion } from '@/config/promotions';
 import type { SocialLink } from '@/config/socials';
 
 /** Store settings the storefront shows (admin-editable; config files are the offline fallback). */
@@ -39,4 +40,6 @@ export interface StoreMenus {
 export interface StoreContent {
   settings: StoreSettings;
   menus: StoreMenus;
+  /** The live campaign (Shop mega menu card), or null. */
+  promotion: Promotion | null;
 }

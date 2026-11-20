@@ -1,5 +1,6 @@
 import 'server-only';
 
+import type { ProductSource } from '@as/contracts';
 import { cacheLife, cacheTag } from 'next/cache';
 
 import type { CategorySlug } from '@/config/catalog';
@@ -13,7 +14,7 @@ import {
   paginate,
   sortProducts,
 } from '../lib/query-products';
-import { type CatalogQuery, PAGE_SIZE } from '../schemas';
+import { type CatalogQuery, catalogQuerySchema, PAGE_SIZE } from '../schemas';
 import type {
   CatalogFacets,
   Paginated,
@@ -172,7 +173,35 @@ async function getVariantSnapshots(variantIds: readonly string[]): Promise<Varia
   );
 }
 
+/** Section sources on the in-memory catalog (collections map to occasions). */
+async function getProductsBySource(
+  source: ProductSource,
+  limit: number,
+): Promise<ProductSummary[]> {
+  switch (source.kind) {
+    case 'newest':
+      return getNewArrivals(limit);
+    case 'bestsellers':
+      return getFeaturedProducts(limit);
+    case 'top-rated':
+      return sortProducts(mockProducts, 'rating')
+        .slice(0, limit)
+        .map((p) => toSummary(p));
+    case 'on-sale':
+    case 'collection':
+    case 'category': {
+      const query = catalogQuerySchema.parse({
+        ...(source.kind === 'on-sale' ? { sale: '1' } : {}),
+        ...(source.kind === 'collection' ? { occasion: source.slug } : {}),
+        ...(source.kind === 'category' ? { category: source.slug } : {}),
+      });
+      return [...(await listProducts(query, limit)).items];
+    }
+  }
+}
+
 export const mockCatalogService: CatalogService = {
+  getProductsBySource,
   getVariantSnapshots,
   getVariantDetails,
   listProducts,
