@@ -62,6 +62,7 @@ export async function createTestApp(
     NODE_ENV: 'test',
     LOG_LEVEL: 'fatal',
     CORS_ORIGINS: TRUSTED_ORIGIN,
+    JOBS_ENABLED: 'false', // tests run jobs explicitly
     ...overrides,
   });
 

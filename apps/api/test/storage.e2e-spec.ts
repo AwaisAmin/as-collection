@@ -46,6 +46,34 @@ describe('S3 object storage (e2e)', () => {
     ).rejects.toMatchObject({ $metadata: { httpStatusCode: 404 } });
   });
 
+  it('serves an object through a short-lived signed URL, and nothing else', async () => {
+    const key = `e2e/${randomUUID()}.png`;
+    const body = Buffer.from('signed-bytes');
+    await storage.putPrivate({ key, body, contentType: 'image/png' });
+    try {
+      const url = await storage.signedPrivateUrl(key, {
+        expiresInSeconds: 60,
+        contentType: 'image/png',
+      });
+      const res = await fetch(url);
+      expect(res.status).toBe(200);
+      expect(res.headers.get('content-type')).toBe('image/png');
+      expect(res.headers.get('content-disposition')).toBe('inline');
+      expect(Buffer.from(await res.arrayBuffer()).equals(body)).toBe(true);
+
+      // Same signature for another object, or a tampered signature: refused.
+      const otherKey = url.replace(key, `e2e/${randomUUID()}.png`);
+      expect((await fetch(otherKey)).status).toBe(403);
+      const tampered = url.replace(
+        /X-Amz-Signature=([0-9a-f])/,
+        (_m, c: string) => `X-Amz-Signature=${c === '0' ? '1' : '0'}`,
+      );
+      expect((await fetch(tampered)).status).toBe(403);
+    } finally {
+      await storage.deletePrivate(key);
+    }
+  });
+
   it('refuses anonymous reads (the bucket is private)', async () => {
     const key = `e2e/${randomUUID()}.png`;
     await storage.putPrivate({ key, body: Buffer.from('secret'), contentType: 'image/png' });

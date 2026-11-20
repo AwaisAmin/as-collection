@@ -21,6 +21,7 @@ import {
   toTrackingDto,
 } from './order.mapper.js';
 import { normalizeOrderNumber } from './order-number.js';
+import { releaseDiscount, releaseReservation } from './stock.js';
 
 /** How a caller proves the order is theirs: the confirmation-link key, or their session. */
 export interface OrderAccess {
@@ -128,19 +129,8 @@ export class OrdersService {
           'This order can no longer be cancelled online. Please contact us.',
         );
       }
-      for (const item of order.items) {
-        if (!item.variantId) continue;
-        await tx.$executeRaw`
-          UPDATE inventory_items
-          SET reserved = GREATEST(reserved - ${item.quantity}, 0), version = version + 1,
-              updated_at = now()
-          WHERE variant_id = ${item.variantId}::uuid AND track_inventory`;
-      }
-      if (order.discountId) {
-        await tx.$executeRaw`
-          UPDATE discounts SET usage_count = GREATEST(usage_count - 1, 0), updated_at = now()
-          WHERE id = ${order.discountId}::uuid`;
-      }
+      await releaseReservation(tx, order.items);
+      await releaseDiscount(tx, order.discountId);
       return tx.order.update({
         where: { id },
         data: {

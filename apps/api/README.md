@@ -34,6 +34,7 @@ docker build -f apps/api/Dockerfile -t as-collection-api .   # from the repo roo
 | `/api/v1/account/*`                                                   | Signed-in customer: profile, verified phone, address book, signed-in devices                                                                    |
 | `/api/v1/admin/auth/*`                                                | Staff sign-in: `login` → `totp/enrol` / `totp/verify` → session; `session`, `logout`, `password`, `permissions`                                 |
 | `/api/v1/admin/staff`, `/admin/roles`, `/admin/audit-logs`            | Staff accounts (create, roles, disable, reset password/2FA, unlock, sign out), roles, audit trail                                               |
+| `/api/v1/admin/orders/*`                                              | Staff orders: search, counts, confirm → process → ship → deliver, cancel, return, refund, notes, payment-proof review (signed URLs)             |
 
 ## Structure
 
@@ -197,6 +198,35 @@ Rules:
   - `AuditService.record(actor, entry, tx)` writes inside the change's transaction. Secret-looking fields are redacted, and IP, user agent and request id are kept.
   - The table is append-only, enforced by a database trigger. Retention purges must run `SET LOCAL app.audit_purge = 'on'` in their transaction.
 - **Docker:** argon2's native binding for the image platform is copied into the production bundle, and the build fails if it doesn't load.
+
+## Staff order workflow & jobs
+
+- **State machine:** the rules live in `orders/admin/order-workflow.ts` (pure and unit-tested). Each order response includes `actions`, the steps possible now, for the admin panel's buttons.
+  - `PENDING → confirm → CONFIRMED → (process) → ship → SHIPPED → deliver → DELIVERED`
+  - `cancel` works before shipping.
+  - `return` works after shipping or delivery.
+  - `refund` applies to paid orders that were cancelled or returned.
+  - Transfers can only be confirmed or shipped once the payment is verified (`PAYMENT_NOT_VERIFIED`).
+- **Stock** (`orders/stock.ts`, lines processed in variant-id order):
+  - Checkout reserves the units.
+  - `ship` turns the reservation into a sale: `on_hand` drops, with a SALE movement. If units aren't physically there, it returns 409 `INSUFFICIENT_STOCK`.
+  - `cancel` releases the reservation and the coupon use.
+  - `return` with `restock: true` adds the units back, with a RETURN movement.
+- **Every change:**
+  - Locks the order row, re-checks the state machine, and writes timeline events in the same transaction as an audit entry.
+  - Timeline events are either customer-visible (standard messages) or internal (reasons, staff notes).
+  - Double clicks get 409.
+- **Payment proofs:**
+  - **Viewing:** `GET …/payment-proofs/:id/url` returns a 5-minute signed link, shown inline. Each view is audited.
+  - **Accept:** marks the order PAID and confirms a pending one; duplicate uploads are closed.
+  - **Reject:** the reason is shown to the customer. With no other screenshot pending, payment becomes FAILED and the customer can upload again.
+  - **Mismatch:** `amountMismatch` flags a stated amount that differs from the order total.
+- **Search:** `q` matches an order number (any spelling), a phone (any spelling) or part of a name (trigram index). Dates are filtered in Pakistan time.
+- **Jobs** (`src/jobs`, off with `JOBS_ENABLED=false`, which the tests use):
+  - **Scheduler:** in-process with jitter; a Redis lock means one instance runs each tick. If Redis is down every instance runs, which is safe because the jobs are idempotent and use row locks.
+  - `cancel-unpaid-transfers`, every 5 minutes: transfer orders unpaid after `TRANSFER_PAYMENT_WINDOW_HOURS` are cancelled as SYSTEM, which frees their stock. Orders with a screenshot awaiting review are skipped, re-checked under the row lock.
+  - `cleanup-auth`, hourly: deletes OTP challenges older than a day, sessions that ended more than 30 days ago, and expired stock holds, in 5,000-row batches.
+- **To do:** customer notifications (WhatsApp/SMS on confirm, ship and reject); partial refunds.
 
 ## Conventions
 

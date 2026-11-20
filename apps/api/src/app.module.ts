@@ -12,6 +12,7 @@ import { isStrictRateLimited } from './common/http/rate-limit.js';
 import { RequestIdMiddleware } from './common/http/request-id.middleware.js';
 import type { Env } from './config/env.js';
 import { DatabaseModule } from './database/database.module.js';
+import { JobsModule } from './jobs/jobs.module.js';
 import { AccountModule } from './modules/account/account.module.js';
 import { AuthModule } from './modules/auth/auth.module.js';
 import { CatalogModule } from './modules/catalog/catalog.module.js';
@@ -74,6 +75,7 @@ export class AppModule implements NestModule {
         ContactModule,
         ContentModule,
         StaffModule,
+        JobsModule,
       ],
       providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
     };

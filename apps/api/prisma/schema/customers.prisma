@@ -70,6 +70,8 @@ model OtpChallenge {
 
   @@index([phone, createdAt(sort: Desc)])
   @@index([expiresAt])
+  /// Cleanup job deletes old challenges by age.
+  @@index([createdAt])
   @@map("otp_challenges")
 }
 

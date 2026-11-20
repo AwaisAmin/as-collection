@@ -2,6 +2,14 @@
 export interface ObjectStorage {
   putPrivate(input: { key: string; body: Buffer; contentType: string }): Promise<void>;
   deletePrivate(key: string): Promise<void>;
+  /**
+   * Short-lived GET URL for a private object (staff viewing a payment screenshot). Signed
+   * locally — no network call — and useless after `expiresInSeconds`.
+   */
+  signedPrivateUrl(
+    key: string,
+    options: { expiresInSeconds: number; contentType: string },
+  ): Promise<string>;
 }
 
 export const OBJECT_STORAGE = Symbol('OBJECT_STORAGE');
@@ -18,5 +26,11 @@ export class MemoryObjectStorage implements ObjectStorage {
   deletePrivate(key: string) {
     this.objects.delete(key);
     return Promise.resolve();
+  }
+
+  signedPrivateUrl(key: string, { expiresInSeconds }: { expiresInSeconds: number }) {
+    return Promise.resolve(
+      `memory://private/${encodeURIComponent(key)}?expires=${String(expiresInSeconds)}`,
+    );
   }
 }

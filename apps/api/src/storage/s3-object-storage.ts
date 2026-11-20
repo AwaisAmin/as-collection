@@ -1,11 +1,13 @@
 import {
   CreateBucketCommand,
   DeleteObjectCommand,
+  GetObjectCommand,
   HeadBucketCommand,
   PutObjectCommand,
   S3Client,
   S3ServiceException,
 } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { Logger, type OnApplicationShutdown, type OnModuleInit } from '@nestjs/common';
 
 import type { Env } from '../config/env.js';
@@ -15,6 +17,7 @@ type StorageEnv = Pick<
   Env,
   | 'NODE_ENV'
   | 'S3_ENDPOINT'
+  | 'S3_PUBLIC_ENDPOINT'
   | 'S3_REGION'
   | 'S3_ACCESS_KEY_ID'
   | 'S3_SECRET_ACCESS_KEY'
@@ -30,6 +33,8 @@ type StorageEnv = Pick<
 export class S3ObjectStorage implements ObjectStorage, OnModuleInit, OnApplicationShutdown {
   private readonly logger = new Logger('Storage');
   private readonly client: S3Client;
+  /** Signs URLs for the endpoint browsers can reach (may differ from the internal one). */
+  private readonly signer: S3Client;
   private readonly bucket: string;
 
   constructor(private readonly env: StorageEnv) {
@@ -45,6 +50,17 @@ export class S3ObjectStorage implements ObjectStorage, OnModuleInit, OnApplicati
       maxAttempts: 3,
       requestHandler: { connectionTimeout: 3_000, requestTimeout: 15_000 },
     });
+    this.signer = env.S3_PUBLIC_ENDPOINT
+      ? new S3Client({
+          region: env.S3_REGION,
+          endpoint: env.S3_PUBLIC_ENDPOINT,
+          forcePathStyle: env.S3_FORCE_PATH_STYLE,
+          credentials:
+            env.S3_ACCESS_KEY_ID && env.S3_SECRET_ACCESS_KEY
+              ? { accessKeyId: env.S3_ACCESS_KEY_ID, secretAccessKey: env.S3_SECRET_ACCESS_KEY }
+              : undefined,
+        })
+      : this.client;
   }
 
   async onModuleInit(): Promise<void> {
@@ -66,6 +82,7 @@ export class S3ObjectStorage implements ObjectStorage, OnModuleInit, OnApplicati
 
   onApplicationShutdown(): void {
     this.client.destroy();
+    if (this.signer !== this.client) this.signer.destroy();
   }
 
   async putPrivate({
@@ -93,5 +110,23 @@ export class S3ObjectStorage implements ObjectStorage, OnModuleInit, OnApplicati
 
   async deletePrivate(key: string): Promise<void> {
     await this.client.send(new DeleteObjectCommand({ Bucket: this.bucket, Key: key }));
+  }
+
+  signedPrivateUrl(
+    key: string,
+    { expiresInSeconds, contentType }: { expiresInSeconds: number; contentType: string },
+  ): Promise<string> {
+    return getSignedUrl(
+      this.signer,
+      new GetObjectCommand({
+        Bucket: this.bucket,
+        Key: key,
+        // Shown in the admin panel; only verified images (magic bytes) are ever stored here.
+        ResponseContentType: contentType,
+        ResponseContentDisposition: 'inline',
+        ResponseCacheControl: 'private, no-store',
+      }),
+      { expiresIn: expiresInSeconds },
+    );
   }
 }

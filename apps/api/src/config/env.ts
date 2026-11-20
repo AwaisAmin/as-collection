@@ -78,6 +78,11 @@ export const envSchema = z
      * SDK's default chain is used (IAM role, env, profile). Path-style for RustFS/MinIO.
      */
     S3_ENDPOINT: z.url({ protocol: /^https?$/ }).optional(),
+    /**
+     * Endpoint put into signed URLs, when browsers must reach storage on a different host than
+     * the API does (e.g. API → http://storage:9000 inside Docker, browser → https://files.…).
+     */
+    S3_PUBLIC_ENDPOINT: z.url({ protocol: /^https?$/ }).optional(),
     S3_REGION: z.string().min(1).default('us-east-1'),
     S3_ACCESS_KEY_ID: optionalString,
     S3_SECRET_ACCESS_KEY: optionalString,
@@ -138,6 +143,11 @@ export const envSchema = z
     STAFF_SESSION_IDLE_MINUTES: z.coerce.number().int().min(5).max(1440).default(120),
     /** …and in any case this long after sign-in. */
     STAFF_SESSION_MAX_HOURS: z.coerce.number().int().min(1).max(72).default(12),
+
+    /** Background jobs (auto-cancel, cleanup). Off in tests; run them explicitly there. */
+    JOBS_ENABLED: booleanFlag.default(true),
+    /** Unpaid bank/wallet transfer orders are cancelled (stock released) after this many hours. */
+    TRANSFER_PAYMENT_WINDOW_HOURS: z.coerce.number().int().min(1).max(336).default(48),
   })
   .superRefine((env, ctx) => {
     if (env.NODE_ENV === 'production' && env.CORS_ORIGINS.length === 0) {

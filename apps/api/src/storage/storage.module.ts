@@ -16,6 +16,7 @@ import { S3ObjectStorage } from './s3-object-storage.js';
         new S3ObjectStorage({
           NODE_ENV: config.get('NODE_ENV', { infer: true }),
           S3_ENDPOINT: config.get('S3_ENDPOINT', { infer: true }),
+          S3_PUBLIC_ENDPOINT: config.get('S3_PUBLIC_ENDPOINT', { infer: true }),
           S3_REGION: config.get('S3_REGION', { infer: true }),
           S3_ACCESS_KEY_ID: config.get('S3_ACCESS_KEY_ID', { infer: true }),
           S3_SECRET_ACCESS_KEY: config.get('S3_SECRET_ACCESS_KEY', { infer: true }),

@@ -1,0 +1,185 @@
+import type { Prisma } from '../../../generated/prisma/client.js';
+import { availableActions, canReviewPayment } from './order-workflow.js';
+
+/** Everything staff see on the order page: internal events, proofs and who reviewed them. */
+export const adminOrderSelect = {
+  id: true,
+  number: true,
+  customerId: true,
+  status: true,
+  paymentMethod: true,
+  paymentStatus: true,
+  customerName: true,
+  phone: true,
+  email: true,
+  shippingName: true,
+  shippingPhone: true,
+  shippingLine1: true,
+  shippingLine2: true,
+  shippingCity: true,
+  shippingProvince: true,
+  shippingPostalCode: true,
+  notes: true,
+  currency: true,
+  subtotalMinor: true,
+  discountMinor: true,
+  shippingMinor: true,
+  totalMinor: true,
+  discountCode: true,
+  courier: true,
+  trackingNumber: true,
+  placedAt: true,
+  confirmedAt: true,
+  shippedAt: true,
+  deliveredAt: true,
+  cancelledAt: true,
+  updatedAt: true,
+  items: {
+    orderBy: { id: 'asc' },
+    select: {
+      id: true,
+      productId: true,
+      variantId: true,
+      productName: true,
+      variantTitle: true,
+      sku: true,
+      imageUrl: true,
+      unitPriceMinor: true,
+      compareAtPriceMinor: true,
+      quantity: true,
+      lineTotalMinor: true,
+    },
+  },
+  events: {
+    orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
+    select: {
+      id: true,
+      type: true,
+      status: true,
+      note: true,
+      isCustomerVisible: true,
+      actorType: true,
+      createdAt: true,
+      actorStaff: { select: { id: true, name: true } },
+    },
+  },
+  paymentProofs: {
+    orderBy: { createdAt: 'desc' },
+    select: {
+      id: true,
+      method: true,
+      status: true,
+      reference: true,
+      amountMinor: true,
+      note: true,
+      createdAt: true,
+      reviewedAt: true,
+      reviewedBy: { select: { id: true, name: true } },
+      media: { select: { mimeType: true, sizeBytes: true } },
+    },
+  },
+} satisfies Prisma.OrderSelect;
+
+export type AdminOrderRow = Prisma.OrderGetPayload<{ select: typeof adminOrderSelect }>;
+
+const iso = (d: Date | null) => d?.toISOString() ?? null;
+
+export function toAdminOrderDto(row: AdminOrderRow) {
+  return {
+    id: row.id,
+    number: row.number,
+    status: row.status,
+    paymentMethod: row.paymentMethod,
+    paymentStatus: row.paymentStatus,
+    customerId: row.customerId,
+    customer: { fullName: row.customerName, phone: row.phone, email: row.email },
+    shipping: {
+      fullName: row.shippingName,
+      phone: row.shippingPhone,
+      line1: row.shippingLine1,
+      line2: row.shippingLine2,
+      city: row.shippingCity,
+      province: row.shippingProvince,
+      postalCode: row.shippingPostalCode,
+    },
+    notes: row.notes,
+    items: row.items,
+    totals: {
+      currency: row.currency,
+      itemCount: row.items.reduce((sum, i) => sum + i.quantity, 0),
+      subtotalMinor: row.subtotalMinor,
+      discountMinor: row.discountMinor,
+      shippingMinor: row.shippingMinor,
+      totalMinor: row.totalMinor,
+    },
+    discountCode: row.discountCode,
+    delivery: { courier: row.courier, trackingNumber: row.trackingNumber },
+    placedAt: row.placedAt.toISOString(),
+    confirmedAt: iso(row.confirmedAt),
+    shippedAt: iso(row.shippedAt),
+    deliveredAt: iso(row.deliveredAt),
+    cancelledAt: iso(row.cancelledAt),
+    updatedAt: row.updatedAt.toISOString(),
+    timeline: row.events.map((e) => ({
+      id: e.id,
+      type: e.type,
+      status: e.status,
+      note: e.note,
+      customerVisible: e.isCustomerVisible,
+      actorType: e.actorType,
+      actor: e.actorStaff,
+      at: e.createdAt.toISOString(),
+    })),
+    paymentProofs: row.paymentProofs.map((p) => ({
+      id: p.id,
+      method: p.method,
+      status: p.status,
+      reference: p.reference,
+      amountMinor: p.amountMinor,
+      /** Differs from the order total → staff should look closely. */
+      amountMismatch: p.amountMinor !== null && p.amountMinor !== row.totalMinor,
+      note: p.note,
+      mimeType: p.media.mimeType,
+      sizeBytes: p.media.sizeBytes,
+      uploadedAt: p.createdAt.toISOString(),
+      reviewedAt: iso(p.reviewedAt),
+      reviewedBy: p.reviewedBy,
+    })),
+    actions: availableActions(row),
+    canReviewPayment: canReviewPayment(row),
+  };
+}
+
+export type AdminOrderDto = ReturnType<typeof toAdminOrderDto>;
+
+export const adminOrderListSelect = {
+  id: true,
+  number: true,
+  status: true,
+  paymentMethod: true,
+  paymentStatus: true,
+  customerName: true,
+  phone: true,
+  shippingCity: true,
+  totalMinor: true,
+  currency: true,
+  placedAt: true,
+  _count: { select: { items: true } },
+} satisfies Prisma.OrderSelect;
+
+type AdminOrderListRow = Prisma.OrderGetPayload<{ select: typeof adminOrderListSelect }>;
+
+export const toAdminOrderListItem = (row: AdminOrderListRow) => ({
+  id: row.id,
+  number: row.number,
+  status: row.status,
+  paymentMethod: row.paymentMethod,
+  paymentStatus: row.paymentStatus,
+  customerName: row.customerName,
+  phone: row.phone,
+  city: row.shippingCity,
+  totalMinor: row.totalMinor,
+  currency: row.currency,
+  lineCount: row._count.items,
+  placedAt: row.placedAt.toISOString(),
+});

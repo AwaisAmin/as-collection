@@ -92,6 +92,8 @@ model Order {
   @@index([placedAt(sort: Desc)])
   /// Per-customer coupon limits (counted by phone, so guests are limited too).
   @@index([discountId, phone])
+  /// Admin search by customer name (trigram, substring match).
+  @@index([customerName(ops: raw("gin_trgm_ops"))], type: Gin, map: "orders_customer_name_trgm_idx")
   @@map("orders")
 }
 
