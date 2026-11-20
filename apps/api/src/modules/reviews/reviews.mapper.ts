@@ -1,4 +1,8 @@
+import type { ReviewDto, ReviewSummaryDto } from '@as/contracts';
+
 import type { Prisma } from '../../generated/prisma/client.js';
+
+export type { ReviewDto, ReviewSummaryDto };
 import type { ReviewSort } from './reviews.schemas.js';
 
 export const reviewSelect = {
@@ -18,22 +22,6 @@ export const reviewSelect = {
 
 type ReviewRow = Prisma.ReviewGetPayload<{ select: typeof reviewSelect }>;
 
-/** Public review: no customer id, moderation data or IP hash. */
-export interface ReviewDto {
-  id: string;
-  productId: string;
-  author: string;
-  city: string | null;
-  rating: number;
-  title: string;
-  body: string;
-  createdAt: string;
-  verifiedPurchase: boolean;
-  helpfulCount: number;
-  /** The store's public answer, if any. */
-  reply: { body: string; at: string } | null;
-}
-
 export const toReviewDto = (r: ReviewRow): ReviewDto => ({
   id: r.id,
   productId: r.productId,
@@ -47,14 +35,6 @@ export const toReviewDto = (r: ReviewRow): ReviewDto => ({
   helpfulCount: r.helpfulCount,
   reply: r.reply && r.repliedAt ? { body: r.reply, at: r.repliedAt.toISOString() } : null,
 });
-
-export interface ReviewSummaryDto {
-  /** One decimal (4.7). */
-  average: number;
-  count: number;
-  /** Count per star: index 0 = 1★ … index 4 = 5★. */
-  distribution: [number, number, number, number, number];
-}
 
 /** Summary from per-star counts (grouped APPROVED reviews). */
 export function summarize(counts: readonly { rating: number; count: number }[]): ReviewSummaryDto {

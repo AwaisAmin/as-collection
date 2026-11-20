@@ -32,7 +32,33 @@ export type RequestOtpResult =
     }
   | { ok: false; reason: 'rate_limited'; retryIn: number };
 
+/** A new session; the token goes into our HttpOnly cookie and never reaches the browser's JS. */
+export interface NewSession {
+  token: string;
+  expiresAt: Date;
+}
+
+export type SignInSuccess = { ok: true; user: User; isNew: boolean; session: NewSession };
+
 export type VerifyOtpResult =
-  | { ok: true; user: User; isNew: boolean }
+  | SignInSuccess
   | { ok: false; reason: 'invalid'; attemptsLeft: number }
   | { ok: false; reason: 'expired' | 'too_many_attempts' | 'no_challenge' };
+
+export type GoogleSignInResult = SignInSuccess | { ok: false; error: string };
+
+/** One device signed in to the account (profile → signed-in devices). */
+export interface DeviceSession {
+  id: string;
+  /** The device making this request. */
+  current: boolean;
+  /** e.g. "Chrome on Android". */
+  device: string;
+  lastSeenAt: string;
+  createdAt: string;
+}
+
+export interface ClientContext {
+  ip: string | null;
+  userAgent: string | null;
+}

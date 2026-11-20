@@ -57,6 +57,17 @@ describe('productWhere', () => {
     expect(and(where)[0]).toEqual({ status: 'ACTIVE', publishedAt: { lte: now } });
   });
 
+  it('looks up exact products by id or slug (still only visible ones)', () => {
+    const id = '01890000-0000-7000-8000-000000000000';
+    const where = productWhere(parse({ ids: `${id},${id}`, slugs: 'ruby-lawn' }), ctx());
+    expect(and(where)).toEqual([
+      { status: 'ACTIVE', publishedAt: { lte: now } },
+      { id: { in: [id] } },
+      { slug: { in: ['ruby-lawn'] } },
+    ]);
+    expect(listProductsQuerySchema.safeParse({ ids: 'not-a-uuid' }).success).toBe(false);
+  });
+
   it('filters product attributes by value and variant options by available stock', () => {
     const where = productWhere(
       parse({ 'f.fabric': 'lawn', 'f.size': 'm', 'f.unknown': 'x' }),

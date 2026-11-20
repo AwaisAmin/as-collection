@@ -1,0 +1,15 @@
+{
+  "name": "@as/contracts",
+  "version": "0.0.0",
+  "private": true,
+  "description": "API response types shared by apps/api and apps/web (types only, no runtime code)",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts"
+    }
+  },
+  "files": [
+    "src"
+  ]
+}

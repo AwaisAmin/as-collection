@@ -5,6 +5,8 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 
 import { serverEnv } from '@/config/env.server';
+import { clientInfo } from '@/lib/api/client-ip';
+import { ApiError } from '@/lib/api/http-client';
 import { reportError } from '@/lib/errors/report-error';
 import { formatPkMobile } from '@/lib/utils/phone';
 
@@ -17,7 +19,7 @@ import {
   profileSchema,
 } from './schemas';
 import { authService } from './services/auth.service';
-import { endSession, getCurrentUser, startSession } from './session';
+import { endSession, getCurrentUser, getSessionToken, startSession } from './session';
 
 /* ───────────────────────────── OTP login ───────────────────────────── */
 
@@ -30,7 +32,7 @@ export async function requestOtpAction(rawPhone: string): Promise<RequestOtpStat
   if (!phone.success) return { ok: false, error: phone.error.issues[0]!.message };
 
   try {
-    const result = await authService.requestOtp(phone.data);
+    const result = await authService.requestOtp(phone.data, await clientInfo());
     if (!result.ok) {
       return {
         ok: false,
@@ -42,8 +44,8 @@ export async function requestOtpAction(rawPhone: string): Promise<RequestOtpStat
       phone: phone.data,
       displayPhone: formatPkMobile(phone.data),
       resendIn: result.resendIn,
-      // The code is only ever returned while running on mocks (local development).
-      devCode: serverEnv.MOCK_API ? result.devCode : undefined,
+      // Only ever present in development (mocks, or the API's OTP_DEV_ECHO, refused in production).
+      devCode: process.env.NODE_ENV === 'production' ? undefined : result.devCode,
     };
   } catch (error) {
     reportError(error, { action: 'auth.requestOtp' });
@@ -59,7 +61,16 @@ export async function verifyOtpAction(rawPhone: string, rawCode: string): Promis
   const code = otpCodeSchema.safeParse(rawCode);
   if (!phone.success || !code.success) return { ok: false, error: 'Enter the 6-digit code.' };
 
-  const result = await authService.verifyOtp(phone.data, code.data);
+  let result;
+  try {
+    result = await authService.verifyOtp(phone.data, code.data, await clientInfo());
+  } catch (error) {
+    if (error instanceof ApiError && error.code === 'ACCOUNT_BLOCKED') {
+      return { ok: false, error: error.message, restart: true };
+    }
+    reportError(error, { action: 'auth.verifyOtp' });
+    return { ok: false, error: 'We couldn’t sign you in right now. Please try again.' };
+  }
   if (!result.ok) {
     switch (result.reason) {
       case 'invalid':
@@ -78,7 +89,7 @@ export async function verifyOtpAction(rawPhone: string, rawCode: string): Promis
     }
   }
 
-  await startSession(result.user.id);
+  await startSession(result.session);
   return { ok: true, needsName: !result.user.name };
 }
 
@@ -86,23 +97,36 @@ export async function completeProfileAction(
   rawName: string,
 ): Promise<{ ok: true } | { ok: false; error: string }> {
   const user = await getCurrentUser();
-  if (!user) return { ok: false, error: 'Your session expired. Please sign in again.' };
+  const token = await getSessionToken();
+  if (!user || !token) return { ok: false, error: 'Your session expired. Please sign in again.' };
   const name = personNameSchema.safeParse(rawName);
   if (!name.success) return { ok: false, error: name.error.issues[0]!.message };
-  await authService.updateProfile(user.id, { name: name.data, email: user.email });
+  await authService.updateProfile(token, { name: name.data, email: user.email });
   return { ok: true };
 }
 
-/** Mock Google sign-in. The real flow (OAuth redirect + callback) is wired with the API. */
-export async function googleSignInAction(): Promise<{ ok: true } | { ok: false; error: string }> {
-  if (!serverEnv.MOCK_API) return { ok: false, error: 'Google sign-in is not configured yet.' };
-  const user = await authService.signInWithGoogle({
-    googleId: 'mock-google-001',
-    email: 'demo.customer@gmail.com',
-    name: 'Demo Google Customer',
-  });
-  await startSession(user.id);
-  return { ok: true };
+const googleCredentialSchema = z.string().min(20).max(4096);
+
+/**
+ * Google sign-in: `credential` is the ID token from Google's button (verified by the API). In
+ * offline development (`MOCK_API=true`) any value signs in a demo customer.
+ */
+export async function googleSignInAction(
+  credential: string,
+): Promise<{ ok: true; needsName: boolean } | { ok: false; error: string }> {
+  const parsed = googleCredentialSchema.safeParse(credential);
+  if (!parsed.success && !serverEnv.MOCK_API) {
+    return { ok: false, error: 'Google sign-in failed. Please try again.' };
+  }
+  try {
+    const result = await authService.signInWithGoogle(credential, await clientInfo());
+    if (!result.ok) return { ok: false, error: result.error };
+    await startSession(result.session);
+    return { ok: true, needsName: !result.user.name };
+  } catch (error) {
+    reportError(error, { action: 'auth.google' });
+    return { ok: false, error: 'We couldn’t sign you in with Google right now. Please try again.' };
+  }
 }
 
 export async function logoutAction(): Promise<void> {
@@ -126,23 +150,62 @@ function fieldErrors<F extends string>(error: z.ZodError): Partial<Record<F, str
   return out;
 }
 
+const signedOut = <F extends string>(): FormState<F> => ({
+  status: 'error',
+  message: 'Your session expired. Please sign in again.',
+  fieldErrors: {},
+  at: Date.now(),
+});
+
+/** The API's field names → this form's (e.g. `line1` → `address`). */
+function apiFailure<F extends string>(
+  error: unknown,
+  fields: Partial<Record<string, F>>,
+  action: string,
+): FormState<F> {
+  if (error instanceof ApiError && error.status !== 0 && error.status < 500) {
+    const mapped: Partial<Record<F, string>> = {};
+    for (const [apiField, message] of Object.entries(error.fieldErrors)) {
+      const field = fields[apiField];
+      if (field) mapped[field] ??= message;
+    }
+    const message =
+      Object.keys(mapped).length > 0
+        ? undefined
+        : error.status === 401
+          ? 'Your session expired. Please sign in again.'
+          : error.message;
+    return { status: 'error', message, fieldErrors: mapped, at: Date.now() };
+  }
+  reportError(error, { action });
+  return {
+    status: 'error',
+    message: 'We couldn’t save that right now. Please try again.',
+    fieldErrors: {},
+    at: Date.now(),
+  };
+}
+
 export async function updateProfileAction(
   _prev: FormState<'name' | 'email'>,
   formData: FormData,
 ): Promise<FormState<'name' | 'email'>> {
-  const user = await getCurrentUser();
-  if (!user)
-    return { status: 'error', message: 'Please sign in again.', fieldErrors: {}, at: Date.now() };
+  const token = await getSessionToken();
+  if (!token) return signedOut();
   const parsed = profileSchema.safeParse({
     name: formData.get('name'),
     email: formData.get('email') ?? '',
   });
   if (!parsed.success)
     return { status: 'error', fieldErrors: fieldErrors(parsed.error), at: Date.now() };
-  await authService.updateProfile(user.id, {
-    name: parsed.data.name,
-    email: parsed.data.email || undefined,
-  });
+  try {
+    await authService.updateProfile(token, {
+      name: parsed.data.name,
+      email: parsed.data.email || undefined,
+    });
+  } catch (error) {
+    return apiFailure(error, { name: 'name', email: 'email' }, 'account.profile');
+  }
   refresh();
   return { status: 'success', message: 'Profile updated.', at: Date.now() };
 }
@@ -151,13 +214,21 @@ export async function updateProfileAction(
 
 const addressIdSchema = z.uuid();
 
+const ADDRESS_FIELDS: Partial<Record<string, AddressFormField>> = {
+  label: 'label',
+  fullName: 'recipientName',
+  phone: 'phone',
+  line1: 'address',
+  city: 'city',
+  postalCode: 'postalCode',
+};
+
 export async function saveAddressAction(
   _prev: FormState<AddressFormField>,
   formData: FormData,
 ): Promise<FormState<AddressFormField>> {
-  const user = await getCurrentUser();
-  if (!user)
-    return { status: 'error', message: 'Please sign in again.', fieldErrors: {}, at: Date.now() };
+  const token = await getSessionToken();
+  if (!token) return signedOut();
 
   const parsed = addressSchema.safeParse({
     label: formData.get('label'),
@@ -173,11 +244,15 @@ export async function saveAddressAction(
 
   const rawId = String(formData.get('addressId') ?? '');
   const addressId = rawId && addressIdSchema.safeParse(rawId).success ? rawId : undefined;
-  await authService.saveAddress(
-    user.id,
-    { ...parsed.data, postalCode: parsed.data.postalCode || undefined },
-    addressId,
-  );
+  try {
+    await authService.saveAddress(
+      token,
+      { ...parsed.data, postalCode: parsed.data.postalCode || undefined },
+      addressId,
+    );
+  } catch (error) {
+    return apiFailure(error, ADDRESS_FIELDS, 'account.address.save');
+  }
   refresh();
   return {
     status: 'success',
@@ -187,15 +262,38 @@ export async function saveAddressAction(
 }
 
 export async function deleteAddressAction(addressId: string): Promise<void> {
-  const user = await getCurrentUser();
-  if (!user || !addressIdSchema.safeParse(addressId).success) return;
-  await authService.deleteAddress(user.id, addressId);
+  const token = await getSessionToken();
+  if (!token || !addressIdSchema.safeParse(addressId).success) return;
+  await authService.deleteAddress(token, addressId);
   refresh();
 }
 
 export async function setDefaultAddressAction(addressId: string): Promise<void> {
-  const user = await getCurrentUser();
-  if (!user || !addressIdSchema.safeParse(addressId).success) return;
-  await authService.setDefaultAddress(user.id, addressId);
+  const token = await getSessionToken();
+  if (!token || !addressIdSchema.safeParse(addressId).success) return;
+  await authService.setDefaultAddress(token, addressId);
   refresh();
+}
+
+/* ───────────────────────────── Signed-in devices ───────────────────────────── */
+
+const sessionIdSchema = z.string().min(1).max(64);
+
+export async function revokeSessionAction(sessionId: string): Promise<void> {
+  const token = await getSessionToken();
+  if (!token || !sessionIdSchema.safeParse(sessionId).success) return;
+  try {
+    await authService.revokeSession(token, sessionId);
+  } catch (error) {
+    if (!(error instanceof ApiError && error.status === 404)) throw error;
+  }
+  refresh();
+}
+
+export async function revokeOtherSessionsAction(): Promise<{ revoked: number }> {
+  const token = await getSessionToken();
+  if (!token) return { revoked: 0 };
+  const revoked = await authService.revokeOtherSessions(token);
+  refresh();
+  return { revoked };
 }

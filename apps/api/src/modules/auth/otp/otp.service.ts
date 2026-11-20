@@ -1,3 +1,4 @@
+import type { OtpRequestResultDto } from '@as/contracts';
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
@@ -9,13 +10,7 @@ import type { OtpChannel } from '../../../generated/prisma/client.js';
 import { OtpDeliveryFailedError, OtpDeliveryService } from './otp-delivery.service.js';
 import { decideOtpRequest, OTP_POLICY } from './otp-policy.js';
 
-export interface OtpRequestResult {
-  channel: OtpChannel;
-  expiresInSeconds: number;
-  resendInSeconds: number;
-  /** Only with OTP_DEV_ECHO (never allowed in production). */
-  devCode?: string;
-}
+export type OtpRequestResult = OtpRequestResultDto;
 
 const otpError = (code: string, detail: string, extensions?: Record<string, number>) =>
   new DomainException(HttpStatus.BAD_REQUEST, code, detail, { extensions });

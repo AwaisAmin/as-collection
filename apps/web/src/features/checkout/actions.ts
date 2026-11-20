@@ -3,7 +3,7 @@
 import { z } from 'zod';
 
 import { authService } from '@/features/auth/services/auth.service';
-import { getCurrentUser } from '@/features/auth/session';
+import { getCurrentUser, getSessionToken } from '@/features/auth/session';
 import { ordersService } from '@/features/orders/services/orders.service';
 import type { PlaceOrderInput } from '@/features/orders/types';
 import { reportError } from '@/lib/errors/report-error';
@@ -117,14 +117,15 @@ export async function placeOrder(_prev: CheckoutState, formData: FormData): Prom
     }
 
     // Best-effort: saving to the address book must never fail a placed order.
-    if (user && formData.get('saveAddress') === 'on') {
+    const token = await getSessionToken();
+    if (user && token && formData.get('saveAddress') === 'on') {
       try {
-        const existing = await authService.listAddresses(user.id);
+        const existing = await authService.listAddresses(token);
         const duplicate = existing.some(
           (a) => a.city.toLowerCase() === f.city.toLowerCase() && a.address === f.address,
         );
         if (!duplicate) {
-          await authService.saveAddress(user.id, {
+          await authService.saveAddress(token, {
             label: existing.length === 0 ? 'Home' : `Address ${existing.length + 1}`,
             recipientName: f.fullName,
             phone: f.phone,

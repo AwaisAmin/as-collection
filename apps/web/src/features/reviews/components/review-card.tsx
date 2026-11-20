@@ -1,17 +1,30 @@
 'use client';
 
 import { BadgeCheck, ThumbsUp } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 
 import { RatingStars } from '@/components/ui/rating-stars';
 import type { Review } from '@/features/catalog/types';
 import { cn } from '@/lib/utils/cn';
 import { formatDate } from '@/lib/utils/format';
 
+import { markReviewHelpful } from '../actions';
+
 export function ReviewCard({ review }: { review: Review }) {
-  // Optimistic local vote; persisted via the API once reviews move server-side.
+  // One vote per shopper (the API ignores repeats), shown optimistically.
   const [voted, setVoted] = useState(false);
-  const helpful = review.helpfulCount + (voted ? 1 : 0);
+  const [count, setCount] = useState(review.helpfulCount);
+  const [pending, startTransition] = useTransition();
+
+  const vote = () => {
+    if (voted) return;
+    setVoted(true);
+    setCount((c) => c + 1);
+    startTransition(async () => {
+      const confirmed = await markReviewHelpful(review.id);
+      if (confirmed !== null) setCount(confirmed);
+    });
+  };
 
   return (
     <article className="flex flex-col gap-3 border-b border-gold/40 py-6 first:pt-0 last:border-b-0">
@@ -24,6 +37,15 @@ export function ReviewCard({ review }: { review: Review }) {
 
       <h3 className="font-display text-[19px] leading-snug text-ink">{review.title}</h3>
       <p className="text-[17px] leading-relaxed text-text">{review.body}</p>
+
+      {review.reply ? (
+        <div className="rounded-xl border-l-4 border-gold bg-white/70 px-4 py-3">
+          <p className="text-[14px] font-bold tracking-wide text-gold-dark uppercase">
+            Reply from AS Collection Hub
+          </p>
+          <p className="mt-1 text-[16px] leading-relaxed text-text">{review.reply.body}</p>
+        </div>
+      ) : null}
 
       <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
         <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[15px]">
@@ -38,17 +60,19 @@ export function ReviewCard({ review }: { review: Review }) {
         </p>
         <button
           type="button"
-          onClick={() => setVoted((v) => !v)}
+          onClick={vote}
+          disabled={voted || pending}
           aria-pressed={voted}
           className={cn(
             'inline-flex items-center gap-1.5 rounded-full border px-3 py-1 font-body text-[14px] font-semibold transition-colors',
             voted
               ? 'border-gold bg-ink text-white'
               : 'border-gold/60 text-muted hover:border-gold hover:text-ink',
+            'disabled:cursor-default',
           )}
         >
           <ThumbsUp aria-hidden size={14} />
-          Helpful ({helpful})
+          Helpful ({count})
         </button>
       </div>
     </article>

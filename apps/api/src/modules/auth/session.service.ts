@@ -1,3 +1,4 @@
+import type { SessionSummaryDto } from '@as/contracts';
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
@@ -18,14 +19,7 @@ export interface ClientInfo {
   userAgent: string | null;
 }
 
-export interface SessionSummary {
-  id: string;
-  current: boolean;
-  userAgent: string | null;
-  createdAt: string;
-  lastSeenAt: string;
-  expiresAt: string;
-}
+export type SessionSummary = SessionSummaryDto;
 
 interface CachedSession {
   sessionId: string;

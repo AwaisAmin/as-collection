@@ -5,7 +5,7 @@ import { PageHeader } from '@/components/layout/page-header';
 import { Container } from '@/components/ui/container';
 import { Skeleton } from '@/components/ui/skeleton';
 import { authService } from '@/features/auth/services/auth.service';
-import { getCurrentUser } from '@/features/auth/session';
+import { getCurrentUser, getSessionToken } from '@/features/auth/session';
 import { CheckoutView } from '@/features/checkout/components/checkout-view';
 
 export const metadata: Metadata = { title: 'Checkout', robots: { index: false, follow: false } };
@@ -40,8 +40,9 @@ export default function CheckoutPage() {
 /** Reads the session (request-time) to prefill details for signed-in customers. */
 async function CheckoutWithAccount() {
   const user = await getCurrentUser();
-  if (!user) return <CheckoutView />;
-  const addresses = await authService.listAddresses(user.id);
+  const token = await getSessionToken();
+  if (!user || !token) return <CheckoutView />;
+  const addresses = await authService.listAddresses(token);
   return (
     <CheckoutView prefill={{ name: user.name, phone: user.phone, email: user.email, addresses }} />
   );

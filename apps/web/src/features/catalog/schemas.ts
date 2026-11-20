@@ -78,7 +78,10 @@ export const reviewSortOptions = [
 export type ReviewSort = (typeof reviewSortOptions)[number]['value'];
 
 export const reviewInputSchema = z.object({
-  productId: z.string().min(1),
+  productSlug: z
+    .string()
+    .regex(/^[a-z0-9]+(-[a-z0-9]+)*$/)
+    .max(160),
   rating: z.coerce.number().int().min(1, 'Please select a rating.').max(5),
   title: z.string().trim().min(3, 'Please add a short title.').max(80, 'Title is too long.'),
   body: z

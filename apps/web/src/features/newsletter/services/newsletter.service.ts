@@ -1,24 +1,31 @@
 import 'server-only';
 
+import type { NewsletterSource, SubscribeResultDto } from '@as/contracts';
+
 import { serverEnv } from '@/config/env.server';
 import { apiRequest } from '@/lib/api/http-client';
 
-export interface SubscribeResult {
-  alreadySubscribed: boolean;
-}
+export type SubscribeResult = SubscribeResultDto;
 
 /** Port: what the app needs from "newsletter", independent of transport. */
 export interface NewsletterService {
-  subscribe(email: string): Promise<SubscribeResult>;
+  subscribe(
+    email: string,
+    context: { source: NewsletterSource; ip: string | null },
+  ): Promise<SubscribeResult>;
 }
 
 /** Adapter: NestJS API. */
 const httpNewsletterService: NewsletterService = {
-  subscribe: (email) =>
-    apiRequest<SubscribeResult>('/newsletter/subscriptions', { method: 'POST', body: { email } }),
+  subscribe: (email, { source, ip }) =>
+    apiRequest<SubscribeResult>('/newsletter/subscriptions', {
+      method: 'POST',
+      body: { email, source },
+      clientIp: ip,
+    }),
 };
 
-/** Adapter: in-memory mock for local development before the API is running. */
+/** Adapter: in-memory mock for offline development (`MOCK_API=true`). */
 const subscribed = new Set<string>();
 const mockNewsletterService: NewsletterService = {
   async subscribe(email) {

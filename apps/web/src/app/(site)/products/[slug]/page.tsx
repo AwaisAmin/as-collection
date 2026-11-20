@@ -114,7 +114,7 @@ async function ProductContent({ params }: Pick<PageProps<'/products/[slug]'>, 'p
         </section>
 
         <Suspense fallback={<ReviewsSkeleton />}>
-          <ProductReviews productId={product.id} productName={product.name} />
+          <ProductReviews productSlug={product.slug} productName={product.name} />
         </Suspense>
 
         {related.length > 0 ? (

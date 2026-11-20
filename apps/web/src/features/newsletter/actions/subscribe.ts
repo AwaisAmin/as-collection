@@ -1,5 +1,6 @@
 'use server';
 
+import { clientIp } from '@/lib/api/client-ip';
 import { ApiError } from '@/lib/api/http-client';
 import { reportError } from '@/lib/errors/report-error';
 
@@ -30,7 +31,10 @@ export async function subscribeToNewsletter(
   }
 
   try {
-    const { alreadySubscribed } = await newsletterService.subscribe(parsed.data.email);
+    const { alreadySubscribed } = await newsletterService.subscribe(parsed.data.email, {
+      source: 'footer',
+      ip: await clientIp(),
+    });
     return {
       status: 'success',
       message: alreadySubscribed
@@ -44,7 +48,9 @@ export async function subscribeToNewsletter(
 
     let message = "We couldn't subscribe you right now. Please try again shortly.";
     if (error instanceof ApiError) {
-      if (error.status === 422 || error.status === 400) message = error.message;
+      if (error.status === 422 || error.status === 400) {
+        message = error.fieldErrors.email ?? error.message;
+      }
       if (error.status === 429) message = 'Too many attempts. Please wait a moment and try again.';
     }
     return { status: 'error', message, email: rawEmail, at };

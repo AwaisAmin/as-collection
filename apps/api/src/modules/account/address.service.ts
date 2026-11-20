@@ -1,3 +1,4 @@
+import type { AddressDto } from '@as/contracts';
 import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 
 import { DomainException } from '../../common/http/problem-details.js';
@@ -25,10 +26,7 @@ const addressSelect = {
 
 type AddressRow = Prisma.AddressGetPayload<{ select: typeof addressSelect }>;
 
-export type AddressDto = Omit<AddressRow, 'createdAt' | 'updatedAt'> & {
-  createdAt: string;
-  updatedAt: string;
-};
+export type { AddressDto };
 
 const toDto = (row: AddressRow): AddressDto => ({
   ...row,

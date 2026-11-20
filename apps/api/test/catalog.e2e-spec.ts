@@ -73,6 +73,16 @@ describe('catalog API (e2e)', () => {
       expect(overlap).toEqual([]);
     });
 
+    it('looks up exact products by id or slug (wishlist, recently viewed)', async () => {
+      const page = await get('/products?pageSize=3&sort=newest').expect(200);
+      const [a, b] = page.body.items as { id: string; slug: string }[];
+      const byIds = await get(`/products?ids=${b?.id ?? ''},${a?.id ?? ''}`).expect(200);
+      expect(slugs(byIds.body).sort()).toEqual([a?.slug, b?.slug].sort());
+      const bySlug = await get(`/products?slugs=${a?.slug ?? ''},no-such-product`).expect(200);
+      expect(slugs(bySlug.body)).toEqual([a?.slug]);
+      await get('/products?ids=not-a-uuid').expect(422);
+    });
+
     it('filters by category, including only that subtree', async () => {
       const res = await get('/products?category=makeup&pageSize=48').expect(200);
       expect(res.body.total).toBe(5);
@@ -229,6 +239,12 @@ describe('catalog API (e2e)', () => {
         productSlug: 'velvet-matte-lipstick',
         purchasable: true,
       });
+      // Display labels for carts: attribute name → value label.
+      const shade = product.options.find((o: { code: string }) => o.code === 'shade');
+      const label = shade.values.find(
+        (v: { value: string }) => v.value === res.body[0].options.shade,
+      ).label;
+      expect(res.body[0].optionLabels).toEqual({ Shade: label });
     });
 
     it('validates ids', async () => {

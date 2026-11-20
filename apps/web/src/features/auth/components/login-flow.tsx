@@ -17,6 +17,10 @@ import {
   requestOtpAction,
   verifyOtpAction,
 } from '../actions';
+import { GoogleButton } from './google-button';
+
+/** Which Google sign-in to offer: the real button, the offline demo, or none. */
+export type GoogleOption = { mode: 'google'; clientId: string } | { mode: 'mock' } | null;
 
 type Step = 'phone' | 'code' | 'name';
 
@@ -32,7 +36,7 @@ function GoogleIcon() {
 }
 
 /** Phone → 6-digit code (WhatsApp/SMS) → name (first time only). Google as a one-tap alternative. */
-export function LoginFlow({ next }: { next: Route }) {
+export function LoginFlow({ next, google }: { next: Route; google: GoogleOption }) {
   const router = useRouter();
   const [step, setStep] = useState<Step>('phone');
   const [phone, setPhone] = useState('');
@@ -109,11 +113,12 @@ export function LoginFlow({ next }: { next: Route }) {
     });
   }
 
-  function google() {
+  function signInWithGoogle(credential: string) {
     setError(null);
     startTransition(async () => {
-      const result = await googleSignInAction();
+      const result = await googleSignInAction(credential);
       if (!result.ok) setError(result.error);
+      else if (result.needsName) setStep('name');
       else finish();
     });
   }
@@ -171,21 +176,29 @@ export function LoginFlow({ next }: { next: Route }) {
             </Button>
           </form>
 
-          <div className="flex items-center gap-3 text-[15px] text-muted" aria-hidden>
-            <span className="h-px flex-1 bg-gold/50" />
-            or
-            <span className="h-px flex-1 bg-gold/50" />
-          </div>
+          {google ? (
+            <>
+              <div className="flex items-center gap-3 text-[15px] text-muted" aria-hidden>
+                <span className="h-px flex-1 bg-gold/50" />
+                or
+                <span className="h-px flex-1 bg-gold/50" />
+              </div>
 
-          <button
-            type="button"
-            onClick={google}
-            disabled={isPending}
-            className="inline-flex h-13 w-full items-center justify-center gap-3 rounded-full border-[1.5px] border-gold bg-white font-display text-[18px] text-ink transition-colors hover:bg-cream disabled:opacity-60"
-          >
-            <GoogleIcon />
-            Continue with Google
-          </button>
+              {google.mode === 'google' ? (
+                <GoogleButton clientId={google.clientId} onCredential={signInWithGoogle} />
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => signInWithGoogle('mock-credential')}
+                  disabled={isPending}
+                  className="inline-flex h-13 w-full items-center justify-center gap-3 rounded-full border-[1.5px] border-gold bg-white font-display text-[18px] text-ink transition-colors hover:bg-cream disabled:opacity-60"
+                >
+                  <GoogleIcon />
+                  Continue with Google
+                </button>
+              )}
+            </>
+          ) : null}
 
           <p className="text-center text-[14px] text-muted">
             No password needed. New here? Your account is created automatically.

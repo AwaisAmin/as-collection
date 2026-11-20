@@ -5,25 +5,30 @@ import { z } from 'zod';
 import { reviewInputSchema, type ReviewSort, reviewSortOptions } from '@/features/catalog/schemas';
 import { reviewsService } from '@/features/catalog/services/reviews.service';
 import type { Paginated, Review } from '@/features/catalog/types';
+import { clientIp } from '@/lib/api/client-ip';
+import { ApiError } from '@/lib/api/http-client';
 import { reportError } from '@/lib/errors/report-error';
 
 import { REVIEW_HONEYPOT, type ReviewField, type ReviewFormState } from './types';
 
 const loadSchema = z.object({
-  productId: z.string().regex(/^[a-z0-9-]{1,64}$/),
+  productSlug: z
+    .string()
+    .regex(/^[a-z0-9]+(-[a-z0-9]+)*$/)
+    .max(160),
   sort: z.enum(reviewSortOptions.map((o) => o.value) as [ReviewSort, ...ReviewSort[]]),
   page: z.number().int().min(1).max(500),
 });
 
 /** Paginated/sorted reviews for "Load more" and sort changes. */
 export async function loadReviews(
-  productId: string,
+  productSlug: string,
   sort: ReviewSort,
   page: number,
 ): Promise<Paginated<Review> | null> {
-  const parsed = loadSchema.safeParse({ productId, sort, page });
+  const parsed = loadSchema.safeParse({ productSlug, sort, page });
   if (!parsed.success) return null;
-  return reviewsService.listReviews(parsed.data.productId, {
+  return reviewsService.listReviews(parsed.data.productSlug, {
     sort: parsed.data.sort,
     page: parsed.data.page,
   });
@@ -44,7 +49,7 @@ export async function submitReview(
 
   const parsed = reviewInputSchema.safeParse({
     ...values,
-    productId: String(formData.get('productId') ?? ''),
+    productSlug: String(formData.get('productSlug') ?? ''),
   });
 
   if (!parsed.success) {
@@ -54,7 +59,7 @@ export async function submitReview(
     ) as Partial<Record<ReviewField, string>>;
     return {
       status: 'error',
-      message: flat.productId ? 'Something went wrong. Please refresh and try again.' : undefined,
+      message: flat.productSlug ? 'Something went wrong. Please refresh and try again.' : undefined,
       fieldErrors,
       values,
       at: Date.now(),
@@ -62,16 +67,41 @@ export async function submitReview(
   }
 
   try {
-    await reviewsService.submitReview(parsed.data);
+    await reviewsService.submitReview(parsed.data, { ip: await clientIp() });
     return { status: 'success' };
   } catch (error) {
+    const failed = (message: string, fieldErrors: Partial<Record<ReviewField, string>> = {}) =>
+      ({ status: 'error', message, fieldErrors, values, at: Date.now() }) as const;
+    if (error instanceof ApiError) {
+      if (error.status === 422) {
+        const fieldErrors = Object.fromEntries(
+          Object.entries(error.fieldErrors).filter(([k]) => (FIELDS as string[]).includes(k)),
+        ) as Partial<Record<ReviewField, string>>;
+        return failed('Please check the highlighted fields.', fieldErrors);
+      }
+      if (error.status === 409) return failed('You have already reviewed this product. Thank you!');
+      if (error.status === 429)
+        return failed('Too many reviews from your connection. Please try again later.');
+      if (error.status === 404) return failed('This product is no longer available.');
+    }
     reportError(error, { action: 'reviews.submit' });
-    return {
-      status: 'error',
-      message: "We couldn't submit your review right now. Please try again shortly.",
-      fieldErrors: {},
-      values,
-      at: Date.now(),
-    };
+    return failed("We couldn't submit your review right now. Please try again shortly.");
+  }
+}
+
+const reviewIdSchema = z.string().min(1).max(64);
+
+/** "Helpful" vote: once per shopper (the API ignores repeats). Returns the new count. */
+export async function markReviewHelpful(reviewId: string): Promise<number | null> {
+  const parsed = reviewIdSchema.safeParse(reviewId);
+  if (!parsed.success) return null;
+  try {
+    const { helpfulCount } = await reviewsService.markHelpful(parsed.data, {
+      ip: await clientIp(),
+    });
+    return helpfulCount;
+  } catch (error) {
+    reportError(error, { action: 'reviews.helpful' });
+    return null;
   }
 }

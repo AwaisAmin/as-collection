@@ -1,8 +1,13 @@
 'use server';
 
+import type { ContactReceivedDto, ContactTopic } from '@as/contracts';
+
+import { serverEnv } from '@/config/env.server';
+import { clientIp } from '@/lib/api/client-ip';
+import { ApiError, apiRequest } from '@/lib/api/http-client';
 import { reportError } from '@/lib/errors/report-error';
 
-import { CONTACT_HONEYPOT, type ContactField, contactSchema } from './schema';
+import { CONTACT_HONEYPOT, type ContactField, contactSchema, type contactTopics } from './schema';
 
 export type ContactState =
   | { status: 'idle' }
@@ -14,7 +19,16 @@ export type ContactState =
       at: number;
     };
 
-/* Mock "inbox" — the API will store messages and notify staff (email / WhatsApp). */
+/** Form topics (labels) → the API's topic codes. */
+const TOPICS: Record<(typeof contactTopics)[number], ContactTopic> = {
+  'Order enquiry': 'ORDER',
+  'Returns & exchange': 'RETURNS',
+  'Product question': 'PRODUCT',
+  'Bulk / wholesale': 'WHOLESALE',
+  Other: 'OTHER',
+};
+
+/* Offline development (`MOCK_API=true`): messages are kept in memory. */
 const inbox: unknown[] = ((globalThis as { __asInbox?: unknown[] }).__asInbox ??= []);
 
 export async function sendContactMessage(
@@ -50,9 +64,33 @@ export async function sendContactMessage(
   }
 
   try {
-    inbox.push({ ...parsed.data, receivedAt: new Date().toISOString() });
+    if (serverEnv.MOCK_API) {
+      inbox.push({ ...parsed.data, receivedAt: new Date().toISOString() });
+      return { status: 'success' };
+    }
+    const { topic, ...fields } = parsed.data;
+    await apiRequest<ContactReceivedDto>('/contact', {
+      method: 'POST',
+      body: { ...fields, topic: TOPICS[topic] },
+      clientIp: await clientIp(),
+    });
     return { status: 'success' };
   } catch (error) {
+    if (error instanceof ApiError && error.status === 422) {
+      return {
+        status: 'error',
+        fieldErrors: error.fieldErrors as Partial<Record<ContactField, string>>,
+        at: Date.now(),
+      };
+    }
+    if (error instanceof ApiError && error.status === 429) {
+      return {
+        status: 'error',
+        message: 'You have sent several messages already. Please wait a while or WhatsApp us.',
+        fieldErrors: {},
+        at: Date.now(),
+      };
+    }
     reportError(error, { action: 'contact.send' });
     return {
       status: 'error',

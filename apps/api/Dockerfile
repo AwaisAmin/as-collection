@@ -18,11 +18,14 @@ WORKDIR /repo
 # Manifests first so dependency layers are cached until a lockfile/package.json changes.
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json .npmrc ./
 COPY packages/typescript-config/package.json packages/typescript-config/
+COPY packages/contracts/package.json packages/contracts/
 COPY apps/api/package.json apps/api/
 RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
     pnpm install --frozen-lockfile --filter @as/api... --ignore-scripts
 
 COPY packages/typescript-config packages/typescript-config
+# Shared response types (compile time only; nothing from it ships in the image).
+COPY packages/contracts packages/contracts
 COPY apps/api apps/api
 # --no-optional keeps optional peers (the Prisma CLI, Studio, TypeScript) out of the image, but it
 # also drops native platform bindings, so argon2's and sharp's (musl) bindings are copied back

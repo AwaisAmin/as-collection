@@ -324,6 +324,11 @@ export class CatalogService {
         sku: row.sku,
         title: row.title,
         options: variant.options,
+        optionLabels: Object.fromEntries(
+          row.options
+            .toSorted((a, b) => a.attribute.position - b.attribute.position)
+            .map((o) => [o.attribute.name, o.value.label]),
+        ),
         priceMinor: row.priceMinor,
         compareAtPriceMinor: row.compareAtPriceMinor,
         availableQuantity: visible && row.isActive ? variant.availableQuantity : 0,

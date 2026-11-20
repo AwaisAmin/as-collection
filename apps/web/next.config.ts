@@ -10,6 +10,19 @@ const securityHeaders = [
   { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
 ];
 
+/**
+ * Where uploaded product images live (MEDIA_PUBLIC_BASE_URL of the API):
+ * - `MEDIA_REMOTE_HOSTS`: CDN hosts next/image may optimise from, comma-separated (production).
+ * - `MEDIA_BUCKET_URL`: development only — the public bucket (e.g. http://127.0.0.1:9000/as-media)
+ *   that `/media/*` on this site proxies to, so uploads work with MEDIA_PUBLIC_BASE_URL pointing
+ *   at the storefront itself.
+ */
+const mediaRemoteHosts = (process.env.MEDIA_REMOTE_HOSTS ?? '')
+  .split(',')
+  .map((h) => h.trim())
+  .filter(Boolean);
+const mediaBucketUrl = process.env.MEDIA_BUCKET_URL?.replace(/\/+$/, '');
+
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
@@ -25,6 +38,12 @@ const nextConfig: NextConfig = {
   images: {
     formats: ['image/avif', 'image/webp'],
     qualities: [75, 90],
+    remotePatterns: mediaRemoteHosts.map((hostname) => ({ protocol: 'https', hostname })),
+  },
+  async rewrites() {
+    return mediaBucketUrl
+      ? [{ source: '/media/:path*', destination: `${mediaBucketUrl}/media/:path*` }]
+      : [];
   },
   turbopack: {
     rules: {

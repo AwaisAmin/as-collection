@@ -45,6 +45,9 @@ export const listProductsQuerySchema = z
     q: z.string().trim().min(1).max(100).optional(),
     collection: csvOf(slugSchema, 10).optional(),
     tag: csvOf(slugSchema, 10).optional(),
+    /** Exact products (wishlist, recently viewed): at most one page of ids or slugs. */
+    ids: csvOf(z.uuid(), MAX_PAGE_SIZE).optional(),
+    slugs: csvOf(slugSchema, MAX_PAGE_SIZE).optional(),
     sort: z.enum(productSorts).default('featured'),
     /** Price range in minor units (paisa), compared with the product's lowest price. */
     min: minor.optional(),
@@ -56,7 +59,22 @@ export const listProductsQuerySchema = z
   })
   .transform(
     (
-      { category, q, collection, tag, sort, min, max, inStock, sale, page, pageSize, ...rest },
+      {
+        category,
+        q,
+        collection,
+        tag,
+        ids,
+        slugs,
+        sort,
+        min,
+        max,
+        inStock,
+        sale,
+        page,
+        pageSize,
+        ...rest
+      },
       ctx,
     ) => {
       const attributes: Record<string, string[]> = {};
@@ -82,6 +100,8 @@ export const listProductsQuerySchema = z
         q,
         collections: collection ?? [],
         tags: tag ?? [],
+        ids: ids ?? [],
+        slugs: slugs ?? [],
         attributes,
         sort,
         min,

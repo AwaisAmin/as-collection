@@ -13,12 +13,12 @@ import { loadReviews } from '../actions';
 import { ReviewCard } from './review-card';
 
 interface ReviewListProps {
-  productId: string;
+  productSlug: string;
   /** First page, server-rendered (indexable, no loading flash). */
   initial: Paginated<Review>;
 }
 
-export function ReviewList({ productId, initial }: ReviewListProps) {
+export function ReviewList({ productSlug, initial }: ReviewListProps) {
   const [items, setItems] = useState(initial.items);
   const [page, setPage] = useState(initial.page);
   const [pageCount, setPageCount] = useState(initial.pageCount);
@@ -28,7 +28,7 @@ export function ReviewList({ productId, initial }: ReviewListProps) {
 
   function fetchPage(nextSort: ReviewSort, nextPage: number) {
     startTransition(async () => {
-      const result = await loadReviews(productId, nextSort, nextPage);
+      const result = await loadReviews(productSlug, nextSort, nextPage);
       if (!result) {
         toast.error("Couldn't load reviews. Please try again.");
         return;

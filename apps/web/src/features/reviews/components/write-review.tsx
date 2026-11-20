@@ -17,13 +17,13 @@ import { initialReviewFormState, REVIEW_HONEYPOT } from '../types';
 const BODY_MAX = 1500;
 
 interface WriteReviewProps {
-  productId: string;
+  productSlug: string;
   productName: string;
   /** "Be the first to review" empty-state wording. */
   first?: boolean;
 }
 
-export function WriteReview({ productId, productName, first = false }: WriteReviewProps) {
+export function WriteReview({ productSlug, productName, first = false }: WriteReviewProps) {
   const { isOpen, open, close } = useDisclosure();
   // Remount the form each time the dialog opens so a previous success/error is cleared.
   const [session, setSession] = useState(0);
@@ -49,13 +49,13 @@ export function WriteReview({ productId, productName, first = false }: WriteRevi
         description={productName}
         size="lg"
       >
-        <ReviewForm key={session} productId={productId} onDone={close} />
+        <ReviewForm key={session} productSlug={productSlug} onDone={close} />
       </Dialog>
     </>
   );
 }
 
-function ReviewForm({ productId, onDone }: { productId: string; onDone: () => void }) {
+function ReviewForm({ productSlug, onDone }: { productSlug: string; onDone: () => void }) {
   const [state, formAction, pending] = useActionState(submitReview, initialReviewFormState);
   const [bodyLength, setBodyLength] = useState(0);
   const base = useId();
@@ -89,7 +89,7 @@ function ReviewForm({ productId, onDone }: { productId: string; onDone: () => vo
       key={formKey}
       className="flex flex-col gap-5 px-5 py-6 sm:px-7"
     >
-      <input type="hidden" name="productId" value={productId} />
+      <input type="hidden" name="productSlug" value={productSlug} />
 
       {state.status === 'error' && state.message ? (
         <p

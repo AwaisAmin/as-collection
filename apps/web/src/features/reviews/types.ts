@@ -1,6 +1,6 @@
 import type { ReviewInput } from '@/features/catalog/schemas';
 
-export type ReviewField = keyof Omit<ReviewInput, 'productId'>;
+export type ReviewField = keyof Omit<ReviewInput, 'productSlug'>;
 
 export type ReviewFormState =
   | { status: 'idle' }

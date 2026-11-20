@@ -8,15 +8,15 @@ import { ReviewSummary } from './review-summary';
 import { WriteReview } from './write-review';
 
 interface ProductReviewsProps {
-  productId: string;
+  productSlug: string;
   productName: string;
 }
 
 /** Reviews section: summary + write button (left), sortable/paginated list (right). */
-export async function ProductReviews({ productId, productName }: ProductReviewsProps) {
+export async function ProductReviews({ productSlug, productName }: ProductReviewsProps) {
   const [summary, firstPage] = await Promise.all([
-    reviewsService.getSummary(productId),
-    reviewsService.listReviews(productId, { sort: 'newest', page: 1 }),
+    reviewsService.getSummary(productSlug),
+    reviewsService.listReviews(productSlug, { sort: 'newest', page: 1 }),
   ]);
 
   return (
@@ -34,7 +34,7 @@ export async function ProductReviews({ productId, productName }: ProductReviewsP
           <p className="text-[17px] text-muted">
             Bought this piece? Share your thoughts and help other shoppers.
           </p>
-          <WriteReview productId={productId} productName={productName} first />
+          <WriteReview productSlug={productSlug} productName={productName} first />
         </div>
       ) : (
         <div className="mt-10 grid gap-10 lg:grid-cols-[320px_1fr] lg:gap-14">
@@ -47,10 +47,10 @@ export async function ProductReviews({ productId, productName }: ProductReviewsP
               <p className="mb-2 text-[16px] text-muted">
                 Tell other shoppers about the fit, fabric and finish.
               </p>
-              <WriteReview productId={productId} productName={productName} />
+              <WriteReview productSlug={productSlug} productName={productName} />
             </div>
           </div>
-          <ReviewList productId={productId} initial={firstPage} />
+          <ReviewList productSlug={productSlug} initial={firstPage} />
         </div>
       )}
     </section>

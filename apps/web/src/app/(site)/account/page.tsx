@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 import { ButtonLink } from '@/components/ui/button';
 import { authService } from '@/features/auth/services/auth.service';
-import { requireUser } from '@/features/auth/session';
+import { requireSession } from '@/features/auth/session';
 import { OrderStatusBadge } from '@/features/orders/components/order-status-badge';
 import { ordersService } from '@/features/orders/services/orders.service';
 import { formatDate, formatPrice } from '@/lib/utils/format';
@@ -13,10 +13,10 @@ import { formatPkMobile } from '@/lib/utils/phone';
 export const metadata: Metadata = { title: 'Overview' };
 
 export default async function AccountOverviewPage() {
-  const user = await requireUser('/account');
+  const { user, token } = await requireSession('/account');
   const [orders, addresses] = await Promise.all([
     ordersService.listOrdersForCustomer({ userId: user.id, phone: user.phone }),
-    authService.listAddresses(user.id),
+    authService.listAddresses(token),
   ]);
   const defaultAddress = addresses.find((a) => a.isDefault);
   const firstName = user.name.split(' ')[0] || 'there';

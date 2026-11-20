@@ -5,7 +5,7 @@ Next.js 16 (App Router, Cache Components) · React 19 · TypeScript (strict) · 
 ## Run
 
 ```bash
-cp .env.example .env.local     # set MOCK_API=true until apps/api is running
+cp .env.example .env.local     # MOCK_API=true works offline (in-memory data, no API needed)
 pnpm --filter @as/web dev      # http://localhost:3000
 pnpm --filter @as/web test     # unit tests (Vitest)
 pnpm --filter @as/web build    # production build
@@ -50,10 +50,32 @@ Lower features expose slots (e.g. `ProductCard` `actions`) instead of importing 
 
 ## Conventions
 
-- **Data access** goes through `features/*/services/*.service.ts` (a port + adapter). Adapters are **mocks** today
-  (in-memory, kept on `globalThis` in dev); the NestJS API adapters replace them without touching pages.
+- **Data access** goes through `features/*/services/*.service.ts` (a port). Each port has an API adapter (`*.api.ts`)
+  and an in-memory mock (`*.mock.ts`, `MOCK_API=true`); pages never know which one runs.
+  - **Live on the API:**
+    - **B8a:** catalog, filters, product pages, reviews (with store replies and votes), newsletter and contact.
+    - **B8b:** phone-code and Google sign-in, profile, address book and signed-in devices.
+  - **Still mocked (B8c):** cart, checkout and orders.
+- **Sessions (backend-for-frontend):**
+  - **Cookie:** the API's bearer token lives only in the HttpOnly `as_session` cookie (SameSite=Lax, Secure in
+    production, 180 days). The API decides validity (it slides sessions, 30 days idle), so the browser's JS never sees the
+    token.
+  - **Account calls:** take the token, never a user id (`requireSession()`).
+  - **Forwarded details:** sign-in forwards the shopper's IP and browser, so "Signed-in devices" names each device.
+- **Google sign-in:** Google's own button, shown only when `NEXT_PUBLIC_GOOGLE_CLIENT_ID` is set (the API must list the same
+  id in `GOOGLE_CLIENT_IDS`). The ID token goes to the API, which verifies it. With `MOCK_API=true` a demo button signs in a
+  demo customer.
+- **API client** (`lib/api/http-client.ts`): server-only, typed with `@as/contracts` (the API's response types,
+  shared). Errors arrive as RFC 9457 problems mapped to `ApiError` (`code`, `fieldErrors`). The shopper's IP is
+  forwarded (`X-Forwarded-For`) so the API's per-IP limits apply to them, not to this server.
+- **Mapping** (`features/catalog/services/api-mappers.ts`, unit-tested): paisa → whole rupees; attribute codes and value
+  slugs → the names and labels shoppers see (filter URLs keep labels, e.g. `?shade=Ruby Red`); collections →
+  occasions; own-site image URLs → paths.
+- **Images:** uploads live in the API's public bucket. In development `/media/*` is proxied to `MEDIA_BUCKET_URL`; in
+  production list the CDN in `MEDIA_REMOTE_HOSTS` so next/image can optimise from it.
 - **Server is the source of truth**: checkout re-prices and re-checks stock server-side; client prices are never trusted.
-- **Caching**: catalog/review reads are `'use cache'` (`cacheLife('hours')`, tags `catalog`, `reviews:<id>`).
+- **Caching**: catalog/review reads are `'use cache'` (API: `cacheLife('minutes')`; tags `catalog`, `reviews`,
+  `reviews:<slug>`). Instant refresh on admin edits (a revalidation webhook) comes with B8d.
   Stock/price checks for cart & checkout are deliberately uncached.
 - **Rendering**: pages reading `params`/`searchParams`/cookies render a static shell and stream the request-time part
   inside `<Suspense>` (or `loading.tsx`). Session lookups call `connection()` so they never run during prerender.

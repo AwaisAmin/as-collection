@@ -100,6 +100,8 @@ export interface Review {
   createdAt: string;
   verifiedPurchase: boolean;
   helpfulCount: number;
+  /** Public answer from the store. */
+  reply?: { body: string; at: string };
 }
 
 /** A review plus the product it belongs to (testimonials outside the product page). */

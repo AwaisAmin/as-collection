@@ -134,11 +134,14 @@ export function rulesWhere(
 // ─── Listing ───
 
 export function productWhere(
-  query: Pick<ProductListQuery, 'q' | 'attributes' | 'tags' | 'min' | 'max' | 'inStock' | 'sale'>,
+  query: Pick<ProductListQuery, 'q' | 'attributes' | 'tags' | 'min' | 'max' | 'inStock' | 'sale'> &
+    Partial<Pick<ProductListQuery, 'ids' | 'slugs'>>,
   ctx: ProductQueryContext,
 ): Prisma.ProductWhereInput {
   const and: Prisma.ProductWhereInput[] = [visibleProduct(ctx.now)];
 
+  if (query.ids?.length) and.push({ id: { in: query.ids } });
+  if (query.slugs?.length) and.push({ slug: { in: query.slugs } });
   if (ctx.categoryPath) and.push(categoryWhere(ctx.categoryPath));
   if (query.q) and.push(...searchWhere(query.q));
   if (query.min !== undefined) and.push({ priceMinMinor: { gte: query.min } });

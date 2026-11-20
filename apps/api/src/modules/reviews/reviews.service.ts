@@ -1,3 +1,4 @@
+import type { FeaturedReviewDto, ReviewPage } from '@as/contracts';
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
@@ -11,7 +12,6 @@ import type { Prisma } from '../../generated/prisma/client.js';
 import { CacheService } from '../../redis/cache.service.js';
 import { visibleProduct } from '../catalog/product-query.js';
 import {
-  type ReviewDto,
   reviewOrderBy,
   reviewSelect,
   type ReviewSummaryDto,
@@ -29,17 +29,7 @@ export const REVIEW_LIMIT = { max: 5, windowMs: 86_400_000 } as const;
 /** Testimonials quote at least this much text. */
 const FEATURED_MIN_BODY = 60;
 
-export interface FeaturedReviewDto extends ReviewDto {
-  product: { name: string; slug: string };
-}
-
-export interface ReviewPage {
-  items: ReviewDto[];
-  total: number;
-  page: number;
-  pageSize: number;
-  pageCount: number;
-}
+export type { FeaturedReviewDto, ReviewPage };
 
 const notFound = () =>
   new DomainException(HttpStatus.NOT_FOUND, 'PRODUCT_NOT_FOUND', 'This product is not available.');
