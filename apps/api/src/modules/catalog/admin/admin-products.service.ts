@@ -355,10 +355,10 @@ export class AdminProductsService {
   async remove(id: string, actor: AuditActor): Promise<void> {
     await this.write(async (tx) => {
       const product = await this.lockProduct(tx, id);
-      const [ordered, reserved] = await Promise.all([
-        tx.orderItem.count({ where: { productId: id } }),
-        tx.inventoryItem.count({ where: { variant: { productId: id }, reserved: { gt: 0 } } }),
-      ]);
+      const ordered = await tx.orderItem.count({ where: { productId: id } });
+      const reserved = await tx.inventoryItem.count({
+        where: { variant: { productId: id }, reserved: { gt: 0 } },
+      });
       if (ordered > 0) {
         throw conflict(
           'PRODUCT_HAS_ORDERS',

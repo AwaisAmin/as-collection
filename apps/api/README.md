@@ -38,6 +38,9 @@ docker build -f apps/api/Dockerfile -t as-collection-api .   # from the repo roo
 | `/api/v1/admin/media`                                                 | Staff image library: upload (WebP + responsive copies, de-duplicated), alt text, delete unused                                                  |
 | `/api/v1/admin/products/*`                                            | Staff products: search, create with variants, edit (conflict-safe), variants, delete never-ordered                                              |
 | `/api/v1/admin/inventory/*`                                           | Stock list (low / out / backorder), ledgered adjustments, stock settings, history                                                               |
+| `/api/v1/admin/categories/*`                                          | Category tree: create, edit, move with subtree, reorder, delete empty                                                                           |
+| `/api/v1/admin/attributes/*`, `/admin/brands`                         | Attributes and values (filters / variant options), brands                                                                                       |
+| `/api/v1/admin/collections/*`                                         | Collections: hand-picked lists or checked rules, rule preview, schedule, order                                                                  |
 
 ## Structure
 
@@ -231,7 +234,7 @@ Rules:
   - `cleanup-auth`, hourly: deletes OTP challenges older than a day, sessions that ended more than 30 days ago, and expired stock holds, in 5,000-row batches.
 - **To do:** customer notifications (WhatsApp/SMS on confirm, ship and reject); partial refunds.
 
-## Staff catalog: images, products & stock
+## Staff catalog: images, products, stock & taxonomy
 
 - **Images** (`modules/media`, `media.write`):
   - **Checks:** the upload must be JPG, PNG or WEBP by its magic bytes, at most 20 MB and at least 64 px. Anything over ~50 MP is refused before decoding.
@@ -256,6 +259,28 @@ Rules:
   - **Adjustments:** `add` (±) or `set` per line, applied all-or-nothing. Rows are locked in variant-id order (like checkout). Every change gets a movement (reason, note, who) and an audit entry.
   - **Limits:** stock never drops below units reserved by open orders, unless backorders are on. Backorders can't be turned off while they're in use.
   - **List:** filters `stock=low|out|backorder`, SKU or name search; plus per-variant history.
+- **Categories** (`admin-categories.service.ts`):
+  - **Tree data:** `path` and `depth` are maintained by the API (at most 11 levels, as the DB check allows).
+  - **Moving** (`parentId`): rewrites the whole subtree in one statement. Moving a category inside itself is refused.
+  - **Serialised:** tree changes take an advisory lock, so two moves can't race into a cycle.
+  - **Reorder:** takes every child of the parent, exactly once.
+  - **Delete:** refused while the category has subcategories or is a product's main category.
+  - **Banner:** `focus` is validated as a CSS position (`50% 30%`).
+- **Attributes** (`admin-attributes.service.ts`):
+  - **Fixed after creation:** `code` and value slugs are part of filter URLs (`?f.fabric=lawn`). They're generated from the name or label if omitted.
+  - **Type and scope** can change only while nothing uses the attribute. Variant options must be SELECT (also a DB check).
+  - **Deleting** an attribute or value that's in use is refused, with counts.
+- **Brands:** the same pattern; deleting a brand that products use is refused.
+- **Collections** (`admin-collections.service.ts`):
+  - **Hand-picked:** `PUT …/products` sets the list in order.
+  - **Automated:** rules are checked against the catalog (attribute codes, values and tags must exist). `POST /admin/collections/preview` shows the count and sample before saving.
+  - **Switching** a collection to automated clears its hand-picked list.
+  - **`state`:** `live`, `scheduled`, `ended` or `hidden`, using the same rule as the storefront.
+- **Edit rules for all of the above:**
+  - `PATCH` needs `updatedAt` (409 `STALE_UPDATE` if someone saved in between).
+  - Every write is audited and refreshes the storefront cache.
+  - Slug, code and swatch formats are also enforced by DB checks (migration `taxonomy_checks`).
+- **Known:** Prisma 7.10's pg adapter sometimes overlaps queries inside a transaction. pg 8 queues them and logs a deprecation warning. Keep `pg` on 8.x until Prisma fixes it.
 - **Caching:** every write refreshes the storefront cache after commit. Listing prices and stock flags are kept up to date by the existing database triggers.
 - **Docker:** sharp's musl bindings (libvips) are copied into the image, and the build fails if sharp doesn't load.
 
