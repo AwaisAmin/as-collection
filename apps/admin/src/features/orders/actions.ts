@@ -4,24 +4,18 @@ import type { AdminOrderDto, StaffOrderAction } from '@as/contracts';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
+import type { ActionState } from '@/lib/action-state';
 import { clientInfo } from '@/lib/api/client-ip';
 import { ApiError, apiRequest } from '@/lib/api/http-client';
 import { requireStaff } from '@/lib/session';
+
+export type { ActionState };
 
 /*
  * Order changes from the order page. Bound arguments (order number, action, proof id) come from
  * the browser like any form field, so they are validated here; the API checks the permission,
  * the order's state and every field again.
  */
-
-export interface ActionState {
-  /** Set on success; the dialog closes and shows this as a toast. */
-  done?: string;
-  error?: string;
-  fieldErrors?: Record<string, string>;
-  /** Changes on every result, so the form can react to repeated identical outcomes. */
-  at?: number;
-}
 
 const numberSchema = z.string().regex(/^AS-\d{6}-[23456789A-HJKMNP-Z]{5}$/);
 const actionSchema = z.enum([

@@ -5,7 +5,8 @@ PostgreSQL, Redis and storage, on the seeded catalog. It covers browsing (deskto
 checkout (place → track → cancel, with stock held and released), phone-code sign-in with the
 account pages, the contact and newsletter forms, and the admin panel: staff sign-in (password +
 first-time authenticator setup → dashboard → sign out) and order handling (a bank-transfer order
-with a payment screenshot is verified, shipped and delivered; stock moves from reserved to sold).
+with a payment screenshot is verified, shipped and delivered; stock moves from reserved to sold) and
+products (create with an uploaded photo and two sizes, publish, edit a variant, delete).
 
 ```bash
 pnpm services:up                                  # Docker: PostgreSQL, Redis, storage
@@ -23,5 +24,6 @@ pnpm --filter @as/e2e test:browser --project=admin        # only the admin panel
   code in a toast and the test reads it.
 - **Staff:** admin tests create a super admin with the real `staff:create` CLI (`@e2e-admin.example.test`),
   compute the authenticator code from the key shown on the setup screen (RFC 6238, `tests/admin/totp.ts`), and
-  afterwards delete the account, its sessions and its audit entries (`tests/admin/staff-db.ts`).
+  afterwards delete the account, its sessions and its audit entries (`tests/admin/staff-db.ts`). Uploaded test
+  photos are unique generated PNGs (`tests/admin/png.ts`) and are deleted through the API, storage included.
 - **Servers:** locally, already-running servers on 4100 / 3100 / 3101 are reused; CI always starts fresh ones.

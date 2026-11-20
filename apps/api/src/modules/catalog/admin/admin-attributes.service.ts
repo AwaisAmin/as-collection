@@ -1,3 +1,4 @@
+import type { AdminAttributeDto, AdminBrandDto } from '@as/contracts';
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { z } from 'zod';
@@ -60,7 +61,7 @@ const attributeSelect = {
 
 type AttributeRow = Prisma.AttributeGetPayload<{ select: typeof attributeSelect }>;
 
-const toAttributeDto = (row: AttributeRow) => ({
+const toAttributeDto = (row: AttributeRow): AdminAttributeDto => ({
   id: row.id,
   /** Filter parameter: `?f.<code>=<value>`. */
   code: row.code,
@@ -84,7 +85,7 @@ const toAttributeDto = (row: AttributeRow) => ({
     variants: row._count.variantValues,
     categories: row._count.categories,
   },
-  updatedAt: row.updatedAt,
+  updatedAt: row.updatedAt.toISOString(),
 });
 
 /** Value slugs from labels, unique within the attribute (`red`, `red-2`). */
@@ -365,7 +366,7 @@ export class AdminAttributesService {
 
   // ─── Brands ───
 
-  async brands() {
+  async brands(): Promise<AdminBrandDto[]> {
     const rows = await this.prisma.brand.findMany({
       orderBy: { name: 'asc' },
       select: {
@@ -381,6 +382,7 @@ export class AdminAttributesService {
     });
     return rows.map(({ logo, _count, ...b }) => ({
       ...b,
+      updatedAt: b.updatedAt.toISOString(),
       logo: logo
         ? { id: logo.id, url: mediaUrl(this.baseUrl, logo.storageKey), alt: logo.alt }
         : null,

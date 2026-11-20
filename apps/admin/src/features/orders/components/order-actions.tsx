@@ -3,6 +3,7 @@
 import type { StaffOrderAction } from '@as/contracts';
 import { useId } from 'react';
 
+import { ActionDialog } from '@/components/ui/action-dialog';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Field } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
@@ -10,7 +11,6 @@ import { Textarea } from '@/components/ui/textarea';
 
 import { orderTransition } from '../actions';
 import { ACTIONS } from '../labels';
-import { ActionDialog } from './action-dialog';
 
 /** The next steps for this order (only those the API allows and the staff member may take). */
 export function OrderActions({

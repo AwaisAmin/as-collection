@@ -2,12 +2,12 @@
 
 import { useId } from 'react';
 
+import { ActionDialog } from '@/components/ui/action-dialog';
 import { Field } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 
 import { reviewPaymentProof } from '../actions';
-import { ActionDialog } from './action-dialog';
 
 /** Accept (order becomes paid, a new order is confirmed) or reject with a reason for the customer. */
 export function ProofReview({ number, proofId }: { number: string; proofId: string }) {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useId, useRef } from 'react';
+import { startTransition, useActionState, useId, useRef } from 'react';
 import { toast } from 'sonner';
 
 import { Alert } from '@/components/ui/alert';
@@ -25,7 +25,17 @@ export function NoteForm({ number }: { number: string }) {
   }, {});
 
   return (
-    <form ref={form} action={action} className="flex flex-col gap-3" noValidate>
+    <form
+      ref={form}
+      // Submitted by hand so a failed attempt keeps the text (a form `action` always resets).
+      onSubmit={(event) => {
+        event.preventDefault();
+        const formData = new FormData(event.currentTarget);
+        startTransition(() => action(formData));
+      }}
+      className="flex flex-col gap-3"
+      noValidate
+    >
       {state.error ? <Alert tone="error">{state.error}</Alert> : null}
       <Field id={`${id}-note`} label="Add a note" error={state.fieldErrors?.note}>
         {(control) => <Textarea {...control} name="note" maxLength={1000} rows={2} required />}

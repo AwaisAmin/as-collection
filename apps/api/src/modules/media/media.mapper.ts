@@ -1,3 +1,4 @@
+import type { AdminMediaDto } from '@as/contracts';
 import { z } from 'zod';
 
 import type { Prisma } from '../../generated/prisma/client.js';
@@ -42,7 +43,7 @@ export const objectKeys = (row: { storageKey: string; variants: unknown }) => [
   ...storedVariantsSchema.parse(row.variants).map((v) => v.key),
 ];
 
-export function toAdminMediaDto(baseUrl: string, row: AdminMediaRow) {
+export function toAdminMediaDto(baseUrl: string, row: AdminMediaRow): AdminMediaDto {
   return {
     id: row.id,
     url: mediaUrl(baseUrl, row.storageKey),
@@ -62,6 +63,6 @@ export function toAdminMediaDto(baseUrl: string, row: AdminMediaRow) {
       collections: row._count.collectionImages,
     },
     uploadedBy: row.uploadedBy,
-    createdAt: row.createdAt,
+    createdAt: row.createdAt.toISOString(),
   };
 }

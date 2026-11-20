@@ -142,7 +142,7 @@ export class AdminProductsService {
       page: query.page,
       pageSize: query.pageSize,
       total,
-      totalPages: Math.ceil(total / query.pageSize),
+      pageCount: Math.ceil(total / query.pageSize),
     };
   }
 

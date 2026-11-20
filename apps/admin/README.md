@@ -31,6 +31,21 @@ on stdin). Everyone else is added from the panel.
   (confirm, pack, ship with courier + tracking, deliver, cancel, return, refund), transfer
   screenshots to accept or reject, and the timeline with internal or customer-visible notes.
   Screenshots are streamed through the admin (`/orders/[number]/proof/[id]`), never linked directly.
+- **Products** (`/products`): list by status with search, category, low-stock filter and sorting.
+  The editor covers basics, images (upload several at once or pick from the library; order, alt
+  text, tie an image to a variant), variants, details (attributes, with the ones a category asks
+  for shown first), specifications, SEO, status, categories, brand, tags and highlights. Saving
+  sends the version that was loaded; if someone else saved meanwhile, nothing is overwritten.
+  Variants of a saved product are edited one by one (paused while the form has unsaved changes);
+  stock is shown but changed only through stock adjustments.
+
+## Conventions
+
+- Response types come from `@as/contracts` (`admin/*`); the API's mappers are typed to them.
+- Lists keep their state in the URL (GET forms), so filtered views can be shared and bookmarked.
+- Forms that can fail keep what was typed: `ActionDialog` submits by hand, because a React form
+  `action` resets every field after each attempt.
+- Errors inside a modal are shown in the modal (toasts sit behind it).
 
 ## Layout
 

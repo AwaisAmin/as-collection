@@ -1,3 +1,9 @@
+import type {
+  AdminProductDto,
+  AdminProductListItemDto,
+  AdminVariantDto,
+  ProductAttributeValueDto,
+} from '@as/contracts';
 import { z } from 'zod';
 
 import type { Prisma } from '../../../generated/prisma/client.js';
@@ -93,7 +99,7 @@ type VariantRow = Prisma.ProductVariantGetPayload<{ select: typeof adminVariantS
 
 const specificationsSchema = z.array(z.object({ label: z.string(), value: z.string() })).catch([]);
 
-export function toAdminVariantDto(row: VariantRow) {
+export function toAdminVariantDto(row: VariantRow): AdminVariantDto {
   const inventory = row.inventory;
   return {
     id: row.id,
@@ -116,6 +122,7 @@ export function toAdminVariantDto(row: VariantRow) {
       })),
     inventory: inventory && {
       ...inventory,
+      updatedAt: inventory.updatedAt.toISOString(),
       available: inventory.onHand - inventory.reserved,
       isLow:
         inventory.trackInventory &&
@@ -126,7 +133,7 @@ export function toAdminVariantDto(row: VariantRow) {
   };
 }
 
-export function toAdminProductDto(baseUrl: string, row: AdminProductRow) {
+export function toAdminProductDto(baseUrl: string, row: AdminProductRow): AdminProductDto {
   return {
     id: row.id,
     slug: row.slug,
@@ -165,18 +172,15 @@ export function toAdminProductDto(baseUrl: string, row: AdminProductRow) {
       orders: row._count.orderItems,
       reviews: row._count.reviews,
     },
-    publishedAt: row.publishedAt,
-    createdAt: row.createdAt,
+    publishedAt: row.publishedAt?.toISOString() ?? null,
+    createdAt: row.createdAt.toISOString(),
     /** Send back as `updatedAt` when saving (conflict detection). */
-    updatedAt: row.updatedAt,
+    updatedAt: row.updatedAt.toISOString(),
   };
 }
 
-function groupAttributes(rows: AdminProductRow['attributes']) {
-  const byAttribute = new Map<
-    string,
-    { attributeId: string; valueIds?: string[]; text?: string; number?: number; boolean?: boolean }
-  >();
+function groupAttributes(rows: AdminProductRow['attributes']): ProductAttributeValueDto[] {
+  const byAttribute = new Map<string, ProductAttributeValueDto>();
   for (const row of rows) {
     const entry = byAttribute.get(row.attributeId) ?? { attributeId: row.attributeId };
     if (row.valueId) entry.valueIds = [...(entry.valueIds ?? []), row.valueId];
@@ -214,7 +218,7 @@ export const adminProductListSelect = {
 
 type ListRow = Prisma.ProductGetPayload<{ select: typeof adminProductListSelect }>;
 
-export function toAdminProductListItem(baseUrl: string, row: ListRow) {
+export function toAdminProductListItem(baseUrl: string, row: ListRow): AdminProductListItemDto {
   const tracked = row.variants.filter((v) => v.isActive && v.inventory?.trackInventory);
   const image = row.media[0]?.media;
   return {
@@ -241,7 +245,7 @@ export function toAdminProductListItem(baseUrl: string, row: ListRow) {
       (v) =>
         v.inventory && v.inventory.onHand - v.inventory.reserved <= v.inventory.lowStockThreshold,
     ).length,
-    updatedAt: row.updatedAt,
-    publishedAt: row.publishedAt,
+    updatedAt: row.updatedAt.toISOString(),
+    publishedAt: row.publishedAt?.toISOString() ?? null,
   };
 }

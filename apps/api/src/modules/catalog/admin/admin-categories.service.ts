@@ -1,3 +1,4 @@
+import type { AdminCategoryNodeDto } from '@as/contracts';
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
@@ -91,7 +92,7 @@ export class AdminCategoriesService {
   }
 
   /** The whole tree (active or not), children in display order. */
-  async tree() {
+  async tree(): Promise<AdminCategoryNodeDto[]> {
     const rows = await this.prisma.category.findMany({
       orderBy: [{ depth: 'asc' }, { position: 'asc' }, { name: 'asc' }],
       select: categorySelect,
