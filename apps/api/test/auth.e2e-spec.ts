@@ -217,7 +217,10 @@ describe('customer auth & account (e2e)', () => {
 
     it('refuses blocked customers', async () => {
       const { phone, customer } = await login();
-      await prisma.customer.update({ where: { id: customer.id }, data: { status: 'BLOCKED' } });
+      await prisma.customer.update({
+        where: { id: customer.id },
+        data: { status: 'BLOCKED', blockedAt: new Date() },
+      });
       await prisma.otpChallenge.updateMany({
         where: { phone },
         data: { createdAt: new Date(Date.now() - 60_000) },

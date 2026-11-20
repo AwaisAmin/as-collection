@@ -29,6 +29,9 @@ const LOCKABLE = {
   pages: Prisma.raw('pages'),
   page_sections: Prisma.raw('page_sections'),
   menus: Prisma.raw('menus'),
+  reviews: Prisma.raw('reviews'),
+  contact_messages: Prisma.raw('contact_messages'),
+  customers: Prisma.raw('customers'),
 } as const;
 
 /** `SELECT … FOR UPDATE` on one row; false when it does not exist. */

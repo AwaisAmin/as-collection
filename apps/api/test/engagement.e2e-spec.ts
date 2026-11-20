@@ -129,6 +129,7 @@ describe('reviews, newsletter, contact & content (e2e)', () => {
             'city',
             'createdAt',
             'helpfulCount',
+            'reply',
             'id',
             'productId',
             'rating',

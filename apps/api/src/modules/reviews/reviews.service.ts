@@ -105,27 +105,42 @@ export class ReviewsService {
     );
   }
 
-  /** Newest quotable five-star verified reviews, at most one per product (home testimonials). */
+  /**
+   * Home testimonials: staff picks first (newest pick first), then the newest quotable five-star
+   * verified reviews; at most one per product.
+   */
   async featured(limit: number): Promise<FeaturedReviewDto[]> {
     return this.cached(`featured:${String(limit)}`, async () => {
-      const rows = await this.prisma.review.findMany({
+      const select = { ...reviewSelect, product: { select: { name: true, slug: true } } };
+      const product = visibleProduct(new Date());
+      const picks = await this.prisma.review.findMany({
+        where: { status: 'APPROVED', isFeatured: true, product },
+        orderBy: [{ moderatedAt: 'desc' }, { id: 'desc' }],
+        take: limit,
+        select,
+      });
+      const automatic = await this.prisma.review.findMany({
         where: {
           status: 'APPROVED',
           rating: 5,
           isVerifiedPurchase: true,
-          product: visibleProduct(new Date()),
+          isFeatured: false,
+          product,
         },
         orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
         take: Math.max(50, limit * 6),
-        select: { ...reviewSelect, product: { select: { name: true, slug: true } } },
+        select,
       });
       const seen = new Set<string>();
       const featured: FeaturedReviewDto[] = [];
-      for (const row of rows) {
-        if (row.body.length < FEATURED_MIN_BODY || seen.has(row.productId)) continue;
+      for (const [row, picked] of [
+        ...picks.map((r) => [r, true] as const),
+        ...automatic.map((r) => [r, false] as const),
+      ]) {
+        if (featured.length === limit) break;
+        if (seen.has(row.productId) || (!picked && row.body.length < FEATURED_MIN_BODY)) continue;
         seen.add(row.productId);
         featured.push({ ...toReviewDto(row), product: row.product });
-        if (featured.length === limit) break;
       }
       return featured;
     });

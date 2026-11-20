@@ -12,6 +12,8 @@ export const reviewSelect = {
   createdAt: true,
   isVerifiedPurchase: true,
   helpfulCount: true,
+  reply: true,
+  repliedAt: true,
 } satisfies Prisma.ReviewSelect;
 
 type ReviewRow = Prisma.ReviewGetPayload<{ select: typeof reviewSelect }>;
@@ -28,6 +30,8 @@ export interface ReviewDto {
   createdAt: string;
   verifiedPurchase: boolean;
   helpfulCount: number;
+  /** The store's public answer, if any. */
+  reply: { body: string; at: string } | null;
 }
 
 export const toReviewDto = (r: ReviewRow): ReviewDto => ({
@@ -41,6 +45,7 @@ export const toReviewDto = (r: ReviewRow): ReviewDto => ({
   createdAt: r.createdAt.toISOString(),
   verifiedPurchase: r.isVerifiedPurchase,
   helpfulCount: r.helpfulCount,
+  reply: r.reply && r.repliedAt ? { body: r.reply, at: r.repliedAt.toISOString() } : null,
 });
 
 export interface ReviewSummaryDto {

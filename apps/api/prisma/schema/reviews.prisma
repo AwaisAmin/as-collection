@@ -23,6 +23,12 @@ model Review {
   moderatedByStaffId String?      @map("moderated_by_staff_id") @db.Uuid
   moderatedAt        DateTime?    @map("moderated_at") @db.Timestamptz(3)
   rejectionReason    String?      @map("rejection_reason") @db.VarChar(300)
+  /// Picked by staff for the home-page testimonials (shown before the automatic picks).
+  isFeatured         Boolean      @default(false) @map("is_featured")
+  /// Public reply from the store, shown under the review.
+  reply              String?      @db.VarChar(1000)
+  repliedAt          DateTime?    @map("replied_at") @db.Timestamptz(3)
+  repliedByStaffId   String?      @map("replied_by_staff_id") @db.Uuid
   /// HMAC of the submitter's IP (abuse limits); never the raw address.
   ipHash             String?      @map("ip_hash") @db.Char(64)
   createdAt          DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
@@ -31,7 +37,8 @@ model Review {
   product     Product      @relation(fields: [productId], references: [id], onDelete: Cascade)
   customer    Customer?    @relation(fields: [customerId], references: [id], onDelete: SetNull)
   orderItem   OrderItem?   @relation(fields: [orderItemId], references: [id], onDelete: SetNull)
-  moderatedBy StaffUser?   @relation(fields: [moderatedByStaffId], references: [id], onDelete: SetNull)
+  moderatedBy StaffUser?   @relation("ReviewModerator", fields: [moderatedByStaffId], references: [id], onDelete: SetNull)
+  repliedBy   StaffUser?   @relation("ReviewReplier", fields: [repliedByStaffId], references: [id], onDelete: SetNull)
   votes       ReviewVote[]
 
   @@index([productId, status, createdAt(sort: Desc)])

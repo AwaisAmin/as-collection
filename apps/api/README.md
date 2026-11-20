@@ -44,6 +44,9 @@ docker build -f apps/api/Dockerfile -t as-collection-api .   # from the repo roo
 | `/api/v1/admin/discounts/*`                                           | Discount codes: create, edit (future checkouts only), state filter, results, delete unused                                                      |
 | `/api/v1/admin/pages/*`                                               | Pages and their sections (validated per type), reorder, schedule, publish                                                                       |
 | `/api/v1/admin/menus/:key`, `/admin/settings/:key`                    | Menus (whole-tree save), store settings (validated per key, refresh checkout at once)                                                           |
+| `/api/v1/admin/reviews/*`                                             | Review moderation: approve, reject, feature on home, public reply, delete spam                                                                  |
+| `/api/v1/admin/inbox/*`, `/admin/newsletter/*`                        | Contact inbox (status, notes), subscribers and CSV export                                                                                       |
+| `/api/v1/admin/customers/*`                                           | Customers: search, profile and orders, edit, block (signs out everywhere) / unblock                                                             |
 
 ## Structure
 
@@ -307,6 +310,26 @@ Rules:
   - **Saving** refreshes the settings cache, so checkout charges a new delivery fee immediately.
   - **Audit:** records before and after values, plus who saved.
 - **Concurrency:** every edit needs `updatedAt` (null when creating a menu or setting); someone else's newer save gives 409 `STALE_UPDATE`.
+
+## Staff moderation, inbox & customers
+
+- **Reviews** (`reviews/admin`, `reviews.moderate`):
+  - **Approving and rejecting:** approving publishes a review (the product rating trigger updates). Rejecting stores an internal reason and also unfeatures.
+  - **Featuring:** only published reviews can be featured (also a DB check). Staff picks come first in `/catalog/reviews/featured`, then the automatic five-star picks.
+  - **Reply:** shown publicly as `reply: { body, at }`.
+  - **Caches:** every decision refreshes the review and catalog caches.
+- **Inbox** (`inbox.read`):
+  - **Search:** name, email, phone (any spelling), order number or text.
+  - **Handling:** NEW → READ → ARCHIVED, with an internal note and who handled it.
+  - **Detail:** includes the order a message mentions, when it exists.
+- **Newsletter** (`newsletter.read`):
+  - **Subscribers:** list and counts.
+  - **`export.csv`:** streamed in 1,000-row keyset batches. Cells that would start a spreadsheet formula are prefixed with `'` (CSV injection). Each export is audited.
+- **Customers** (`customers.read` / `customers.write`):
+  - **Search:** phone (any spelling), email or name (trigram index).
+  - **Profile:** addresses, recent orders, totals and active sessions (the Google id is never shown).
+  - **Edit:** name, marketing consent and an internal note, with `updatedAt` conflict checks.
+  - **Block:** stores the reason and date (a DB check keeps them consistent with the status) and revokes every session after commit. Sign-in flows already refuse blocked accounts.
 
 ## Conventions
 

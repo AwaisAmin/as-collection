@@ -136,6 +136,8 @@ model ContactMessage {
   orderNumber      String?       @map("order_number") @db.VarChar(20)
   message          String        @db.VarChar(5000)
   status           ContactStatus @default(NEW)
+  /// Internal note (never shown to the sender).
+  staffNote        String?       @map("staff_note") @db.VarChar(2000)
   ipHash           String?       @map("ip_hash") @db.Char(64)
   handledByStaffId String?       @map("handled_by_staff_id") @db.Uuid
   createdAt        DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)

@@ -31,7 +31,8 @@ model StaffUser {
   auditLogs          AuditLog[]
   uploadedMedia      Media[]
   inventoryMovements InventoryMovement[]
-  moderatedReviews   Review[]
+  moderatedReviews   Review[]            @relation("ReviewModerator")
+  repliedReviews     Review[]            @relation("ReviewReplier")
   orderEvents        OrderEvent[]
   paymentReviews     PaymentProof[]
   settingsUpdated    Setting[]

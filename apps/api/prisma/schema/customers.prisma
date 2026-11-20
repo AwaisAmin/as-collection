@@ -19,6 +19,11 @@ model Customer {
   /// Google account subject id ("sub" claim).
   googleSub       String?        @unique @map("google_sub") @db.VarChar(255)
   status          CustomerStatus @default(ACTIVE)
+  /// Why and when staff blocked the account (internal).
+  blockedReason   String?        @map("blocked_reason") @db.VarChar(300)
+  blockedAt       DateTime?      @map("blocked_at") @db.Timestamptz(3)
+  /// Internal note (never shown to the customer).
+  staffNote       String?        @map("staff_note") @db.VarChar(2000)
   marketingOptIn  Boolean        @default(false) @map("marketing_opt_in")
   phoneVerifiedAt DateTime?      @map("phone_verified_at") @db.Timestamptz(3)
   /// Set when the email came from a verified source (Google). Only verified emails link accounts.
@@ -33,6 +38,8 @@ model Customer {
   reviews   Review[]
 
   @@index([createdAt(sort: Desc)])
+  // Staff search by part of a name (pg_trgm).
+  @@index([name(ops: raw("gin_trgm_ops"))], type: Gin, map: "customers_name_trgm_idx")
   @@map("customers")
 }
 
