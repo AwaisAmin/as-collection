@@ -3,14 +3,6 @@ import { ConfigService } from '@nestjs/config';
 import type { z } from 'zod';
 
 import type { AppConfig } from '../../../app.module.js';
-import { ValidationFailedException } from '../../../common/http/problem-details.js';
-import { isUniqueViolation } from '../../../common/prisma-errors.js';
-import { slugify, uniqueSlug } from '../../../common/slug.js';
-import { PrismaService } from '../../../database/prisma.service.js';
-import type { Prisma } from '../../../generated/prisma/client.js';
-import { type AuditActor, AuditService, diff } from '../../audit/audit.service.js';
-import { mediaUrl } from '../catalog.mapper.js';
-import { CatalogService } from '../catalog.service.js';
 import {
   assertFresh,
   checkImages,
@@ -19,7 +11,15 @@ import {
   lockRow,
   notFound,
   type Tx,
-} from './admin-write.js';
+} from '../../../common/admin-write.js';
+import { ValidationFailedException } from '../../../common/http/problem-details.js';
+import { isUniqueViolation } from '../../../common/prisma-errors.js';
+import { slugify, uniqueSlug } from '../../../common/slug.js';
+import { PrismaService } from '../../../database/prisma.service.js';
+import type { Prisma } from '../../../generated/prisma/client.js';
+import { type AuditActor, AuditService, diff } from '../../audit/audit.service.js';
+import { mediaUrl } from '../catalog.mapper.js';
+import { CatalogService } from '../catalog.service.js';
 import type {
   AttributeValueInput,
   CreateAttributeInput,

@@ -1,10 +1,10 @@
 import { HttpStatus } from '@nestjs/common';
 
-import { DomainException } from '../../../common/http/problem-details.js';
-import { slugify, uniqueSlug } from '../../../common/slug.js';
-import { Prisma } from '../../../generated/prisma/client.js';
+import { Prisma } from '../generated/prisma/client.js';
+import { DomainException } from './http/problem-details.js';
+import { slugify, uniqueSlug } from './slug.js';
 
-/* Small building blocks shared by the catalog admin services. */
+/* Small building blocks shared by the admin (staff) write services. */
 
 export type Tx = Prisma.TransactionClient;
 
@@ -25,6 +25,10 @@ const LOCKABLE = {
   attribute_values: Prisma.raw('attribute_values'),
   brands: Prisma.raw('brands'),
   collections: Prisma.raw('collections'),
+  discounts: Prisma.raw('discounts'),
+  pages: Prisma.raw('pages'),
+  page_sections: Prisma.raw('page_sections'),
+  menus: Prisma.raw('menus'),
 } as const;
 
 /** `SELECT … FOR UPDATE` on one row; false when it does not exist. */

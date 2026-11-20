@@ -2,17 +2,6 @@ import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import type { AppConfig } from '../../../app.module.js';
-import { uuidv7 } from '../../../common/crypto.js';
-import {
-  type FieldError,
-  ValidationFailedException,
-} from '../../../common/http/problem-details.js';
-import { isUniqueViolation } from '../../../common/prisma-errors.js';
-import { PrismaService } from '../../../database/prisma.service.js';
-import type { Prisma } from '../../../generated/prisma/client.js';
-import { type AuditActor, AuditService, diff } from '../../audit/audit.service.js';
-import { mediaUrl } from '../catalog.mapper.js';
-import { CatalogService } from '../catalog.service.js';
 import {
   assertFresh,
   checkImages,
@@ -24,7 +13,18 @@ import {
   notFound,
   sameMembers,
   type Tx,
-} from './admin-write.js';
+} from '../../../common/admin-write.js';
+import { uuidv7 } from '../../../common/crypto.js';
+import {
+  type FieldError,
+  ValidationFailedException,
+} from '../../../common/http/problem-details.js';
+import { isUniqueViolation } from '../../../common/prisma-errors.js';
+import { PrismaService } from '../../../database/prisma.service.js';
+import type { Prisma } from '../../../generated/prisma/client.js';
+import { type AuditActor, AuditService, diff } from '../../audit/audit.service.js';
+import { mediaUrl } from '../catalog.mapper.js';
+import { CatalogService } from '../catalog.service.js';
 import type { CreateCategoryInput, UpdateCategoryInput } from './taxonomy.schemas.js';
 
 /** Same limit as the `categories_depth_check` constraint (0 = top level). */

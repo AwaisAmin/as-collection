@@ -41,6 +41,9 @@ docker build -f apps/api/Dockerfile -t as-collection-api .   # from the repo roo
 | `/api/v1/admin/categories/*`                                          | Category tree: create, edit, move with subtree, reorder, delete empty                                                                           |
 | `/api/v1/admin/attributes/*`, `/admin/brands`                         | Attributes and values (filters / variant options), brands                                                                                       |
 | `/api/v1/admin/collections/*`                                         | Collections: hand-picked lists or checked rules, rule preview, schedule, order                                                                  |
+| `/api/v1/admin/discounts/*`                                           | Discount codes: create, edit (future checkouts only), state filter, results, delete unused                                                      |
+| `/api/v1/admin/pages/*`                                               | Pages and their sections (validated per type), reorder, schedule, publish                                                                       |
+| `/api/v1/admin/menus/:key`, `/admin/settings/:key`                    | Menus (whole-tree save), store settings (validated per key, refresh checkout at once)                                                           |
 
 ## Structure
 
@@ -283,6 +286,27 @@ Rules:
 - **Known:** Prisma 7.10's pg adapter sometimes overlaps queries inside a transaction. pg 8 queues them and logs a deprecation warning. Keep `pg` on 8.x until Prisma fixes it.
 - **Caching:** every write refreshes the storefront cache after commit. Listing prices and stock flags are kept up to date by the existing database triggers.
 - **Docker:** sharp's musl bindings (libvips) are copied into the image, and the build fails if sharp doesn't load.
+
+## Staff discounts, content & settings
+
+- **Discounts** (`orders/admin/admin-discounts.*`, `discounts.write`; reading also allowed with `orders.read`):
+  - **Codes:** stored upper-case; checkout matches them case-insensitively.
+  - **Values per type:** PERCENTAGE in basis points (1–10000), FIXED_AMOUNT in paisa, FREE_SHIPPING 0. A cap is allowed only on percentages.
+  - **Used codes:** can't be renamed, can't have their usage limit set below what's already been used, and can't be deleted (deactivate them instead).
+  - **Edits** affect future checkouts only; orders keep their own amounts.
+  - **`state`:** active, scheduled, expired, used-up or inactive. Filtered in SQL, comparing `usage_count` with `usage_limit` via a field reference.
+  - **Detail:** includes orders, discount given and revenue.
+- **Pages** (`content/admin`, `content.write`):
+  - **Sections:** `settings` are validated with the same `SECTION_SCHEMAS` the storefront parses with, and stored as parsed. Errors point at `settings.<field>`.
+  - **Section editing:** insert at any position, reorder, hide, schedule. Deleted sections' settings stay in the audit log.
+  - **Admin view:** shows every section with `valid` and `live` flags.
+  - **Protected:** `home` can't be unpublished, moved or deleted.
+- **Menus:** `PUT /admin/menus/:key` creates the menu or replaces its whole tree (at most 3 levels and 300 items, safe links only). `main`, `shop-mega`, `footer` and `mobile` can't be deleted.
+- **Settings** (`settings.write`):
+  - **Keys:** every key in `PUBLIC_SETTINGS`, each validated by its schema and stored stripped of unknown fields.
+  - **Saving** refreshes the settings cache, so checkout charges a new delivery fee immediately.
+  - **Audit:** records before and after values, plus who saved.
+- **Concurrency:** every edit needs `updatedAt` (null when creating a menu or setting); someone else's newer save gives 409 `STALE_UPDATE`.
 
 ## Conventions
 

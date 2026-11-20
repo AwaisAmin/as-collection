@@ -1,5 +1,5 @@
+import { sameMembers } from '../../../common/admin-write.js';
 import { collectionState } from './admin-collections.service.js';
-import { sameMembers } from './admin-write.js';
 import {
   adminCollectionRulesSchema,
   createAttributeSchema,

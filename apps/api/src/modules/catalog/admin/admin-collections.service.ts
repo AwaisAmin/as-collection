@@ -3,6 +3,17 @@ import { ConfigService } from '@nestjs/config';
 
 import type { AppConfig } from '../../../app.module.js';
 import {
+  assertFresh,
+  checkImages,
+  conflict,
+  freeSlug,
+  jsonOrNull,
+  lockRow,
+  notFound,
+  sameMembers,
+  type Tx,
+} from '../../../common/admin-write.js';
+import {
   type FieldError,
   ValidationFailedException,
 } from '../../../common/http/problem-details.js';
@@ -13,17 +24,6 @@ import { type AuditActor, AuditService, diff } from '../../audit/audit.service.j
 import { mediaUrl } from '../catalog.mapper.js';
 import { CatalogService } from '../catalog.service.js';
 import { type CollectionRules, rulesWhere } from '../product-query.js';
-import {
-  assertFresh,
-  checkImages,
-  conflict,
-  freeSlug,
-  jsonOrNull,
-  lockRow,
-  notFound,
-  sameMembers,
-  type Tx,
-} from './admin-write.js';
 import type { CreateCollectionInput, UpdateCollectionInput } from './taxonomy.schemas.js';
 
 const collectionNotFound = () => notFound('COLLECTION_NOT_FOUND', 'Collection not found.');
