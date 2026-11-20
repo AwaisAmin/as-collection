@@ -28,6 +28,7 @@ import type { Address } from '@/features/auth/types';
 import { OrderSummary } from '@/features/cart/components/order-summary';
 import { useCart } from '@/features/cart/hooks/use-cart';
 import { useCartStore } from '@/features/cart/store/cart-store';
+import { useShippingRulesStore } from '@/features/cart/store/shipping-rules-store';
 import type { CartItem } from '@/features/cart/types';
 import type { PaymentMethod } from '@/features/orders/types';
 import { cn } from '@/lib/utils/cn';
@@ -102,6 +103,7 @@ export function CheckoutView({ prefill }: { prefill?: CheckoutPrefill }) {
   const router = useRouter();
   const { items, totals, hydrated } = useCart();
   const syncWithServer = useCartStore((s) => s.syncWithServer);
+  const setShippingRules = useShippingRulesStore((s) => s.setRules);
   const clearCart = useCartStore((s) => s.clear);
 
   const [state, formAction, pending] = useActionState(placeOrder, initialCheckoutState);
@@ -125,10 +127,11 @@ export function CheckoutView({ prefill }: { prefill?: CheckoutPrefill }) {
       clearCart();
       router.replace(`/order-confirmation/${state.orderNumber}?key=${state.accessKey}` as Route);
     } else if (state.status === 'error') {
+      if (state.shipping) setShippingRules(state.shipping);
       if (state.snapshots) syncWithServer(state.snapshots);
       alertRef.current?.focus();
     }
-  }, [state, clearCart, router, syncWithServer]);
+  }, [state, clearCart, router, syncWithServer, setShippingRules]);
 
   /** Fill delivery fields from a saved address (or clear them for a new one). */
   function selectAddress(id: string) {

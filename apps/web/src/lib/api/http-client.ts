@@ -84,6 +84,8 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
     timeoutMs = serverEnv.API_TIMEOUT_MS,
   } = options;
   const url = `${serverEnv.API_URL}${path}${buildQuery(query)}`;
+  // FormData (file uploads) sets its own multipart Content-Type with the boundary.
+  const isMultipart = body instanceof FormData;
 
   let response: Response;
   try {
@@ -91,13 +93,13 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
       method,
       headers: {
         Accept: 'application/json',
-        ...(body !== undefined ? { 'Content-Type': 'application/json' } : {}),
+        ...(body !== undefined && !isMultipart ? { 'Content-Type': 'application/json' } : {}),
         ...(clientIp ? { 'X-Forwarded-For': clientIp } : {}),
         ...(userAgent ? { 'User-Agent': userAgent.slice(0, 512) } : {}),
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...headers,
       },
-      body: body !== undefined ? JSON.stringify(body) : undefined,
+      body: body instanceof FormData ? body : body !== undefined ? JSON.stringify(body) : undefined,
       signal: AbortSignal.timeout(timeoutMs),
       cache: 'no-store',
     });

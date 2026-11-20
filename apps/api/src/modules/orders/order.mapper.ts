@@ -1,3 +1,5 @@
+import type { OrderDto, OrderSummaryDto, TrackedOrderDto } from '@as/contracts';
+
 import type { Prisma } from '../../generated/prisma/client.js';
 
 export const orderDetailSelect = {
@@ -100,7 +102,7 @@ const itemsOf = (row: OrderDetailRow) =>
   }));
 
 /** The customer's own view (confirmation page, account): everything they entered. */
-export function toOrderDto(row: OrderDetailRow) {
+export function toOrderDto(row: OrderDetailRow): OrderDto {
   return {
     number: row.number,
     status: row.status,
@@ -151,13 +153,13 @@ export function toOrderDto(row: OrderDetailRow) {
   };
 }
 
-export type OrderDto = ReturnType<typeof toOrderDto>;
+export type { OrderDto };
 
 /**
  * Public tracking (order number + phone). The phone is known to many people, so this view has no
  * name, phone, email or street address — only progress, items and the delivery city.
  */
-export function toTrackingDto(row: OrderDetailRow) {
+export function toTrackingDto(row: OrderDetailRow): TrackedOrderDto {
   return {
     number: row.number,
     status: row.status,
@@ -197,7 +199,7 @@ export const orderSummarySelect = {
 
 type OrderSummaryRow = Prisma.OrderGetPayload<{ select: typeof orderSummarySelect }>;
 
-export const toOrderSummary = (row: OrderSummaryRow) => ({
+export const toOrderSummary = (row: OrderSummaryRow): OrderSummaryDto => ({
   number: row.number,
   status: row.status,
   paymentMethod: row.paymentMethod,

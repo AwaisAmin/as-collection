@@ -10,6 +10,7 @@ const tone: Record<Order['status'], string> = {
   shipped: 'border-gold bg-ink text-white',
   delivered: 'border-ink bg-ink text-white',
   cancelled: 'border-muted/40 bg-ivory text-muted line-through',
+  returned: 'border-muted/40 bg-ivory text-muted',
 };
 
 export function OrderStatusBadge({

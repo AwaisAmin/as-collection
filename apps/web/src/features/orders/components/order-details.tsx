@@ -10,7 +10,9 @@ import type { Order } from '../types';
 
 export const paymentStatusLabel: Record<Order['payment']['status'], string> = {
   pay_on_delivery: 'Pay on delivery',
+  awaiting_payment: 'Awaiting payment',
   awaiting_verification: 'Awaiting verification',
+  payment_failed: 'Screenshot not accepted',
   paid: 'Paid',
   refunded: 'Refunded',
 };
@@ -22,6 +24,7 @@ export const orderStatusLabel: Record<Order['status'], string> = {
   shipped: 'Shipped',
   delivered: 'Delivered',
   cancelled: 'Cancelled',
+  returned: 'Returned',
 };
 
 /** Items, totals, delivery and payment details of an order (confirmation, account, tracking). */
@@ -52,18 +55,24 @@ export function OrderDetails({ order }: { order: Order }) {
                 <Image src={line.image.src} alt="" fill sizes="64px" className="object-cover" />
               </span>
               <div className="flex min-w-0 flex-1 flex-col gap-0.5 text-[16px]">
-                <Link
-                  href={productHref(line.slug)}
-                  className="font-display text-ink hover:text-gold-dark"
-                >
-                  {line.name}
-                </Link>
+                {line.slug ? (
+                  <Link
+                    href={productHref(line.slug)}
+                    className="font-display text-ink hover:text-gold-dark"
+                  >
+                    {line.name}
+                  </Link>
+                ) : (
+                  <span className="font-display text-ink">{line.name}</span>
+                )}
                 {Object.keys(line.options).length > 0 ? (
                   <span className="text-muted">
                     {Object.entries(line.options)
                       .map(([k, v]) => `${k}: ${v}`)
                       .join(' · ')}
                   </span>
+                ) : line.variantTitle ? (
+                  <span className="text-muted">{line.variantTitle}</span>
                 ) : null}
                 <span className="text-muted">
                   {line.quantity} × {formatPrice(line.price)}
@@ -82,6 +91,12 @@ export function OrderDetails({ order }: { order: Order }) {
             <div className="flex justify-between">
               <dt className="text-muted">You saved</dt>
               <dd className="text-gold-dark">−{formatPrice(order.totals.savings)}</dd>
+            </div>
+          ) : null}
+          {order.totals.discount ? (
+            <div className="flex justify-between">
+              <dt className="text-muted">Discount</dt>
+              <dd className="text-gold-dark">−{formatPrice(order.totals.discount)}</dd>
             </div>
           ) : null}
           <div className="flex justify-between">
@@ -115,6 +130,12 @@ export function OrderDetails({ order }: { order: Order }) {
               <span className="text-muted">{order.customer.email}</span>
             ) : null}
           </address>
+          {order.delivery?.trackingNumber ? (
+            <p className="mt-3 rounded-lg border border-gold/60 px-3 py-2 text-[15px]">
+              Shipped with <span className="font-bold">{order.delivery.courier ?? 'courier'}</span>{' '}
+              · tracking number <span className="font-bold">{order.delivery.trackingNumber}</span>
+            </p>
+          ) : null}
           {order.shipping.notes ? (
             <p className="mt-3 rounded-lg bg-sand/70 px-3 py-2 text-[15px] text-muted">
               Note: {order.shipping.notes}

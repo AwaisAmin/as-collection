@@ -37,7 +37,7 @@ export const checkoutFieldsSchema = z
       .string()
       .trim()
       .min(10, 'Please enter your full address (house, street, area).')
-      .max(250, 'Address is too long.'),
+      .max(200, 'Address is too long.'),
     postalCode: z
       .string()
       .trim()

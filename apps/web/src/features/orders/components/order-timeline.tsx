@@ -28,11 +28,13 @@ const steps = [
 
 /** Vertical progress timeline for an order's fulfilment status. */
 export function OrderTimeline({ status }: { status: Order['status'] }) {
-  if (status === 'cancelled') {
+  if (status === 'cancelled' || status === 'returned') {
     return (
       <p className="flex items-center gap-3 rounded-xl border border-gold bg-sand px-4 py-3 text-[17px]">
         <CircleX aria-hidden className="size-6 text-gold-dark" />
-        This order was cancelled. Contact us if you have any questions.
+        {status === 'cancelled'
+          ? 'This order was cancelled. Contact us if you have any questions.'
+          : 'This order was returned. Contact us if you have any questions about your refund.'}
       </p>
     );
   }

@@ -1,136 +1,49 @@
 import 'server-only';
 
-import { computeCartTotals } from '@/features/cart/lib/cart-totals';
-import type { CartItem } from '@/features/cart/types';
-import { catalogService } from '@/features/catalog/services/catalog.service';
-import { normalizePkMobile } from '@/lib/utils/phone';
+import { serverEnv } from '@/config/env.server';
 
-import { generateAccessKey, generateOrderNumber } from '../lib/order-number';
-import type { Order, OrderLine, PlaceOrderInput, PlaceOrderResult } from '../types';
+import type {
+  Order,
+  OrderAccess,
+  OrderSummary,
+  PlaceOrderInput,
+  PlaceOrderResult,
+  TrackedOrder,
+} from '../types';
+import { apiOrdersService } from './orders.api';
+import { mockOrdersService } from './orders.mock';
 
-/** Port: order placement + lookup. */
+/** Who is asking (signed-in session, IP and browser for the API's limits). */
+export interface RequestContext {
+  token: string | null;
+  ip: string | null;
+  userAgent: string | null;
+}
+
+export type OrderActionResult = { ok: true; order: Order } | { ok: false; error: string };
+
+/** Port: checkout and the customer's orders. */
 export interface OrdersService {
-  placeOrder(input: PlaceOrderInput): Promise<PlaceOrderResult>;
-  /** Customer view (confirmation page) — requires the secret access key. */
-  getOrderForCustomer(orderNumber: string, accessKey: string): Promise<Order | null>;
-  /** Public tracking — order number + the phone used at checkout. */
-  findOrderByNumberAndPhone(orderNumber: string, phone: string): Promise<Order | null>;
+  /** Re-prices and reserves stock server-side; uploads the transfer screenshot when given. */
+  placeOrder(input: PlaceOrderInput, ctx: RequestContext): Promise<PlaceOrderResult>;
+  /** The full order for its owner (confirmation-page access key, or the signed-in session). */
+  getOrder(orderNumber: string, access: OrderAccess): Promise<Order | null>;
+  /** Public tracking — order number + the phone used at checkout; no personal details. */
+  trackOrder(orderNumber: string, phone: string, ctx: RequestContext): Promise<TrackedOrder | null>;
   /** Account history: orders placed while signed in + guest orders with the verified phone. */
-  listOrdersForCustomer(customer: CustomerRef): Promise<Order[]>;
-  getOrderForAccount(orderNumber: string, customer: CustomerRef): Promise<Order | null>;
+  listOrders(token: string): Promise<OrderSummary[]>;
+  /** Cancels a pending, unpaid order (stock is released). */
+  cancelOrder(orderNumber: string, access: OrderAccess): Promise<OrderActionResult>;
+  /** Transfer screenshot (again, after a rejection). */
+  uploadPaymentProof(
+    orderNumber: string,
+    access: OrderAccess,
+    file: File,
+    reference: string | undefined,
+  ): Promise<OrderActionResult>;
 }
 
-export interface CustomerRef {
-  userId: string;
-  /** Verified phone ('' for Google-only accounts). */
-  phone: string;
-}
-
-const belongsTo = (order: Order, c: CustomerRef) =>
-  order.userId === c.userId || (c.phone !== '' && order.customer.phone === c.phone);
-
-/*
- * Adapter: in-memory mock. Kept on globalThis so orders survive dev hot-reloads.
- * The NestJS API replaces this (DB transaction: re-price, reserve stock, create order).
- */
-const store: Map<string, Order> = ((
-  globalThis as { __asOrders?: Map<string, Order> }
-).__asOrders ??= new Map());
-
-async function placeOrder(input: PlaceOrderInput): Promise<PlaceOrderResult> {
-  // Idempotency: a retried/double-submitted checkout returns the original order.
-  const existing = [...store.values()].find((o) => o.checkoutId === input.checkoutId);
-  if (existing) return { ok: true, order: existing };
-
-  // Re-price and re-check stock from the source of truth — never trust client prices.
-  const details = await catalogService.getVariantDetails(input.lines.map((l) => l.variantId));
-  const byId = new Map(details.map((d) => [d.variantId, d]));
-  const snapshots = details.map(({ variantId, price, compareAtPrice, stock }) => ({
-    variantId,
-    price,
-    compareAtPrice,
-    stock,
-  }));
-
-  const stockProblem = input.lines.some((l) => {
-    const d = byId.get(l.variantId);
-    return !d || d.stock < l.quantity;
-  });
-  if (stockProblem) return { ok: false, reason: 'stock_changed', snapshots };
-
-  const lines: OrderLine[] = input.lines.map((l) => {
-    const d = byId.get(l.variantId)!;
-    return {
-      variantId: d.variantId,
-      productId: d.productId,
-      slug: d.slug,
-      name: d.name,
-      sku: d.sku,
-      options: d.options,
-      image: d.image,
-      price: d.price,
-      compareAtPrice: d.compareAtPrice,
-      quantity: l.quantity,
-      lineTotal: d.price * l.quantity,
-    };
-  });
-
-  const asCartItems: CartItem[] = lines.map((l) => ({ ...l, maxQuantity: l.quantity }));
-  const t = computeCartTotals(asCartItems);
-  if (t.total !== input.expectedTotal) return { ok: false, reason: 'price_changed', snapshots };
-
-  const order: Order = {
-    orderNumber: generateOrderNumber(),
-    accessKey: generateAccessKey(),
-    checkoutId: input.checkoutId,
-    userId: input.userId,
-    createdAt: new Date().toISOString(),
-    status: 'pending',
-    customer: input.customer,
-    shipping: input.shipping,
-    payment: {
-      ...input.payment,
-      status: input.payment.method === 'cod' ? 'pay_on_delivery' : 'awaiting_verification',
-    },
-    lines,
-    totals: {
-      itemCount: t.itemCount,
-      subtotal: t.subtotal,
-      savings: t.savings,
-      shipping: t.shipping,
-      total: t.total,
-    },
-  };
-  store.set(order.orderNumber, order);
-  return { ok: true, order };
-}
-
-async function getOrderForCustomer(orderNumber: string, accessKey: string) {
-  const order = store.get(orderNumber);
-  return order && order.accessKey === accessKey ? order : null;
-}
-
-async function findOrderByNumberAndPhone(orderNumber: string, phone: string) {
-  const order = store.get(orderNumber.trim().toUpperCase());
-  const normalized = normalizePkMobile(phone);
-  return order && normalized && order.customer.phone === normalized ? order : null;
-}
-
-async function listOrdersForCustomer(customer: CustomerRef) {
-  return [...store.values()]
-    .filter((o) => belongsTo(o, customer))
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-}
-
-async function getOrderForAccount(orderNumber: string, customer: CustomerRef) {
-  const order = store.get(orderNumber);
-  return order && belongsTo(order, customer) ? order : null;
-}
-
-export const ordersService: OrdersService = {
-  placeOrder,
-  getOrderForCustomer,
-  findOrderByNumberAndPhone,
-  listOrdersForCustomer,
-  getOrderForAccount,
-};
+/** The NestJS API, or in-memory mocks for offline development (`MOCK_API=true`). */
+export const ordersService: OrdersService = serverEnv.MOCK_API
+  ? mockOrdersService
+  : apiOrdersService;

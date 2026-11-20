@@ -1,3 +1,4 @@
+import type { QuoteDto } from '@as/contracts';
 /*
  * Pure checkout pricing: lines → priced quote (stock problems, coupon, shipping, totals). The
  * client's prices are never used — only variant ids and quantities. Amounts are integer paisa.
@@ -75,6 +76,7 @@ export type DiscountResult =
   | { applied: true; code: string; discountMinor: number; freeShipping: boolean }
   | { applied: false; code: string; reason: DiscountRejection; minSubtotalMinor?: number };
 
+/** Same shape as the public `QuoteDto` contract (checked below). */
 export interface Quote {
   lines: QuoteLine[];
   itemCount: number;
@@ -222,3 +224,6 @@ export function buildQuote({ lines, variants, shipping, discount, now }: QuoteIn
     purchasable: quoteLines.length > 0 && quoteLines.every((l) => l.problem === null),
   };
 }
+
+/** Compile-time guarantee that quotes match the shared contract the storefront reads. */
+export const quoteMatchesContract = (quote: Quote): QuoteDto => quote;

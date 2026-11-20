@@ -5,7 +5,7 @@ import Link from 'next/link';
 
 import { ButtonLink } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
-import { requireUser } from '@/features/auth/session';
+import { requireSession } from '@/features/auth/session';
 import { paymentStatusLabel } from '@/features/orders/components/order-details';
 import { OrderStatusBadge } from '@/features/orders/components/order-status-badge';
 import { ordersService } from '@/features/orders/services/orders.service';
@@ -14,8 +14,8 @@ import { formatDate, formatPrice, pluralize } from '@/lib/utils/format';
 export const metadata: Metadata = { title: 'My orders' };
 
 export default async function AccountOrdersPage() {
-  const user = await requireUser('/account/orders');
-  const orders = await ordersService.listOrdersForCustomer({ userId: user.id, phone: user.phone });
+  const { token } = await requireSession('/account/orders');
+  const orders = await ordersService.listOrders(token);
 
   if (orders.length === 0) {
     return (
@@ -43,27 +43,25 @@ export default async function AccountOrdersPage() {
               className="group flex flex-col gap-4 rounded-card border border-gold/60 bg-ivory p-5 transition-all hover:border-gold hover:shadow-soft sm:flex-row sm:items-center"
             >
               <div className="flex -space-x-3">
-                {o.lines.slice(0, 3).map((line) => (
+                {o.previews.map((image, i) => (
                   <span
-                    key={line.variantId}
+                    key={`${image.src}-${i}`}
                     className="relative aspect-3/4 w-14 overflow-hidden rounded-lg border-2 border-ivory bg-sand shadow-soft"
                   >
-                    <Image src={line.image.src} alt="" fill sizes="56px" className="object-cover" />
+                    <Image src={image.src} alt="" fill sizes="56px" className="object-cover" />
                   </span>
                 ))}
               </div>
               <div className="min-w-0 flex-1">
                 <p className="font-body text-[18px] font-bold text-ink">{o.orderNumber}</p>
                 <p className="text-[15px] text-muted">
-                  {formatDate(o.createdAt)} · {pluralize(o.totals.itemCount, 'item')} ·{' '}
-                  {paymentStatusLabel[o.payment.status]}
+                  {formatDate(o.createdAt)} · {pluralize(o.itemCount, 'item')} ·{' '}
+                  {paymentStatusLabel[o.paymentStatus]}
                 </p>
               </div>
               <div className="flex items-center justify-between gap-4 sm:justify-end">
                 <OrderStatusBadge status={o.status} />
-                <span className="font-body text-[18px] font-bold">
-                  {formatPrice(o.totals.total)}
-                </span>
+                <span className="font-body text-[18px] font-bold">{formatPrice(o.total)}</span>
                 <ChevronRight
                   aria-hidden
                   size={20}

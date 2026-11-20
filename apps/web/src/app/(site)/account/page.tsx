@@ -15,7 +15,7 @@ export const metadata: Metadata = { title: 'Overview' };
 export default async function AccountOverviewPage() {
   const { user, token } = await requireSession('/account');
   const [orders, addresses] = await Promise.all([
-    ordersService.listOrdersForCustomer({ userId: user.id, phone: user.phone }),
+    ordersService.listOrders(token),
     authService.listAddresses(token),
   ]);
   const defaultAddress = addresses.find((a) => a.isDefault);
@@ -66,7 +66,7 @@ export default async function AccountOverviewPage() {
                   <span>
                     <span className="block font-body text-[17px] font-bold">{o.orderNumber}</span>
                     <span className="text-[15px] text-muted">
-                      {formatDate(o.createdAt)} · {formatPrice(o.totals.total)}
+                      {formatDate(o.createdAt)} · {formatPrice(o.total)}
                     </span>
                   </span>
                   <OrderStatusBadge status={o.status} />

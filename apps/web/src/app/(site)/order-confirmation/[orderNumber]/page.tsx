@@ -8,6 +8,7 @@ import { Container } from '@/components/ui/container';
 import { CopyButton } from '@/components/ui/copy-button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { siteConfig } from '@/config/site';
+import { CancelOrderButton, PaymentProofForm } from '@/features/orders/components/order-actions';
 import { OrderDetails } from '@/features/orders/components/order-details';
 import { ORDER_NUMBER_PATTERN } from '@/features/orders/lib/order-number';
 import { ordersService } from '@/features/orders/services/orders.service';
@@ -48,8 +49,11 @@ async function Confirmation({
   if (!ORDER_NUMBER_PATTERN.test(orderNumber) || typeof key !== 'string') notFound();
 
   // Private: requires the secret key from the checkout redirect (not cached).
-  const order = await ordersService.getOrderForCustomer(orderNumber, key);
+  const order = await ordersService.getOrder(orderNumber, { accessKey: key });
   if (!order) notFound();
+  const needsScreenshot =
+    order.actions?.canUploadPaymentProof === true &&
+    (order.payment.status === 'awaiting_payment' || order.payment.status === 'payment_failed');
 
   const firstName = order.customer.fullName.split(' ')[0];
   const isCod = order.payment.method === 'cod';
@@ -86,6 +90,11 @@ async function Confirmation({
               Please keep <span className="font-bold">{formatPrice(order.totals.total)}</span> ready
               in cash for the courier. Delivery usually takes 2–5 working days.
             </p>
+          ) : needsScreenshot ? (
+            <p>
+              Transfer <span className="font-bold">{formatPrice(order.totals.total)}</span> and
+              upload the screenshot below. Unpaid transfer orders are cancelled after 48 hours.
+            </p>
           ) : (
             <p>
               We received your payment screenshot. Your order will be confirmed once we verify the
@@ -93,6 +102,14 @@ async function Confirmation({
             </p>
           )}
         </div>
+
+        {needsScreenshot ? (
+          <PaymentProofForm
+            orderNumber={order.orderNumber}
+            accessKey={key}
+            rejected={order.payment.status === 'payment_failed'}
+          />
+        ) : null}
       </div>
 
       <div className="mt-12">
@@ -107,6 +124,9 @@ async function Confirmation({
           <PackageSearch aria-hidden size={18} />
           Track your order
         </ButtonLink>
+        {order.actions?.canCancel ? (
+          <CancelOrderButton orderNumber={order.orderNumber} accessKey={key} />
+        ) : null}
       </div>
 
       <p className="mt-8 text-center text-[15px] text-muted">

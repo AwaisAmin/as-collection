@@ -55,7 +55,21 @@ Lower features expose slots (e.g. `ProductCard` `actions`) instead of importing 
   - **Live on the API:**
     - **B8a:** catalog, filters, product pages, reviews (with store replies and votes), newsletter and contact.
     - **B8b:** phone-code and Google sign-in, profile, address book and signed-in devices.
-  - **Still mocked (B8c):** cart, checkout and orders.
+    - **B8c:** cart prices and stock, checkout, order confirmation, tracking, my orders, cancelling, payment
+      screenshots.
+  - **Still from config files (B8d):** home-page sections, menus, announcement bar, contact details.
+- **Checkout on the API:**
+  - **Placing:** `POST /orders` with the checkout id as `Idempotency-Key`, so a double click or retry returns the same
+    order.
+  - **Changes:** stock or price changes come back as 409 with a fresh quote; the cart is synced and the shopper confirms
+    again.
+  - **Screenshot:** uploaded right after placing the order. If that upload fails, the order stands and the confirmation
+    page asks for the screenshot again (the same form handles screenshots the store rejected).
+  - **Delivery rules:** the fee and free-delivery threshold come from the store's `shipping` setting (seeded into a
+    client store on every page). A refused checkout also returns the current rules, so the total the shopper confirms
+    is always the API's.
+  - **Tracking:** a public view without personal details. Order pages use the confirmation-link key (guests) or the
+    session (account).
 - **Sessions (backend-for-frontend):**
   - **Cookie:** the API's bearer token lives only in the HttpOnly `as_session` cookie (SameSite=Lax, Secure in
     production, 180 days). The API decides validity (it slides sessions, 30 days idle), so the browser's JS never sees the

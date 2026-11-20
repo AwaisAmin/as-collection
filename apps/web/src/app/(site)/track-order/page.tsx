@@ -14,6 +14,7 @@ import { paymentStatusLabel } from '@/features/orders/components/order-details';
 import { OrderStatusBadge } from '@/features/orders/components/order-status-badge';
 import { OrderTimeline } from '@/features/orders/components/order-timeline';
 import { ordersService } from '@/features/orders/services/orders.service';
+import { clientIp } from '@/lib/api/client-ip';
 import { formatDate, formatPrice, pluralize } from '@/lib/utils/format';
 import { formatPkMobile, normalizePkMobile } from '@/lib/utils/phone';
 
@@ -51,7 +52,13 @@ async function Tracker({ searchParams }: Pick<PageProps<'/track-order'>, 'search
 
   // Public lookup needs BOTH order number and phone, and shows no full address.
   const order =
-    orderNumber && phone ? await ordersService.findOrderByNumberAndPhone(orderNumber, phone) : null;
+    orderNumber && phone
+      ? await ordersService.trackOrder(orderNumber, phone, {
+          token: null,
+          ip: await clientIp(),
+          userAgent: null,
+        })
+      : null;
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-8">
@@ -119,18 +126,40 @@ async function Tracker({ searchParams }: Pick<PageProps<'/track-order'>, 'search
               <OrderStatusBadge status={order.status} />
             </div>
             <OrderTimeline status={order.status} />
+            {order.delivery?.trackingNumber ? (
+              <p className="mt-6 rounded-xl border border-gold/60 px-4 py-3 text-[16px]">
+                Shipped with{' '}
+                <span className="font-bold">{order.delivery.courier ?? 'courier'}</span> · tracking
+                number <span className="font-bold">{order.delivery.trackingNumber}</span>
+              </p>
+            ) : null}
+            {order.timeline.length > 0 ? (
+              <ol className="mt-6 flex flex-col gap-2 border-t border-gold/40 pt-4 text-[15px]">
+                {order.timeline.map((event) => (
+                  <li key={`${event.at}-${event.note}`} className="flex gap-3">
+                    <time dateTime={event.at} className="shrink-0 text-muted">
+                      {formatDate(event.at)}
+                    </time>
+                    <span>{event.note}</span>
+                  </li>
+                ))}
+              </ol>
+            ) : null}
           </div>
 
           <aside className="flex flex-col gap-4 rounded-card border border-gold/60 bg-ivory p-5">
             <h3 className="font-display text-[19px]">Summary</h3>
             <ul className="flex flex-col gap-3">
-              {order.lines.map((l) => (
-                <li key={l.variantId} className="flex items-center gap-3 text-[15px]">
+              {order.items.map((l, i) => (
+                <li key={`${l.name}-${i}`} className="flex items-center gap-3 text-[15px]">
                   <span className="relative aspect-3/4 w-11 shrink-0 overflow-hidden rounded-md border border-gold/40">
                     <Image src={l.image.src} alt="" fill sizes="44px" className="object-cover" />
                   </span>
                   <span className="min-w-0 leading-snug">
                     <span className="block truncate text-ink">{l.name}</span>
+                    {l.variantTitle ? (
+                      <span className="block truncate text-muted">{l.variantTitle}</span>
+                    ) : null}
                     <span className="text-muted">× {l.quantity}</span>
                   </span>
                 </li>
@@ -139,19 +168,19 @@ async function Tracker({ searchParams }: Pick<PageProps<'/track-order'>, 'search
             <dl className="flex flex-col gap-1.5 border-t border-gold/40 pt-3 text-[15px]">
               <div className="flex justify-between">
                 <dt className="text-muted">Items</dt>
-                <dd>{pluralize(order.totals.itemCount, 'item')}</dd>
+                <dd>{pluralize(order.itemCount, 'item')}</dd>
               </div>
               <div className="flex justify-between">
                 <dt className="text-muted">Total</dt>
-                <dd className="font-bold">{formatPrice(order.totals.total)}</dd>
+                <dd className="font-bold">{formatPrice(order.total)}</dd>
               </div>
               <div className="flex justify-between">
                 <dt className="text-muted">Payment</dt>
-                <dd>{paymentStatusLabel[order.payment.status]}</dd>
+                <dd>{paymentStatusLabel[order.paymentStatus]}</dd>
               </div>
               <div className="flex justify-between">
                 <dt className="text-muted">Delivering to</dt>
-                <dd>{order.shipping.city}</dd>
+                <dd>{order.city}</dd>
               </div>
             </dl>
           </aside>

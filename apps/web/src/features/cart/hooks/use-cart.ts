@@ -7,6 +7,7 @@ import { useHydrated } from '@/hooks/use-hydrated';
 
 import { type CartTotals, computeCartTotals } from '../lib/cart-totals';
 import { useCartStore } from '../store/cart-store';
+import { useShippingRulesStore } from '../store/shipping-rules-store';
 import type { CartItem } from '../types';
 
 const EMPTY: CartItem[] = [];
@@ -16,7 +17,8 @@ export function useCart(): { items: CartItem[]; totals: CartTotals; hydrated: bo
   const hydrated = useHydrated();
   const stored = useCartStore((s) => s.items);
   const items = hydrated ? stored : EMPTY;
-  const totals = useMemo(() => computeCartTotals(items), [items]);
+  const rules = useShippingRulesStore((s) => s.rules);
+  const totals = useMemo(() => computeCartTotals(items, rules), [items, rules]);
   return { items, totals, hydrated };
 }
 
