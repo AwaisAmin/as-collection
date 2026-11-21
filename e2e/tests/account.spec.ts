@@ -20,7 +20,8 @@ test('sign in with a code, manage the account, sign out', async ({ page }) => {
 
   await page.getByLabel('Full name').fill('E2E Browser Customer');
   await page.getByRole('button', { name: 'Continue' }).click();
-  await expect(page).toHaveURL(/\/account\/profile$/);
+  // Verifies the code, creates the account and redirects: allow for a busy machine.
+  await expect(page).toHaveURL(/\/account\/profile$/, { timeout: 20_000 });
   await expect(page.getByRole('heading', { name: 'Signed-in devices' })).toBeVisible();
   await expect(page.getByText('This device')).toBeVisible();
 

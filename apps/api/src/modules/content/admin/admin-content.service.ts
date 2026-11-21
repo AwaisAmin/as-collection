@@ -1,3 +1,4 @@
+import type { AdminPageDto, AdminPageListItemDto } from '@as/contracts';
 import { Injectable } from '@nestjs/common';
 
 import {
@@ -108,7 +109,7 @@ export class AdminContentService {
 
   // ─── Pages ───
 
-  async pages() {
+  async pages(): Promise<AdminPageListItemDto[]> {
     const rows = await this.prisma.page.findMany({
       orderBy: { slug: 'asc' },
       select: {
@@ -122,13 +123,14 @@ export class AdminContentService {
     });
     return rows.map(({ _count, ...p }) => ({
       ...p,
+      updatedAt: p.updatedAt.toISOString(),
       sections: _count.sections,
       protected: PROTECTED_PAGES.has(p.slug),
     }));
   }
 
   /** The page with every section, including hidden and scheduled ones. */
-  async page(id: string) {
+  async page(id: string): Promise<AdminPageDto> {
     const page = await this.prisma.page.findUnique({
       where: { id },
       select: {
@@ -147,12 +149,18 @@ export class AdminContentService {
     const now = new Date();
     return {
       ...page,
+      createdAt: page.createdAt.toISOString(),
+      updatedAt: page.updatedAt.toISOString(),
       protected: PROTECTED_PAGES.has(page.slug),
       sections: page.sections.map((s) => {
         const valid =
           isSectionType(s.type) && SECTION_SCHEMAS[s.type].safeParse(s.settings).success;
         return {
           ...s,
+          settings: (s.settings ?? {}) as Record<string, unknown>,
+          startsAt: s.startsAt?.toISOString() ?? null,
+          endsAt: s.endsAt?.toISOString() ?? null,
+          updatedAt: s.updatedAt.toISOString(),
           /** False: the storefront skips it (e.g. saved before a schema change). */
           valid,
           live:
