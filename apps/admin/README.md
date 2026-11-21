@@ -31,6 +31,12 @@ on stdin). Everyone else is added from the panel.
   (confirm, pack, ship with courier + tracking, deliver, cancel, return, refund), transfer
   screenshots to accept or reject, and the timeline with internal or customer-visible notes.
   Screenshots are streamed through the admin (`/orders/[number]/proof/[id]`), never linked directly.
+- **Discounts** (`/discounts`): codes by state (active, scheduled, expired, used up, off) with a
+  plain summary ("15% off, up to Rs 1,000 · orders over Rs 3,000"). The form: code (with a
+  readable random generator; fixed once used), percent / amount off / free delivery, cap, minimum
+  order, dates (Pakistan time), total and per-customer (phone) limits, on/off. Each code shows its
+  orders, discount given and revenue; used codes can be switched off but not deleted. Visible to
+  `discounts.write` and `orders.read`.
 - **Products** (`/products`): list by status with search, category, low-stock filter and sorting.
   The editor covers basics, images (upload several at once or pick from the library; order, alt
   text, tie an image to a variant), variants, details (attributes, with the ones a category asks

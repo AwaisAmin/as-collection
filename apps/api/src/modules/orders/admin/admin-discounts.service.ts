@@ -1,3 +1,4 @@
+import type { AdminDiscountDetailDto, AdminDiscountDto, AdminDiscountListDto } from '@as/contracts';
 import { Injectable } from '@nestjs/common';
 
 import { assertFresh, conflict, lockRow, notFound } from '../../../common/admin-write.js';
@@ -42,6 +43,18 @@ const discountSelect = {
 
 type DiscountRow = Prisma.DiscountGetPayload<{ select: typeof discountSelect }>;
 
+const iso = (d: Date | null) => d?.toISOString() ?? null;
+
+/** Dates as ISO strings for the response. */
+const toDto = (d: DiscountRow, state: DiscountState): AdminDiscountDto => ({
+  ...d,
+  startsAt: iso(d.startsAt),
+  endsAt: iso(d.endsAt),
+  createdAt: d.createdAt.toISOString(),
+  updatedAt: d.updatedAt.toISOString(),
+  state,
+});
+
 /** What checkout would do with the code right now (same rules as `evaluateDiscount`). */
 export function discountState(d: DiscountRow, now: Date): DiscountState {
   if (!d.isActive) return 'inactive';
@@ -85,7 +98,7 @@ export class AdminDiscountsService {
     private readonly audit: AuditService,
   ) {}
 
-  async list(query: ListDiscountsQuery) {
+  async list(query: ListDiscountsQuery): Promise<AdminDiscountListDto> {
     const now = new Date();
     const where: Prisma.DiscountWhereInput = {
       ...(query.q ? { code: { startsWith: query.q, mode: 'insensitive' } } : {}),
@@ -102,7 +115,7 @@ export class AdminDiscountsService {
       }),
     ]);
     return {
-      items: rows.map((d) => ({ ...d, state: discountState(d, now) })),
+      items: rows.map((d) => toDto(d, discountState(d, now))),
       page: query.page,
       pageSize: query.pageSize,
       total,
@@ -110,7 +123,7 @@ export class AdminDiscountsService {
     };
   }
 
-  async get(id: string) {
+  async get(id: string): Promise<AdminDiscountDetailDto> {
     const row = await this.prisma.discount.findUnique({ where: { id }, select: discountSelect });
     if (!row) throw discountNotFound();
     const stats = await this.prisma.order.aggregate({
@@ -119,8 +132,7 @@ export class AdminDiscountsService {
       _sum: { discountMinor: true, totalMinor: true },
     });
     return {
-      ...row,
-      state: discountState(row, new Date()),
+      ...toDto(row, discountState(row, new Date())),
       stats: {
         /** Orders (not cancelled) that used the code. */
         orders: stats._count._all,
