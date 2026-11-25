@@ -48,7 +48,7 @@ export default async function MessagePage({ params }: PageProps<'/inbox/[id]'>) 
           Inbox
         </Link>
         <div className="flex flex-col gap-1.5">
-          <h1 className="text-[22px] font-semibold break-words">{title}</h1>
+          <h1 className="text-[22px] font-semibold wrap-break-word">{title}</h1>
           <div className="flex flex-wrap items-center gap-2 text-[14px] text-muted">
             <Badge tone={status.tone}>{status.label}</Badge>
             <span>{TOPIC_LABEL[message.topic]}</span>
@@ -60,13 +60,13 @@ export default async function MessagePage({ params }: PageProps<'/inbox/[id]'>) 
       <Card className="flex flex-col gap-4 p-5">
         <div className="flex flex-col gap-0.5">
           <h2 className="text-[16px] font-semibold">{message.name}</h2>
-          <p className="text-[14px] break-words text-muted">
+          <p className="text-[14px] wrap-break-word text-muted">
             {[message.email, message.phone ? formatPhone(message.phone) : null]
               .filter(Boolean)
               .join(' · ')}
           </p>
         </div>
-        <p className="text-[15px] break-words whitespace-pre-line">{message.message}</p>
+        <p className="text-[15px] wrap-break-word whitespace-pre-line">{message.message}</p>
         <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
           {message.email ? (
             <a

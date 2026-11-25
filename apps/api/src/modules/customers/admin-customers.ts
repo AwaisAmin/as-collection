@@ -1,3 +1,4 @@
+import type { AdminCustomerDto, AdminCustomerListDto, CustomerStatus } from '@as/contracts';
 import {
   Body,
   Controller,
@@ -36,7 +37,7 @@ import { Actor, Staff } from '../staff/staff-auth.guard.js';
 export const customersQuerySchema = z.object({
   /** Phone (any spelling), email or part of the name. */
   q: z.string().trim().min(1).max(100).optional(),
-  status: z.enum(['ACTIVE', 'BLOCKED']).optional(),
+  status: z.enum(['ACTIVE', 'BLOCKED'] satisfies CustomerStatus[]).optional(),
   page: z.coerce.number().int().min(1).max(10_000).default(1),
   pageSize: z.coerce.number().int().min(1).max(100).default(25),
 });
@@ -75,7 +76,7 @@ export class AdminCustomersService {
     private readonly sessions: SessionService,
   ) {}
 
-  async list(query: CustomersQuery) {
+  async list(query: CustomersQuery): Promise<AdminCustomerListDto> {
     const where: Prisma.CustomerWhereInput = {
       status: query.status,
       ...(query.q ? customerSearchWhere(query.q) : {}),
@@ -114,9 +115,11 @@ export class AdminCustomersService {
         const s = byCustomer.get(r.id);
         return {
           ...r,
+          lastLoginAt: r.lastLoginAt?.toISOString() ?? null,
+          createdAt: r.createdAt.toISOString(),
           orders: s?._count._all ?? 0,
           spentMinor: s?._sum.totalMinor ?? 0,
-          lastOrderAt: s?._max.createdAt ?? null,
+          lastOrderAt: s?._max.createdAt?.toISOString() ?? null,
         };
       }),
       page: query.page,
@@ -126,7 +129,7 @@ export class AdminCustomersService {
     };
   }
 
-  async get(id: string) {
+  async get(id: string): Promise<AdminCustomerDto> {
     const customer = await this.prisma.customer.findUnique({
       where: { id },
       select: {
@@ -187,11 +190,18 @@ export class AdminCustomersService {
       }),
     ]);
     const { googleSub, _count, orders, ...rest } = customer;
+    const iso = (date: Date | null) => date?.toISOString() ?? null;
     return {
       ...rest,
+      blockedAt: iso(rest.blockedAt),
+      phoneVerifiedAt: iso(rest.phoneVerifiedAt),
+      emailVerifiedAt: iso(rest.emailVerifiedAt),
+      lastLoginAt: iso(rest.lastLoginAt),
+      createdAt: rest.createdAt.toISOString(),
+      updatedAt: rest.updatedAt.toISOString(),
       /** Signs in with Google (the subject id itself is never shown). */
       hasGoogle: googleSub !== null,
-      recentOrders: orders,
+      recentOrders: orders.map((o) => ({ ...o, createdAt: o.createdAt.toISOString() })),
       stats: {
         orders: _count.orders,
         countedOrders: spent._count._all,
@@ -202,7 +212,11 @@ export class AdminCustomersService {
     };
   }
 
-  async update(id: string, input: z.infer<typeof updateCustomerSchema>, actor: AuditActor) {
+  async update(
+    id: string,
+    input: z.infer<typeof updateCustomerSchema>,
+    actor: AuditActor,
+  ): Promise<AdminCustomerDto> {
     await this.prisma.$transaction(async (tx) => {
       if (!(await lockRow(tx, 'customers', id))) throw customerNotFound();
       const before = await tx.customer.findUniqueOrThrow({

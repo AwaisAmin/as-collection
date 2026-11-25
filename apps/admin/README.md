@@ -42,6 +42,12 @@ on stdin). Everyone else is added from the panel.
   stored as `/media/…` paths (or https CDN URLs) as the shop requires; the hero and trust bar have
   nothing to set. Settings are validated by the same schema the shop reads them with. Also the
   page's title and search-engine text.
+- **Customers** (`/customers`, under Customers): search by mobile (any spelling), email or name, a
+  Blocked tab, paging. The profile shows spending, orders (linked; "all orders" opens the order list
+  filtered by their phone), reviews, signed-in devices, saved addresses and contact links. Name,
+  marketing consent and an internal note are saved with only the changed fields and a conflict
+  check. Blocking needs a reason and signs them out on every device; unblocking restores sign-in.
+  The order page links to the customer's account.
 - **Inbox** (`/inbox`, under Customers): contact-form messages with New / Read / Archived / All
   tabs, search (name, email, phone, order number, words) and topic filter, cursor paging. A message
   is marked read when it is actually shown (a client effect, so link prefetching never marks it).

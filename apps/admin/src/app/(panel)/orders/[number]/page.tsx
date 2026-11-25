@@ -184,7 +184,18 @@ export default async function OrderPage({ params }: PageProps<'/orders/[number]'
               <p className="font-medium">{customer.fullName}</p>
               <p className="tabular-nums">{formatPhone(customer.phone)}</p>
               {customer.email ? <p className="break-all text-muted">{customer.email}</p> : null}
-              <p className="text-muted">{order.customerId ? 'Has an account' : 'Guest checkout'}</p>
+              {order.customerId && can(permissions, 'customers.read') ? (
+                <Link
+                  href={`/customers/${order.customerId}`}
+                  className="w-fit underline-offset-4 hover:underline"
+                >
+                  Open customer account
+                </Link>
+              ) : (
+                <p className="text-muted">
+                  {order.customerId ? 'Has an account' : 'Guest checkout'}
+                </p>
+              )}
             </div>
             <div className="flex gap-2">
               <a href={`tel:${customer.phone}`} className={contactLink}>

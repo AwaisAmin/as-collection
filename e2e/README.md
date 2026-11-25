@@ -20,7 +20,8 @@ link refused, added, moved and saved into the shop's menu, then hidden; header i
 undone; the footer saved back as it was) and reviews (published into the product rating, answered,
 shown on the home page, unpublished; spam rejected with a reason and deleted; test reviews
 removed) and the inbox and newsletter (a message read on opening, noted, archived, restored, marked
-unread; subscribers listed by status and downloaded as CSV, the export audited). Stock,
+unread; subscribers listed by status and downloaded as CSV, the export audited) and customers (found by a local mobile number, details and note saved, a
+conflicting edit refused, blocked with every device signed out, unblocked). Stock,
 category and collection tests restore what they change.
 
 ```bash
