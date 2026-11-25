@@ -6,6 +6,7 @@ import { CartLink } from './cart-link';
 import { MainNav } from './main-nav';
 import { MobileNav } from './mobile-nav';
 import { SearchForm } from './search-form';
+import { WishlistLink } from './wishlist-link';
 
 export function Header() {
   // `relative`: the desktop Shop mega menu is positioned against the header.
@@ -18,6 +19,7 @@ export function Header() {
         <SearchForm inputId="header-search" className="w-47.5 xl:w-55" />
         <div className="ml-6 flex items-center gap-4 xl:ml-9 xl:gap-5">
           <AccountLink />
+          <WishlistLink />
           <CartLink />
         </div>
       </Container>

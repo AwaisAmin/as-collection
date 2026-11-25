@@ -31,7 +31,8 @@ export async function generateMetadata({
   params,
 }: PageProps<'/products/[slug]'>): Promise<Metadata> {
   const product = await catalogService.getProductBySlug((await params).slug);
-  if (!product) return {};
+  // The page then renders the 404 view; the tab should say so too.
+  if (!product) return { title: 'Page not found', robots: { index: false } };
   const image = product.images[0];
   return {
     title: product.name,

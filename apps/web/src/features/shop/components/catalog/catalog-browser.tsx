@@ -1,3 +1,5 @@
+import { redirect } from 'next/navigation';
+
 import { Pagination } from '@/components/ui/pagination';
 import type { CategorySlug } from '@/config/catalog';
 import { catalogHref } from '@/features/catalog/lib/catalog-url';
@@ -39,6 +41,12 @@ export async function CatalogBrowser({
     catalogService.listProducts(query),
     catalogService.getFacets({ category: query.category, q: query.q }),
   ]);
+
+  // A page past the end (an old link, a hand-typed ?page=99) goes to the last page instead of
+  // showing "Showing 1177–16 of 16" with an empty grid.
+  if (results.total > 0 && results.page > results.pageCount) {
+    redirect(catalogHref(basePath, query, { page: results.pageCount }, { includeCategory }));
+  }
 
   const from = results.total === 0 ? 0 : (results.page - 1) * results.pageSize + 1;
   const to = Math.min(results.page * results.pageSize, results.total);

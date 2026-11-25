@@ -16,7 +16,7 @@ export async function generateMetadata({
   params,
 }: PageProps<'/shop/[category]'>): Promise<Metadata> {
   const category = getCategory((await params).category);
-  if (!category) return { title: 'Shop' };
+  if (!category) return { title: 'Page not found', robots: { index: false } };
   return {
     title: category.name,
     description: `Shop ${category.name.toLowerCase()} at AS Collection Hub — free shipping on orders above 2500 and cash on delivery.`,

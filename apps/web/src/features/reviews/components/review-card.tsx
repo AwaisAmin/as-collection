@@ -9,20 +9,28 @@ import { cn } from '@/lib/utils/cn';
 import { formatDate } from '@/lib/utils/format';
 
 import { markReviewHelpful } from '../actions';
+import { rememberHelpfulVote, useHelpfulVote } from '../helpful-votes';
 
 export function ReviewCard({ review }: { review: Review }) {
-  // One vote per shopper (the API ignores repeats), shown optimistically.
-  const [voted, setVoted] = useState(false);
-  const [count, setCount] = useState(review.helpfulCount);
+  // One vote per shopper (the API ignores repeats), shown optimistically and remembered in this
+  // browser, so a reload within the review cache's lifetime still shows it.
+  const remembered = useHelpfulVote(review.id);
+  const [votedNow, setVotedNow] = useState(false);
+  const [countNow, setCountNow] = useState<number | null>(null);
   const [pending, startTransition] = useTransition();
+  const voted = votedNow || remembered !== null;
+  const count = Math.max(review.helpfulCount, countNow ?? 0, remembered ?? 0);
 
   const vote = () => {
     if (voted) return;
-    setVoted(true);
-    setCount((c) => c + 1);
+    setVotedNow(true);
+    setCountNow(review.helpfulCount + 1);
     startTransition(async () => {
       const confirmed = await markReviewHelpful(review.id);
-      if (confirmed !== null) setCount(confirmed);
+      if (confirmed !== null) {
+        setCountNow(confirmed);
+        rememberHelpfulVote(review.id, confirmed);
+      }
     });
   };
 

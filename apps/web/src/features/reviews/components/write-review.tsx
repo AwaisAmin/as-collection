@@ -58,6 +58,7 @@ export function WriteReview({ productSlug, productName, first = false }: WriteRe
 function ReviewForm({ productSlug, onDone }: { productSlug: string; onDone: () => void }) {
   const [state, formAction, pending] = useActionState(submitReview, initialReviewFormState);
   const [bodyLength, setBodyLength] = useState(0);
+  const [edited, setEdited] = useState<{ at: number; names: string[] }>({ at: -1, names: [] });
   const base = useId();
   const ratingLabelId = `${base}-rating-label`;
 
@@ -78,15 +79,34 @@ function ReviewForm({ productSlug, onDone }: { productSlug: string; onDone: () =
     );
   }
 
-  const errors = state.status === 'error' ? state.fieldErrors : {};
-  const values = state.status === 'error' ? state.values : {};
   const formKey = state.status === 'error' ? state.at : 0;
+  // A field's error goes away as soon as it is changed (not only on the next submit).
+  const allErrors: Partial<Record<string, string>> =
+    state.status === 'error' ? state.fieldErrors : {};
+  const errors = Object.fromEntries(
+    Object.entries(allErrors).filter(
+      ([name]) => !(edited.at === formKey && edited.names.includes(name)),
+    ),
+  ) as typeof allErrors;
+  const values = state.status === 'error' ? state.values : {};
 
   return (
     <form
       action={formAction}
       noValidate
       key={formKey}
+      onChange={(event) => {
+        const target = event.target;
+        const name =
+          target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement
+            ? target.name
+            : '';
+        if (!name || !allErrors[name]) return;
+        setEdited((current) => ({
+          at: formKey,
+          names: current.at === formKey ? [...current.names, name] : [name],
+        }));
+      }}
       className="flex flex-col gap-5 px-5 py-6 sm:px-7"
     >
       <input type="hidden" name="productSlug" value={productSlug} />

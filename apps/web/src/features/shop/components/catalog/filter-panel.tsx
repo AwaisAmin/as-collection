@@ -201,9 +201,12 @@ export function FilterPanel({
               />
             </label>
           </div>
-          <p className="text-[14px] text-muted">
-            {formatPrice(facets.priceRange.min)} – {formatPrice(facets.priceRange.max)}
-          </p>
+          {/* No matching products → no range to show (it read "Rs 0 – Rs 0"). */}
+          {facets.priceRange.max > 0 ? (
+            <p className="text-[14px] text-muted">
+              {formatPrice(facets.priceRange.min)} – {formatPrice(facets.priceRange.max)}
+            </p>
+          ) : null}
           <Button type="submit" size="sm" className="self-start">
             Apply
           </Button>

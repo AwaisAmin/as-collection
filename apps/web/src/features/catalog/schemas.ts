@@ -89,7 +89,7 @@ export const reviewInputSchema = z.object({
     .trim()
     .min(10, 'Please write at least a few words (10+ characters).')
     .max(1500, 'Review is too long (1500 characters max).'),
-  author: z.string().trim().min(2, 'Please enter your name.').max(60),
+  author: z.string().trim().min(2, 'Please enter your name (at least 2 letters).').max(60),
   city: z.string().trim().max(60).optional().or(z.literal('')),
 });
 
