@@ -42,6 +42,11 @@ on stdin). Everyone else is added from the panel.
   stored as `/media/…` paths (or https CDN URLs) as the shop requires; the hero and trust bar have
   nothing to set. Settings are validated by the same schema the shop reads them with. Also the
   page's title and search-engine text.
+- **Reviews** (`/reviews`, under Customers): Waiting / Published / Rejected / All tabs (waiting
+  count shown), search, rating and home-page filters, per-product view (linked from the product
+  page), cursor paging. Publish, reject or unpublish with an internal reason, a public store reply,
+  show on the home-page testimonials (published only), delete permanently (not published ones; for
+  spam). Ratings follow automatically.
 - **Menus** (`/menus`): the header, the Shop mega menu and the footer as trees. Items are added,
   renamed, moved up/down, nested under the item above or taken out a level, hidden or removed, and
   the whole tree is saved at once (conflict-checked). Nesting stops at the levels the shop renders

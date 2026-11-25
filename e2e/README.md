@@ -17,7 +17,9 @@ photo, the sale banner, an uploaded Instagram post; every home section's setting
 store settings (a new delivery fee charged by the real checkout quote, derived contact links, a
 refused announcement link, payment accounts confirmed; all settings restored) and menus (a footer
 link refused, added, moved and saved into the shop's menu, then hidden; header items nested and
-undone; the footer saved back as it was). Stock,
+undone; the footer saved back as it was) and reviews (published into the product rating, answered,
+shown on the home page, unpublished; spam rejected with a reason and deleted; test reviews
+removed). Stock,
 category and collection tests restore what they change.
 
 ```bash

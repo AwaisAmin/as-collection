@@ -1,3 +1,9 @@
+import type {
+  AdminReviewCountsDto,
+  AdminReviewDto,
+  AdminReviewListDto,
+  ReviewStatus,
+} from '@as/contracts';
 import { Injectable } from '@nestjs/common';
 import { z } from 'zod';
 
@@ -12,7 +18,7 @@ import { ReviewsService } from '../reviews.service.js';
 
 // ─── Schemas ───
 
-export const reviewStatuses = ['PENDING', 'APPROVED', 'REJECTED'] as const;
+export const reviewStatuses = ['PENDING', 'APPROVED', 'REJECTED'] as const satisfies ReviewStatus[];
 
 export const adminReviewsQuerySchema = z.object({
   status: z.enum(reviewStatuses).optional(),
@@ -67,8 +73,17 @@ const adminReviewSelect = {
 
 type AdminReviewRow = Prisma.ReviewGetPayload<{ select: typeof adminReviewSelect }>;
 
-const toAdminReview = ({ orderItem, ...row }: AdminReviewRow) => ({
+const toAdminReview = ({
+  orderItem,
+  moderatedAt,
+  repliedAt,
+  createdAt,
+  ...row
+}: AdminReviewRow): AdminReviewDto => ({
   ...row,
+  moderatedAt: moderatedAt?.toISOString() ?? null,
+  repliedAt: repliedAt?.toISOString() ?? null,
+  createdAt: createdAt.toISOString(),
   orderNumber: orderItem?.order.number ?? null,
 });
 
@@ -86,7 +101,7 @@ export class AdminReviewsService {
     private readonly catalog: CatalogService,
   ) {}
 
-  async list(query: AdminReviewsQuery) {
+  async list(query: AdminReviewsQuery): Promise<AdminReviewListDto> {
     const where: Prisma.ReviewWhereInput = {
       status: query.status,
       rating: query.rating,
@@ -116,14 +131,14 @@ export class AdminReviewsService {
     };
   }
 
-  async counts() {
+  async counts(): Promise<AdminReviewCountsDto> {
     const groups = await this.prisma.review.groupBy({ by: ['status'], _count: { _all: true } });
-    return Object.fromEntries(
-      reviewStatuses.map((s) => [s, groups.find((g) => g.status === s)?._count._all ?? 0]),
-    );
+    const count = (status: ReviewStatus) =>
+      groups.find((g) => g.status === status)?._count._all ?? 0;
+    return { PENDING: count('PENDING'), APPROVED: count('APPROVED'), REJECTED: count('REJECTED') };
   }
 
-  async get(id: string) {
+  async get(id: string): Promise<AdminReviewDto> {
     const row = await this.prisma.review.findUnique({ where: { id }, select: adminReviewSelect });
     if (!row) throw reviewNotFound();
     return toAdminReview(row);

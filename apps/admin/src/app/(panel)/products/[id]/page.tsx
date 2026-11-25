@@ -52,7 +52,18 @@ export default async function ProductPage({ params, searchParams }: PageProps<'/
             </span>
             <span>
               · {product.summary.orders} {product.summary.orders === 1 ? 'order' : 'orders'} ·{' '}
-              {product.summary.reviews} {product.summary.reviews === 1 ? 'review' : 'reviews'}
+              {can(permissions, 'reviews.moderate') ? (
+                <Link
+                  href={`/reviews?view=all&product=${product.id}`}
+                  className="text-text underline-offset-4 hover:underline"
+                >
+                  {product.summary.reviews} {product.summary.reviews === 1 ? 'review' : 'reviews'}
+                </Link>
+              ) : (
+                <>
+                  {product.summary.reviews} {product.summary.reviews === 1 ? 'review' : 'reviews'}
+                </>
+              )}
             </span>
             <span>· edited {formatDateTime(product.updatedAt)}</span>
           </div>
