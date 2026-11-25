@@ -59,7 +59,11 @@ export const NAVIGATION: readonly NavGroup[] = [
   },
   {
     label: 'Customers',
-    items: [{ label: 'Reviews', href: '/reviews', icon: 'reviews', anyOf: ['reviews.moderate'] }],
+    items: [
+      { label: 'Inbox', href: '/inbox', icon: 'inbox', anyOf: ['inbox.read'] },
+      { label: 'Reviews', href: '/reviews', icon: 'reviews', anyOf: ['reviews.moderate'] },
+      { label: 'Newsletter', href: '/newsletter', icon: 'newsletter', anyOf: ['newsletter.read'] },
+    ],
   },
   {
     label: 'Catalog',

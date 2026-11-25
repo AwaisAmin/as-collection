@@ -1,3 +1,9 @@
+import type {
+  AdminInboxCountsDto,
+  AdminInboxListDto,
+  AdminMessageDto,
+  ContactStatus,
+} from '@as/contracts';
 import { Body, Controller, Get, Header, Injectable, Param, Patch, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { z } from 'zod';
@@ -15,7 +21,7 @@ import { Actor, Staff } from '../../staff/staff-auth.guard.js';
  * Messages are personal data, so every response is `no-store`.
  */
 
-export const contactStatuses = ['NEW', 'READ', 'ARCHIVED'] as const;
+export const contactStatuses = ['NEW', 'READ', 'ARCHIVED'] as const satisfies ContactStatus[];
 const topics = ['ORDER', 'RETURNS', 'PRODUCT', 'WHOLESALE', 'OTHER'] as const;
 
 export const inboxQuerySchema = z.object({
@@ -52,6 +58,13 @@ const messageSelect = {
   handledBy: { select: { id: true, name: true } },
 } satisfies Prisma.ContactMessageSelect;
 
+type MessageRow = Prisma.ContactMessageGetPayload<{ select: typeof messageSelect }>;
+const dates = <T extends Pick<MessageRow, 'createdAt' | 'updatedAt'>>(row: T) => ({
+  ...row,
+  createdAt: row.createdAt.toISOString(),
+  updatedAt: row.updatedAt.toISOString(),
+});
+
 const messageNotFound = () => notFound('MESSAGE_NOT_FOUND', 'Message not found.');
 
 @Injectable()
@@ -61,7 +74,7 @@ export class AdminContactService {
     private readonly audit: AuditService,
   ) {}
 
-  async list(query: InboxQuery) {
+  async list(query: InboxQuery): Promise<AdminInboxListDto> {
     const phone = query.q ? normalizePkMobile(query.q) : null;
     const where: Prisma.ContactMessageWhereInput = {
       status: query.status,
@@ -88,23 +101,23 @@ export class AdminContactService {
     });
     const page = rows.slice(0, query.limit);
     return {
-      items: page.map(({ message, ...m }) => ({ ...m, preview: message.slice(0, 160) })),
+      items: page.map(({ message, ...m }) => ({ ...dates(m), preview: message.slice(0, 160) })),
       nextCursor: rows.length > query.limit ? (page.at(-1)?.id ?? null) : null,
     };
   }
 
-  async counts() {
+  async counts(): Promise<AdminInboxCountsDto> {
     const groups = await this.prisma.contactMessage.groupBy({
       by: ['status'],
       _count: { _all: true },
     });
-    return Object.fromEntries(
-      contactStatuses.map((s) => [s, groups.find((g) => g.status === s)?._count._all ?? 0]),
-    );
+    const count = (status: ContactStatus) =>
+      groups.find((g) => g.status === status)?._count._all ?? 0;
+    return { NEW: count('NEW'), READ: count('READ'), ARCHIVED: count('ARCHIVED') };
   }
 
   /** The full message, plus the order it mentions when that order exists. */
-  async get(id: string) {
+  async get(id: string): Promise<AdminMessageDto> {
     const row = await this.prisma.contactMessage.findUnique({
       where: { id },
       select: messageSelect,
@@ -116,10 +129,14 @@ export class AdminContactService {
           select: { number: true, status: true, paymentStatus: true, totalMinor: true },
         })
       : null;
-    return { ...row, order };
+    return { ...dates(row), order };
   }
 
-  async update(id: string, input: z.infer<typeof updateMessageSchema>, actor: AuditActor) {
+  async update(
+    id: string,
+    input: z.infer<typeof updateMessageSchema>,
+    actor: AuditActor,
+  ): Promise<AdminMessageDto> {
     await this.prisma.$transaction(async (tx) => {
       if (!(await lockRow(tx, 'contact_messages', id))) throw messageNotFound();
       const before = await tx.contactMessage.findUniqueOrThrow({

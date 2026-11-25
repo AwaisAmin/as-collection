@@ -1,5 +1,10 @@
 import { Readable } from 'node:stream';
 
+import type {
+  AdminSubscriberCountsDto,
+  AdminSubscriberListDto,
+  SubscriberStatus,
+} from '@as/contracts';
 import { Controller, Get, Header, Injectable, Query, StreamableFile } from '@nestjs/common';
 import { ApiOperation, ApiProduces, ApiTags } from '@nestjs/swagger';
 import { z } from 'zod';
@@ -15,7 +20,7 @@ import { Actor, Staff } from '../../staff/staff-auth.guard.js';
  * neutralises spreadsheet formulas.
  */
 
-const statuses = ['SUBSCRIBED', 'UNSUBSCRIBED'] as const;
+const statuses = ['SUBSCRIBED', 'UNSUBSCRIBED'] as const satisfies SubscriberStatus[];
 
 export const subscribersQuerySchema = z.object({
   status: z.enum(statuses).optional(),
@@ -47,7 +52,7 @@ export class AdminNewsletterService {
     private readonly audit: AuditService,
   ) {}
 
-  async list(query: z.infer<typeof subscribersQuerySchema>) {
+  async list(query: z.infer<typeof subscribersQuerySchema>): Promise<AdminSubscriberListDto> {
     const rows = await this.prisma.newsletterSubscriber.findMany({
       where: {
         status: query.status,
@@ -68,19 +73,24 @@ export class AdminNewsletterService {
     });
     const page = rows.slice(0, query.limit);
     return {
-      items: page,
+      items: page.map((s) => ({
+        ...s,
+        consentAt: s.consentAt.toISOString(),
+        unsubscribedAt: s.unsubscribedAt?.toISOString() ?? null,
+        createdAt: s.createdAt.toISOString(),
+      })),
       nextCursor: rows.length > query.limit ? (page.at(-1)?.id ?? null) : null,
     };
   }
 
-  async counts() {
+  async counts(): Promise<AdminSubscriberCountsDto> {
     const groups = await this.prisma.newsletterSubscriber.groupBy({
       by: ['status'],
       _count: { _all: true },
     });
-    return Object.fromEntries(
-      statuses.map((s) => [s, groups.find((g) => g.status === s)?._count._all ?? 0]),
-    );
+    const count = (status: SubscriberStatus) =>
+      groups.find((g) => g.status === status)?._count._all ?? 0;
+    return { SUBSCRIBED: count('SUBSCRIBED'), UNSUBSCRIBED: count('UNSUBSCRIBED') };
   }
 
   /** CSV rows, header first, fetched batch by batch. */

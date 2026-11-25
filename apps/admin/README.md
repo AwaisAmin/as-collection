@@ -42,6 +42,13 @@ on stdin). Everyone else is added from the panel.
   stored as `/media/…` paths (or https CDN URLs) as the shop requires; the hero and trust bar have
   nothing to set. Settings are validated by the same schema the shop reads them with. Also the
   page's title and search-engine text.
+- **Inbox** (`/inbox`, under Customers): contact-form messages with New / Read / Archived / All
+  tabs, search (name, email, phone, order number, words) and topic filter, cursor paging. A message
+  is marked read when it is actually shown (a client effect, so link prefetching never marks it).
+  Reply by email (subject prefilled), WhatsApp or call; the order it names with its state; an
+  internal note; archive, back to inbox, mark unread.
+- **Newsletter** (`/newsletter`): subscribed / unsubscribed lists with counts and email search; CSV
+  download through `/newsletter/export` (streams the API's audited, formula-safe export).
 - **Reviews** (`/reviews`, under Customers): Waiting / Published / Rejected / All tabs (waiting
   count shown), search, rating and home-page filters, per-product view (linked from the product
   page), cursor paging. Publish, reject or unpublish with an internal reason, a public store reply,
