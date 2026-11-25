@@ -35,9 +35,12 @@ on stdin). Everyone else is added from the panel.
   hidden / scheduled / ended / needs-fixing state and a one-line summary. Sections are moved,
   shown or hidden, scheduled (Pakistan time), added and removed in place. Structured types have
   forms (category and collection tiles, product carousels and tabs with their product source,
-  recently viewed, customer reviews); the hero and trust bar have nothing to set; sale banner,
-  shop-the-look, brand story and Instagram gallery are edited as checked JSON until their visual
-  editors land. Settings are validated by the same schema the shop reads them with. Also the
+  recently viewed, customer reviews) and visual editors for the image-led ones: sale banner
+  (countdown in Pakistan time, button, picture), brand story, Instagram gallery (posts uploaded or
+  picked from the library, reordered, described, linked) and shop-the-look (product dots placed by
+  clicking the photo, shown in the shop's own 3:4 frame so they land in the same spot). Pictures are
+  stored as `/media/…` paths (or https CDN URLs) as the shop requires; the hero and trust bar have
+  nothing to set. Settings are validated by the same schema the shop reads them with. Also the
   page's title and search-engine text.
 - **Discounts** (`/discounts`): codes by state (active, scheduled, expired, used up, off) with a
   plain summary ("15% off, up to Rs 1,000 · orders over Rs 3,000"). The form: code (with a

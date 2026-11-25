@@ -79,6 +79,10 @@ export default async function PageEditorPage({ params }: PageProps<'/pages/[id]'
           pageId={page.id}
           sections={page.sections}
           lookups={lookups}
+          context={{
+            storefrontUrl: env.STOREFRONT_URL,
+            canUpload: can(permissions, 'media.write'),
+          }}
           canWrite
         />
         <Card className="flex flex-col gap-4 p-5">

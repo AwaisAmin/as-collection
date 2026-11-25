@@ -12,7 +12,8 @@ describe, delete), categories (create with a picture and filter, subcategory, re
 brands (add, hide, delete), attributes (values, swatch, reorder, settings, delete) and collections
 (automatic with preview, hand-picked with products and a schedule, reorder, delete) and discount
 codes (create, applied by the real checkout quote, changed, switched off, deleted) and the home page
-editor (add a carousel, rejected link, move, hide, remove; the home page is restored afterwards). Stock,
+editor (add a carousel, rejected link, move, hide, remove; a shop-the-look dot placed by clicking the
+photo, the sale banner, an uploaded Instagram post; every home section's settings are restored). Stock,
 category and collection tests restore what they change.
 
 ```bash

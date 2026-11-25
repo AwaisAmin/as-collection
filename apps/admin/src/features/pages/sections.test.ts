@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { ADDABLE_TYPES, sectionState, sectionSummary } from './sections';
+import { ADDABLE_TYPES, defaultSettings, sectionState, sectionSummary } from './sections';
 
 const now = new Date('2026-11-21T10:00:00Z');
 const base = { valid: true, isVisible: true, startsAt: null, endsAt: null };
@@ -42,8 +42,12 @@ describe('home page sections', () => {
     ).toBe('Shop · tabs: Makeup');
   });
 
-  it('only offers types it can start with sensible settings', () => {
-    expect(ADDABLE_TYPES).toContain('product-carousel');
-    expect(ADDABLE_TYPES).not.toContain('shop-the-look');
+  it('starts new sections with fresh settings', () => {
+    expect(ADDABLE_TYPES).toContain('shop-the-look');
+    const now = new Date('2026-11-25T00:00:00Z');
+    const banner = defaultSettings('sale-banner', now);
+    expect(banner.id).toBe(`promo-${String(now.getTime())}`);
+    expect(banner.endsAt).toBe('2026-12-09T00:00:00.000Z');
+    expect(defaultSettings('product-carousel')).toMatchObject({ source: { kind: 'newest' } });
   });
 });

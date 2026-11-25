@@ -4,8 +4,8 @@ import type { BadgeTone } from '@/components/ui/badge';
 
 /*
  * Home page section types: what staff call them, what they show, and how they're edited.
- * `form`: a settings form; `none`: nothing to set; `advanced`: the full settings as JSON
- * (rich sections whose editors come with images and hotspots).
+ * `form`: a settings form; `none`: nothing to set; `advanced`: the full settings as JSON (only
+ * for types this admin doesn't know yet).
  */
 
 export interface SectionMeta {
@@ -56,7 +56,7 @@ export const SECTION_TYPES: Record<SectionType, SectionMeta> = {
   'sale-banner': {
     label: 'Sale banner',
     description: 'A campaign banner with a countdown.',
-    editor: 'advanced',
+    editor: 'form',
     repeatable: true,
   },
   'collection-grid': {
@@ -68,7 +68,7 @@ export const SECTION_TYPES: Record<SectionType, SectionMeta> = {
   'shop-the-look': {
     label: 'Shop the look',
     description: 'A styled photo with product hotspots.',
-    editor: 'advanced',
+    editor: 'form',
     repeatable: true,
   },
   testimonials: {
@@ -80,13 +80,13 @@ export const SECTION_TYPES: Record<SectionType, SectionMeta> = {
   'brand-story': {
     label: 'Brand story',
     description: 'A photo with the brand’s story and a link.',
-    editor: 'advanced',
+    editor: 'form',
     repeatable: false,
   },
   'instagram-gallery': {
     label: 'Instagram gallery',
     description: 'A grid of Instagram posts.',
-    editor: 'advanced',
+    editor: 'form',
     repeatable: false,
   },
 };
@@ -115,22 +115,57 @@ export function sectionState(
   return 'live';
 }
 
-/** Settings a new section of each form-edited type starts from. */
-export const DEFAULT_SETTINGS: { [K in SectionType]?: SectionSettingsMap[K] } = {
-  hero: { variant: 'default' },
-  'trust-bar': { settingKey: 'home.trust-features' },
-  'category-grid': { categorySlugs: [] },
-  'product-carousel': { title: 'New arrivals', source: { kind: 'newest' }, limit: 8 },
-  'product-tabs': { title: 'Shop by category', source: { kind: 'newest' }, tabs: [], limit: 8 },
-  'recently-viewed': { minItems: 3 },
-  'collection-grid': { title: 'Shop by occasion', collectionSlugs: [] },
-  testimonials: { title: 'What our customers say', limit: 6 },
-};
+/** Settings a new section starts from (rich types still need a picture before saving). */
+export function defaultSettings(type: SectionType, now = new Date()): Record<string, unknown> {
+  const inTwoWeeks = new Date(now.getTime() + 14 * 24 * 3600_000).toISOString();
+  const blankImage = { src: '', alt: '' };
+  const settings: { [K in SectionType]: SectionSettingsMap[K] } = {
+    hero: { variant: 'default' },
+    'trust-bar': { settingKey: 'home.trust-features' },
+    'category-grid': { categorySlugs: [] },
+    'product-carousel': { title: 'New arrivals', source: { kind: 'newest' }, limit: 8 },
+    'product-tabs': { title: 'Shop by category', source: { kind: 'newest' }, tabs: [], limit: 8 },
+    'recently-viewed': { minItems: 3 },
+    'collection-grid': { title: 'Shop by occasion', collectionSlugs: [] },
+    testimonials: { title: 'What our customers say', limit: 6 },
+    'sale-banner': {
+      id: `promo-${String(now.getTime())}`,
+      eyebrow: 'Limited time',
+      title: '',
+      highlight: '',
+      description: '',
+      endsAt: inTwoWeeks,
+      cta: { label: 'Shop now', href: '/shop?sale=1' },
+      image: blankImage,
+    },
+    'brand-story': {
+      title: 'Our Story',
+      script: '',
+      image: blankImage,
+      cta: { label: 'Read our story', href: '/about' },
+    },
+    'instagram-gallery': {
+      title: 'Follow us on Instagram',
+      handle: '',
+      profileUrl: 'https://instagram.com/',
+      posts: [],
+    },
+    'shop-the-look': {
+      title: 'Shop the look',
+      look: {
+        id: `look-${String(now.getTime())}`,
+        title: '',
+        description: '',
+        image: blankImage,
+        hotspots: [],
+      },
+    },
+  };
+  return { ...settings[type] };
+}
 
-/** Types staff can add here (rich types arrive with their own editors). */
-export const ADDABLE_TYPES = (Object.keys(SECTION_TYPES) as SectionType[]).filter(
-  (type) => DEFAULT_SETTINGS[type] !== undefined,
-);
+/** Every type can be added (one-of-a-kind types only while absent). */
+export const ADDABLE_TYPES = Object.keys(SECTION_TYPES) as SectionType[];
 
 export const SOURCE_LABELS = {
   newest: 'Newest',

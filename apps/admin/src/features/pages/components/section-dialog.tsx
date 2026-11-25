@@ -16,8 +16,11 @@ import type { SaveState } from '@/lib/action-state';
 import { fromPktInput, toPktInput } from '@/lib/format';
 
 import { saveSection } from '../actions';
-import { DEFAULT_SETTINGS, isKnownType, SECTION_TYPES } from '../sections';
+import { defaultSettings, isKnownType, SECTION_TYPES } from '../sections';
+import { type RichContext, RichSettings } from './rich-settings';
 import { type SectionLookups, SectionSettings } from './section-settings';
+
+const RICH_TYPES = new Set(['sale-banner', 'brand-story', 'instagram-gallery', 'shop-the-look']);
 
 /** API paths under `settings.` → the setting's name; anything else stays as is. */
 function splitErrors(errors: Record<string, string> | undefined) {
@@ -40,6 +43,7 @@ export function SectionDialog({
   section,
   addableTypes,
   lookups,
+  context,
   onClose,
 }: {
   pageId: string;
@@ -47,12 +51,13 @@ export function SectionDialog({
   section: AdminSectionDto | null;
   addableTypes: readonly SectionType[];
   lookups: SectionLookups;
+  context: RichContext;
   onClose: () => void;
 }) {
   const id = useId();
   const [type, setType] = useState<string>(section?.type ?? addableTypes[0] ?? 'product-carousel');
   const [settings, setSettings] = useState<Record<string, unknown>>(
-    section?.settings ?? { ...(DEFAULT_SETTINGS[type as SectionType] ?? {}) },
+    () => section?.settings ?? defaultSettings(type as SectionType),
   );
   const [json, setJson] = useState(() => JSON.stringify(section?.settings ?? {}, null, 2));
   const [isVisible, setVisible] = useState(section?.isVisible ?? true);
@@ -160,7 +165,7 @@ export function SectionDialog({
                 onChange={(event) => {
                   const next = event.target.value as SectionType;
                   setType(next);
-                  setSettings({ ...(DEFAULT_SETTINGS[next] ?? {}) });
+                  setSettings(defaultSettings(next));
                 }}
               >
                 {addableTypes.map((t) => (
@@ -177,7 +182,7 @@ export function SectionDialog({
           <Field
             id={`${id}-json`}
             label="Settings (JSON)"
-            hint="Checked by the shop’s rules when you save. A visual editor for this type is on its way."
+            hint="Checked by the shop’s rules when you save. This type is newer than this admin, so it is edited as JSON."
           >
             {(control) => (
               <Textarea
@@ -196,6 +201,14 @@ export function SectionDialog({
               ? 'Its promises are edited in Settings. Here you choose where it sits and when it shows.'
               : 'Nothing to set here. Choose where it sits and when it shows.'}
           </p>
+        ) : RICH_TYPES.has(type) ? (
+          <RichSettings
+            type={type}
+            settings={settings}
+            onChange={setSettings}
+            errors={errors.settings}
+            context={context}
+          />
         ) : (
           <SectionSettings
             type={type}

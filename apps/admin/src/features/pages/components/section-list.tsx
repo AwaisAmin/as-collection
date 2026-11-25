@@ -19,6 +19,7 @@ import {
   sectionState,
   sectionSummary,
 } from '../sections';
+import type { RichContext } from './rich-settings';
 import { SectionDialog } from './section-dialog';
 import type { SectionLookups } from './section-settings';
 
@@ -30,11 +31,14 @@ export function SectionList({
   pageId,
   sections,
   lookups,
+  context,
   canWrite,
 }: {
   pageId: string;
   sections: readonly AdminSectionDto[];
   lookups: SectionLookups;
+  /** Shop address (image previews) and whether this staff member may upload. */
+  context: RichContext;
   canWrite: boolean;
 }) {
   const [editing, setEditing] = useState<AdminSectionDto | 'new' | null>(null);
@@ -199,6 +203,7 @@ export function SectionList({
           section={editing === 'new' ? null : editing}
           addableTypes={addable}
           lookups={lookups}
+          context={context}
           onClose={() => setEditing(null)}
         />
       ) : null}

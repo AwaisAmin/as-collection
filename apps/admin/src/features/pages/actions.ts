@@ -1,5 +1,6 @@
 'use server';
 
+import type { Paginated, ProductSummaryDto } from '@as/contracts';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
@@ -124,4 +125,27 @@ export async function updatePageDetails(
   revalidatePath(`/pages/${pageId.data}`);
   revalidatePath('/pages');
   return { done: 'Page details saved.', at: Date.now() };
+}
+
+const slugsSchema = z
+  .array(
+    z
+      .string()
+      .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
+      .max(120),
+  )
+  .max(48);
+
+/** Names of shop products by slug (hotspots show names, not slugs). Unknown slugs are left out. */
+export async function productNames(slugs: string[]): Promise<Record<string, string>> {
+  const parsed = slugsSchema.safeParse([...new Set(slugs)]);
+  if (!parsed.success || !parsed.data.length) return {};
+  try {
+    const list = await adminCall<Paginated<ProductSummaryDto>>('/catalog/products', {
+      query: { slugs: parsed.data.join(','), pageSize: parsed.data.length },
+    });
+    return Object.fromEntries(list.items.map((p) => [p.slug, p.name]));
+  } catch {
+    return {};
+  }
 }
