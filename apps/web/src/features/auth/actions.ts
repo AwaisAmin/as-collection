@@ -24,7 +24,11 @@ import { endSession, getCurrentUser, getSessionToken, startSession } from './ses
 
 export type RequestOtpState =
   | { ok: true; phone: string; displayPhone: string; resendIn: number; devCode?: string }
-  | { ok: false; error: string };
+  | {
+      ok: false;
+      error: string;
+      /** Seconds until a new code may be requested. */ retryIn?: number;
+    };
 
 export async function requestOtpAction(rawPhone: string): Promise<RequestOtpState> {
   const phone = pkMobileSchema.safeParse(rawPhone);
@@ -36,6 +40,7 @@ export async function requestOtpAction(rawPhone: string): Promise<RequestOtpStat
       return {
         ok: false,
         error: `Too many codes requested. Please try again in ${result.retryIn} seconds.`,
+        retryIn: result.retryIn,
       };
     }
     return {

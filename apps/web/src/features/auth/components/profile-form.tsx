@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
+import { useSubmitKeepingValues } from '@/hooks/use-submit-keeping-values';
 import { formatPkMobile } from '@/lib/utils/phone';
 
 import { type FormState, updateProfileAction } from '../actions';
@@ -16,6 +17,7 @@ const initial: FormState<'name' | 'email'> = { status: 'idle' };
 
 export function ProfileForm({ user }: { user: User }) {
   const [state, formAction, pending] = useActionState(updateProfileAction, initial);
+  const submit = useSubmitKeepingValues(formAction);
   const base = useId();
   const errors = state.status === 'error' ? state.fieldErrors : {};
 
@@ -25,7 +27,7 @@ export function ProfileForm({ user }: { user: User }) {
 
   return (
     <form
-      action={formAction}
+      onSubmit={submit}
       noValidate
       className="flex max-w-xl flex-col gap-5 rounded-card border border-gold/60 bg-ivory p-5 sm:p-7"
     >

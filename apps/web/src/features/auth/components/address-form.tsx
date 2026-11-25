@@ -8,6 +8,7 @@ import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { pakistanCities } from '@/config/cities';
+import { useSubmitKeepingValues } from '@/hooks/use-submit-keeping-values';
 import { formatPkMobile } from '@/lib/utils/phone';
 
 import { type FormState, saveAddressAction } from '../actions';
@@ -24,6 +25,7 @@ interface AddressFormProps {
 
 export function AddressForm({ address, defaults, onSaved }: AddressFormProps) {
   const [state, formAction, pending] = useActionState(saveAddressAction, initial);
+  const submit = useSubmitKeepingValues(formAction);
   const base = useId();
   const errors = state.status === 'error' ? state.fieldErrors : {};
 
@@ -36,7 +38,7 @@ export function AddressForm({ address, defaults, onSaved }: AddressFormProps) {
 
   return (
     <form
-      action={formAction}
+      onSubmit={submit}
       noValidate
       className="grid grid-cols-1 gap-5 px-5 py-6 sm:grid-cols-2 sm:px-7"
     >

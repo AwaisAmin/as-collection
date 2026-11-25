@@ -55,6 +55,8 @@ export function LoginFlow({ next, google }: { next: Route; google: GoogleOption 
       const result = await requestOtpAction(rawPhone);
       if (!result.ok) {
         setError(result.error);
+        // The API's own wait: the countdown shows it instead of a "Resend" that will fail.
+        if (result.retryIn) setResendIn(result.retryIn);
         return;
       }
       setPhone(result.phone);

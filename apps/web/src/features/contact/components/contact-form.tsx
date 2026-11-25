@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { useSubmitKeepingValues } from '@/hooks/use-submit-keeping-values';
 
 import { type ContactState, sendContactMessage } from '../actions';
 import { CONTACT_HONEYPOT, contactTopics } from '../schema';
@@ -16,6 +17,7 @@ const initial: ContactState = { status: 'idle' };
 export function ContactForm() {
   const [state, formAction, pending] = useActionState(sendContactMessage, initial);
   const [dismissed, setDismissed] = useState(false);
+  const submit = useSubmitKeepingValues(formAction, () => setDismissed(false));
   const base = useId();
   const errors = state.status === 'error' ? state.fieldErrors : {};
 
@@ -43,10 +45,7 @@ export function ContactForm() {
 
   return (
     <form
-      action={(fd) => {
-        setDismissed(false);
-        formAction(fd);
-      }}
+      onSubmit={submit}
       noValidate
       className="grid grid-cols-1 gap-5 rounded-card border border-gold/60 bg-ivory p-5 sm:grid-cols-2 sm:p-7"
     >
