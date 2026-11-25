@@ -1,4 +1,11 @@
-import type { AdminPageDto, AdminPageListItemDto } from '@as/contracts';
+import type {
+  AdminMenuDto,
+  AdminMenuItemDto,
+  AdminMenuListItemDto,
+  AdminPageDto,
+  AdminPageListItemDto,
+  MenuItemSettingsDto,
+} from '@as/contracts';
 import { Injectable } from '@nestjs/common';
 
 import {
@@ -406,7 +413,7 @@ export class AdminContentService {
 
   // ─── Menus ───
 
-  async menus() {
+  async menus(): Promise<AdminMenuListItemDto[]> {
     const rows = await this.prisma.menu.findMany({
       orderBy: { key: 'asc' },
       select: {
@@ -419,13 +426,14 @@ export class AdminContentService {
     });
     return rows.map(({ _count, ...m }) => ({
       ...m,
+      updatedAt: m.updatedAt.toISOString(),
       items: _count.items,
       protected: PROTECTED_MENUS.has(m.key),
     }));
   }
 
   /** The full tree, hidden items included (same shape as the PUT body). */
-  async menu(key: string) {
+  async menu(key: string): Promise<AdminMenuDto> {
     const menu = await this.prisma.menu.findUnique({
       where: { key },
       select: {
@@ -448,17 +456,23 @@ export class AdminContentService {
     });
     if (!menu) throw menuNotFound();
     const byParent = Map.groupBy(menu.items, (i) => i.parentId ?? 'root');
-    type Node = Omit<(typeof menu.items)[number], 'parentId'> & { children: Node[] };
-    const build = (parentId: string): Node[] =>
-      (byParent.get(parentId) ?? []).map(({ parentId: _p, ...item }) => ({
+    const build = (parentId: string): AdminMenuItemDto[] =>
+      (byParent.get(parentId) ?? []).map(({ parentId: _p, settings, ...item }) => ({
         ...item,
+        // Written through `menuItemSettingsSchema` only.
+        settings: settings as MenuItemSettingsDto | null,
         children: build(item.id),
       }));
-    return { key: menu.key, name: menu.name, updatedAt: menu.updatedAt, items: build('root') };
+    return {
+      key: menu.key,
+      name: menu.name,
+      updatedAt: menu.updatedAt.toISOString(),
+      items: build('root'),
+    };
   }
 
   /** Creates the menu or replaces its whole tree. */
-  async putMenu(key: string, input: PutMenuInput, actor: AuditActor) {
+  async putMenu(key: string, input: PutMenuInput, actor: AuditActor): Promise<AdminMenuDto> {
     await this.write(async (tx) => {
       await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`menu:${key}`}))`;
       const existing = await tx.menu.findUnique({ where: { key } });

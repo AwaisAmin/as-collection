@@ -42,6 +42,11 @@ on stdin). Everyone else is added from the panel.
   stored as `/media/…` paths (or https CDN URLs) as the shop requires; the hero and trust bar have
   nothing to set. Settings are validated by the same schema the shop reads them with. Also the
   page's title and search-engine text.
+- **Menus** (`/menus`): the header, the Shop mega menu and the footer as trees. Items are added,
+  renamed, moved up/down, nested under the item above or taken out a level, hidden or removed, and
+  the whole tree is saved at once (conflict-checked). Nesting stops at the levels the shop renders
+  (header 2, Shop menu 2, footer 1); Shop menu top items choose a role (category column, link
+  group, feature card). Links follow the API rule (site path, https, tel:, mailto:).
 - **Settings** (`/settings`): one card per store setting, each saved on its own and
   conflict-checked: store details; contact (a Pakistani mobile typed once → shown number, `tel:`,
   WhatsApp and `mailto:` links derived); social links (the four networks the shop has icons for);

@@ -1,5 +1,5 @@
-/* Content pages and their sections (`/admin/pages`). */
-import type { PublicSettingsDto, SectionType } from '../content.js';
+/* Content pages and their sections (`/admin/pages`), menus and store settings. */
+import type { MenuItemSettingsDto, PublicSettingsDto, SectionType } from '../content.js';
 
 export type PageStatus = 'DRAFT' | 'PUBLISHED';
 
@@ -43,6 +43,38 @@ export interface AdminPageDto {
   createdAt: string;
   updatedAt: string;
   sections: AdminSectionDto[];
+}
+
+// ─── Menus (`/admin/menus`) ───
+
+export interface AdminMenuListItemDto {
+  id: string;
+  key: string;
+  name: string;
+  updatedAt: string;
+  /** Items at every level, hidden ones included. */
+  items: number;
+  /** The shop reads it: it can't be deleted. */
+  protected: boolean;
+}
+
+export interface AdminMenuItemDto {
+  id: string;
+  label: string;
+  url: string | null;
+  openInNewTab: boolean;
+  /** Hidden items (and everything under them) stay out of the shop. */
+  isVisible: boolean;
+  settings: MenuItemSettingsDto | null;
+  children: AdminMenuItemDto[];
+}
+
+/** The whole tree; saved back whole with `PUT /admin/menus/:key` (same shape, no ids). */
+export interface AdminMenuDto {
+  key: string;
+  name: string;
+  updatedAt: string;
+  items: AdminMenuItemDto[];
 }
 
 // ─── Store settings (`/admin/settings`) ───

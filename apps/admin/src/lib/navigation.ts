@@ -18,6 +18,7 @@ export type NavIcon =
   | 'customers'
   | 'newsletter'
   | 'content'
+  | 'menus'
   | 'settings'
   | 'staff'
   | 'audit';
@@ -77,6 +78,7 @@ export const NAVIGATION: readonly NavGroup[] = [
     label: 'Shop content',
     items: [
       { label: 'Pages', href: '/pages', icon: 'content', anyOf: ['content.write'] },
+      { label: 'Menus', href: '/menus', icon: 'menus', anyOf: ['content.write'] },
       { label: 'Settings', href: '/settings', icon: 'settings', anyOf: ['settings.write'] },
     ],
   },

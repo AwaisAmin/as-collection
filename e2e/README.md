@@ -15,7 +15,9 @@ codes (create, applied by the real checkout quote, changed, switched off, delete
 editor (add a carousel, rejected link, move, hide, remove; a shop-the-look dot placed by clicking the
 photo, the sale banner, an uploaded Instagram post; every home section's settings are restored) and
 store settings (a new delivery fee charged by the real checkout quote, derived contact links, a
-refused announcement link, payment accounts confirmed; all settings restored). Stock,
+refused announcement link, payment accounts confirmed; all settings restored) and menus (a footer
+link refused, added, moved and saved into the shop's menu, then hidden; header items nested and
+undone; the footer saved back as it was). Stock,
 category and collection tests restore what they change.
 
 ```bash
