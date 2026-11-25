@@ -75,7 +75,10 @@ export const NAVIGATION: readonly NavGroup[] = [
   },
   {
     label: 'Shop content',
-    items: [{ label: 'Pages', href: '/pages', icon: 'content', anyOf: ['content.write'] }],
+    items: [
+      { label: 'Pages', href: '/pages', icon: 'content', anyOf: ['content.write'] },
+      { label: 'Settings', href: '/settings', icon: 'settings', anyOf: ['settings.write'] },
+    ],
   },
 ];
 

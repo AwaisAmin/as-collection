@@ -13,7 +13,9 @@ brands (add, hide, delete), attributes (values, swatch, reorder, settings, delet
 (automatic with preview, hand-picked with products and a schedule, reorder, delete) and discount
 codes (create, applied by the real checkout quote, changed, switched off, deleted) and the home page
 editor (add a carousel, rejected link, move, hide, remove; a shop-the-look dot placed by clicking the
-photo, the sale banner, an uploaded Instagram post; every home section's settings are restored). Stock,
+photo, the sale banner, an uploaded Instagram post; every home section's settings are restored) and
+store settings (a new delivery fee charged by the real checkout quote, derived contact links, a
+refused announcement link, payment accounts confirmed; all settings restored). Stock,
 category and collection tests restore what they change.
 
 ```bash

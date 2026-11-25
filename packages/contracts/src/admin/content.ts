@@ -1,5 +1,5 @@
 /* Content pages and their sections (`/admin/pages`). */
-import type { SectionType } from '../content.js';
+import type { PublicSettingsDto, SectionType } from '../content.js';
 
 export type PageStatus = 'DRAFT' | 'PUBLISHED';
 
@@ -43,4 +43,23 @@ export interface AdminPageDto {
   createdAt: string;
   updatedAt: string;
   sections: AdminSectionDto[];
+}
+
+// ─── Store settings (`/admin/settings`) ───
+
+/** Every editable setting key with its value type (the same shapes the shop reads). */
+export type StoreSettingValues = Required<PublicSettingsDto>;
+export type StoreSettingKey = keyof StoreSettingValues;
+
+export interface AdminSettingDto<K extends StoreSettingKey = StoreSettingKey> {
+  key: K;
+  /** What it is, in a few words. */
+  label: string;
+  /** Null until first saved. */
+  value: StoreSettingValues[K] | null;
+  /** False: the stored value fails its rules, so the shop ignores it. */
+  valid: boolean;
+  /** Send back as `updatedAt` when saving (null for a first save). */
+  updatedAt: string | null;
+  updatedBy: { id: string; name: string } | null;
 }

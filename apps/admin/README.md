@@ -42,6 +42,12 @@ on stdin). Everyone else is added from the panel.
   stored as `/media/…` paths (or https CDN URLs) as the shop requires; the hero and trust bar have
   nothing to set. Settings are validated by the same schema the shop reads them with. Also the
   page's title and search-engine text.
+- **Settings** (`/settings`): one card per store setting, each saved on its own and
+  conflict-checked: store details; contact (a Pakistani mobile typed once → shown number, `tel:`,
+  WhatsApp and `mailto:` links derived); social links (the four networks the shop has icons for);
+  delivery fee, free-delivery threshold and return window (checkout uses a new fee at once);
+  payment accounts per channel with a "these are the real accounts" confirmation; announcement bar
+  messages; trust-bar promises (each icon once, since the shop picks icons by id).
 - **Discounts** (`/discounts`): codes by state (active, scheduled, expired, used up, off) with a
   plain summary ("15% off, up to Rs 1,000 · orders over Rs 3,000"). The form: code (with a
   readable random generator; fixed once used), percent / amount off / free delivery, cap, minimum

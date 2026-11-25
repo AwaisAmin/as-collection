@@ -1,3 +1,4 @@
+import type { AdminSettingDto } from '@as/contracts';
 import { Injectable } from '@nestjs/common';
 
 import { assertFresh, conflict, notFound } from '../../../common/admin-write.js';
@@ -43,7 +44,7 @@ export class AdminSettingsService {
     private readonly storefront: StorefrontRevalidator,
   ) {}
 
-  async list() {
+  async list(): Promise<AdminSettingDto[]> {
     const rows = await this.prisma.setting.findMany({
       where: { key: { in: Object.keys(SETTING_SCHEMAS) } },
       select: {
@@ -59,16 +60,17 @@ export class AdminSettingsService {
       return {
         key,
         label: SETTING_LABELS[key],
-        value: row?.value ?? null,
+        // Shapes are those of PUBLIC_SETTINGS (`settingsMatchContract` checks them at compile time).
+        value: (row?.value ?? null) as AdminSettingDto['value'],
         /** False: stored value fails its schema, so the storefront ignores it. */
         valid: row ? SETTING_SCHEMAS[key].safeParse(row.value).success : false,
-        updatedAt: row?.updatedAt ?? null,
+        updatedAt: row?.updatedAt.toISOString() ?? null,
         updatedBy: row?.updatedBy ?? null,
       };
     });
   }
 
-  async get(key: string) {
+  async get(key: string): Promise<AdminSettingDto> {
     if (!isSettingKey(key)) throw settingNotFound();
     const found = (await this.list()).find((s) => s.key === key);
     if (!found) throw settingNotFound();
