@@ -66,6 +66,14 @@ export default async function ProductPage({ params, searchParams }: PageProps<'/
               )}
             </span>
             <span>· edited {formatDateTime(product.updatedAt)}</span>
+            {can(permissions, 'audit.read') ? (
+              <Link
+                href={`/activity?area=product&record=${product.id}`}
+                className="text-text underline-offset-4 hover:underline"
+              >
+                History
+              </Link>
+            ) : null}
           </div>
         </div>
       </div>

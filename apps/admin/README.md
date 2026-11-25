@@ -57,6 +57,10 @@ on stdin). Everyone else is added from the panel.
   (`/admin/auth/permissions`). Permissions you don't hold are greyed out (`covers` in
   `lib/permissions.ts`, the API's anti-escalation rule). Built-in roles are read-only; a role in use
   can't be deleted.
+- **Activity log** (`/activity`, under Administration): the append-only audit trail in words
+  (`features/activity/labels.ts`: action names, record links, a short before → after summary), filtered
+  by area and person, with each record's own history (`?record=`) and raw details (action, IP,
+  browser, request id, changes JSON). Staff, customer and product pages link to their history.
 - **Inbox** (`/inbox`, under Customers): contact-form messages with New / Read / Archived / All
   tabs, search (name, email, phone, order number, words) and topic filter, cursor paging. A message
   is marked read when it is actually shown (a client effect, so link prefetching never marks it).

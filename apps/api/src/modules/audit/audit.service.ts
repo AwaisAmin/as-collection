@@ -1,3 +1,4 @@
+import type { AdminAuditListDto } from '@as/contracts';
 import { Injectable } from '@nestjs/common';
 
 import type { JsonValue } from '../../common/http/problem-details.js';
@@ -92,7 +93,7 @@ export class AuditService {
     action?: string;
     before?: string;
     limit: number;
-  }) {
+  }): Promise<AdminAuditListDto> {
     const rows = await this.prisma.auditLog.findMany({
       where: {
         actorStaffId: query.actorStaffId,

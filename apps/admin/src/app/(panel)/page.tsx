@@ -16,7 +16,7 @@ interface Tile {
   icon: LucideIcon;
   /** null: could not be loaded right now. */
   value: number | null;
-  /** The list where this work is done (once that area exists). */
+  /** The list where this work is done. */
   href?: Route;
 }
 
@@ -85,9 +85,16 @@ export default async function DashboardPage({ searchParams }: PageProps<'/'>) {
       hint: 'Waiting for approval',
       icon: Star,
       value: reviews,
+      href: '/reviews' as Route,
     });
   if (inbox !== undefined)
-    tiles.push({ label: 'Unread messages', hint: 'Contact form inbox', icon: Inbox, value: inbox });
+    tiles.push({
+      label: 'Unread messages',
+      hint: 'Contact form inbox',
+      icon: Inbox,
+      value: inbox,
+      href: '/inbox' as Route,
+    });
   if (lowStock !== undefined)
     tiles.push({
       label: 'Low stock',

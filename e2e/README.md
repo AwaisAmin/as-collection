@@ -23,7 +23,8 @@ removed) and the inbox and newsletter (a message read on opening, noted, archive
 unread; subscribers listed by status and downloaded as CSV, the export audited) and customers (found by a local mobile number, details and note saved, a
 conflicting edit refused, blocked with every device signed out, unblocked) and staff and roles (role created, member added
 with it, password reset, access off and on, role in use not deletable, removed and deleted; own
-access read-only). Stock,
+access read-only) and the activity log (sign-in and a role change shown, filtered by person and
+area, linked to the record and its history). Stock,
 category and collection tests restore what they change.
 
 ```bash

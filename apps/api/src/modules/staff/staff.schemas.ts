@@ -77,12 +77,12 @@ export const auditQuerySchema = z.looseObject({
   actorStaffId: z.uuid().optional(),
   entityType: z
     .string()
-    .regex(/^[a-z-]{1,60}$/)
+    .regex(/^[a-z_-]{1,60}$/)
     .optional(),
   entityId: z.string().max(64).optional(),
   action: z
     .string()
-    .regex(/^[a-z.-]{1,100}$/)
+    .regex(/^[a-z._-]{1,100}$/)
     .optional(),
   before: z.uuid().optional(),
   limit: z.coerce.number().int().min(1).max(100).default(50),

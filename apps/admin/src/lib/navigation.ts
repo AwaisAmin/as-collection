@@ -97,6 +97,7 @@ export const NAVIGATION: readonly NavGroup[] = [
     items: [
       { label: 'Staff', href: '/staff', icon: 'staff', anyOf: ['staff.manage'] },
       { label: 'Roles', href: '/roles', icon: 'roles', anyOf: ['roles.manage', 'staff.manage'] },
+      { label: 'Activity log', href: '/activity', icon: 'audit', anyOf: ['audit.read'] },
     ],
   },
 ];

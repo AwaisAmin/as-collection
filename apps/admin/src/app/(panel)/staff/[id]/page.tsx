@@ -59,6 +59,14 @@ export default async function StaffMemberPage({ params, searchParams }: PageProp
             )}
             {person.locked ? <Badge tone="warning">Locked</Badge> : null}
             <span className="break-all">{person.email}</span>
+            {can(permissions, 'audit.read') ? (
+              <Link
+                href={`/activity?actor=${person.id}`}
+                className="text-text underline-offset-4 hover:underline"
+              >
+                Their activity
+              </Link>
+            ) : null}
           </div>
         </div>
       </div>

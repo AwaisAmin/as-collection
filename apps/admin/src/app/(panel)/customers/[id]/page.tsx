@@ -81,6 +81,14 @@ export default async function CustomerPage({ params }: PageProps<'/customers/[id
               <Badge tone={status.tone}>{status.label}</Badge>
               {customer.hasGoogle ? <Badge>Google sign-in</Badge> : null}
               <span>Joined {formatDate(customer.createdAt)}</span>
+              {can(permissions, 'audit.read') ? (
+                <Link
+                  href={`/activity?area=customer&record=${customer.id}`}
+                  className="text-text underline-offset-4 hover:underline"
+                >
+                  History
+                </Link>
+              ) : null}
               <span>
                 ·{' '}
                 {customer.lastLoginAt

@@ -516,6 +516,12 @@ describe('staff auth, RBAC & audit (e2e)', () => {
         .expect(200);
       const olderId = (next.body as { items: { id: string }[] }).items[0]?.id ?? '';
       expect(olderId < (nextCursor ?? '')).toBe(true);
+
+      // Record types with an underscore (contact messages) can be filtered too.
+      await http()
+        .get(api('/admin/audit-logs?entityType=contact_message&action=staff.login_x'))
+        .set(bearer(token))
+        .expect(200);
     });
 
     it('is append-only in the database', async () => {
