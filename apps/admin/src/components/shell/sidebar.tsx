@@ -16,6 +16,7 @@ import {
   ScrollText,
   Settings,
   Shapes,
+  ShieldCheck,
   SlidersHorizontal,
   Star,
   Tag,
@@ -47,6 +48,7 @@ const ICONS: Record<NavIcon, LucideIcon> = {
   menus: ListTree,
   settings: Settings,
   staff: UserCog,
+  roles: ShieldCheck,
   audit: ScrollText,
 };
 

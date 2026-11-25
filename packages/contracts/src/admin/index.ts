@@ -6,3 +6,4 @@ export type * from './content.js';
 export type * from './reviews.js';
 export type * from './engagement.js';
 export type * from './customers.js';
+export type * from './staff.js';

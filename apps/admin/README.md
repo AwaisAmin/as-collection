@@ -48,6 +48,15 @@ on stdin). Everyone else is added from the panel.
   marketing consent and an internal note are saved with only the changed fields and a conflict
   check. Blocking needs a reason and signs them out on every device; unblocking restores sign-in.
   The order page links to the customer's account.
+- **Staff** (`/staff`, under Administration): everyone with admin access, with flags (you, access
+  off, locked, temporary password, no authenticator). Add a member with a generated temporary
+  password (16 unambiguous characters) and roles; per person: name and roles, reset password, reset
+  authenticator, unlock, sign out everywhere, turn access off/on. Your own roles and access can only
+  be changed by someone else; people holding access you lack are shown read-only.
+- **Roles** (`/roles`): permission sets edited by area from the API's catalog
+  (`/admin/auth/permissions`). Permissions you don't hold are greyed out (`covers` in
+  `lib/permissions.ts`, the API's anti-escalation rule). Built-in roles are read-only; a role in use
+  can't be deleted.
 - **Inbox** (`/inbox`, under Customers): contact-form messages with New / Read / Archived / All
   tabs, search (name, email, phone, order number, words) and topic filter, cursor paging. A message
   is marked read when it is actually shown (a client effect, so link prefetching never marks it).

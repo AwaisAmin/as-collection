@@ -21,6 +21,7 @@ export type NavIcon =
   | 'menus'
   | 'settings'
   | 'staff'
+  | 'roles'
   | 'audit';
 
 export interface NavItem {
@@ -89,6 +90,13 @@ export const NAVIGATION: readonly NavGroup[] = [
       { label: 'Pages', href: '/pages', icon: 'content', anyOf: ['content.write'] },
       { label: 'Menus', href: '/menus', icon: 'menus', anyOf: ['content.write'] },
       { label: 'Settings', href: '/settings', icon: 'settings', anyOf: ['settings.write'] },
+    ],
+  },
+  {
+    label: 'Administration',
+    items: [
+      { label: 'Staff', href: '/staff', icon: 'staff', anyOf: ['staff.manage'] },
+      { label: 'Roles', href: '/roles', icon: 'roles', anyOf: ['roles.manage', 'staff.manage'] },
     ],
   },
 ];

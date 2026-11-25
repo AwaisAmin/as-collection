@@ -1,3 +1,4 @@
+import type { AdminRoleDto, AdminStaffDto } from '@as/contracts';
 import { HttpStatus, Injectable } from '@nestjs/common';
 
 import { DomainException } from '../../common/http/problem-details.js';
@@ -35,7 +36,7 @@ const staffListSelect = {
 
 type StaffRow = Prisma.StaffUserGetPayload<{ select: typeof staffListSelect }>;
 
-const toStaffDto = (s: StaffRow) => ({
+const toStaffDto = (s: StaffRow): AdminStaffDto => ({
   id: s.id,
   email: s.email,
   name: s.name,
@@ -86,7 +87,7 @@ export class StaffAdminService {
 
   // ─── Staff ───
 
-  async listStaff() {
+  async listStaff(): Promise<AdminStaffDto[]> {
     const rows = await this.prisma.staffUser.findMany({
       orderBy: [{ status: 'asc' }, { name: 'asc' }],
       select: staffListSelect,
@@ -94,7 +95,11 @@ export class StaffAdminService {
     return rows.map(toStaffDto);
   }
 
-  async createStaff(actor: StaffPrincipal, audit: AuditActor, body: CreateStaffBody) {
+  async createStaff(
+    actor: StaffPrincipal,
+    audit: AuditActor,
+    body: CreateStaffBody,
+  ): Promise<AdminStaffDto> {
     assertAcceptablePassword(body.password, body.email);
     const passwordHash = await hashPassword(body.password);
     try {
@@ -253,7 +258,7 @@ export class StaffAdminService {
 
   // ─── Roles ───
 
-  async listRoles() {
+  async listRoles(): Promise<AdminRoleDto[]> {
     const roles = await this.prisma.role.findMany({
       orderBy: [{ isSystem: 'desc' }, { name: 'asc' }],
       select: {
