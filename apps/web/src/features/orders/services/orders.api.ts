@@ -1,6 +1,7 @@
 import 'server-only';
 
 import type {
+  DiscountRejection,
   OrderDto,
   OrderPageDto,
   PlacedOrderDto,
@@ -10,7 +11,7 @@ import type {
 
 import { env } from '@/config/env';
 import { siteConfig } from '@/config/site';
-import { toMinor } from '@/features/catalog/services/api-mappers';
+import { toMinor, toRupees } from '@/features/catalog/services/api-mappers';
 import { ApiError, apiFindOrNull, apiRequest, type RequestOptions } from '@/lib/api/http-client';
 import { reportError } from '@/lib/errors/report-error';
 
@@ -23,7 +24,7 @@ import {
   toTrackedOrder,
 } from '../lib/order-mappers';
 import type { OrderAccess, PlaceOrderResult } from '../types';
-import type { OrderActionResult, OrdersService } from './orders.service';
+import type { DiscountCheck, OrderActionResult, OrdersService } from './orders.service';
 
 /* Adapter: the NestJS checkout and orders API. Order reads are never cached (personal data). */
 
@@ -62,7 +63,53 @@ async function uploadProof(
   });
 }
 
+/** Why a code was refused, in the shopper's words. */
+export function discountMessage(reason: DiscountRejection, minSubtotalMinor?: number): string {
+  switch (reason) {
+    case 'NOT_FOUND':
+      return 'We couldn’t find that code. Check the spelling and try again.';
+    case 'INACTIVE':
+      return 'This code isn’t active.';
+    case 'NOT_STARTED':
+      return 'This code isn’t active yet.';
+    case 'EXPIRED':
+      return 'This code has expired.';
+    case 'USAGE_LIMIT':
+      return 'This code has already been used the maximum number of times.';
+    case 'MIN_SUBTOTAL':
+      return minSubtotalMinor
+        ? `Spend Rs ${toRupees(minSubtotalMinor).toLocaleString('en-PK')} or more to use this code.`
+        : 'Your order is below this code’s minimum.';
+  }
+}
+
 export const apiOrdersService: OrdersService = {
+  async checkDiscount(lines, code, ctx): Promise<DiscountCheck> {
+    const quote = await apiRequest<QuoteDto>('/checkout/quote', {
+      method: 'POST',
+      body: { lines, discountCode: code },
+      token: ctx.token,
+      clientIp: ctx.ip,
+      userAgent: ctx.userAgent,
+    });
+    const result = quote.discount;
+    if (!result) return { ok: false, code, message: 'This code can’t be used.' };
+    if (!result.applied) {
+      return {
+        ok: false,
+        code: result.code,
+        message: discountMessage(result.reason, result.minSubtotalMinor),
+      };
+    }
+    return {
+      ok: true,
+      code: result.code,
+      discount: toRupees(result.discountMinor),
+      freeShipping: result.freeShipping,
+      total: toRupees(quote.totalMinor),
+    };
+  },
+
   async placeOrder(input, ctx): Promise<PlaceOrderResult> {
     let placed: PlacedOrderDto;
     try {
@@ -83,6 +130,7 @@ export const apiOrdersService: OrdersService = {
           ...(input.shipping.notes ? { notes: input.shipping.notes } : {}),
           paymentMethod: toApiPaymentMethod(input.payment.method, input.payment.channel),
           lines: input.lines,
+          ...(input.discountCode ? { discountCode: input.discountCode } : {}),
           expectedTotalMinor: toMinor(input.expectedTotal),
         },
         token: ctx.token,
@@ -96,7 +144,12 @@ export const apiOrdersService: OrdersService = {
       if (error instanceof ApiError && error.status === 409 && quote) {
         return {
           ok: false,
-          reason: error.code === 'OUT_OF_STOCK' ? 'stock_changed' : 'price_changed',
+          reason:
+            error.code === 'OUT_OF_STOCK'
+              ? 'stock_changed'
+              : error.code === 'DISCOUNT_INVALID'
+                ? 'discount_invalid'
+                : 'price_changed',
           snapshots: quoteSnapshots(quote),
           shipping: quoteShippingRules(quote, siteConfig.shippingFee),
         };

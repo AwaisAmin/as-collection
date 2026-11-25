@@ -17,6 +17,17 @@ export const paymentStatusLabel: Record<Order['payment']['status'], string> = {
   refunded: 'Refunded',
 };
 
+/** Payment state in words; a cancelled order that was never paid has nothing left to pay. */
+export function paymentLabel(
+  orderStatus: Order['status'],
+  paymentStatus: Order['payment']['status'],
+): string {
+  const unpaid = paymentStatus !== 'paid' && paymentStatus !== 'refunded';
+  return orderStatus === 'cancelled' && unpaid
+    ? 'Nothing to pay'
+    : paymentStatusLabel[paymentStatus];
+}
+
 export const orderStatusLabel: Record<Order['status'], string> = {
   pending: 'Order placed',
   confirmed: 'Confirmed',
@@ -158,7 +169,7 @@ export function OrderDetails({ order }: { order: Order }) {
             <div className="flex justify-between gap-3">
               <dt className="text-muted">Status</dt>
               <dd className="font-bold text-gold-dark">
-                {paymentStatusLabel[order.payment.status]}
+                {paymentLabel(order.status, order.payment.status)}
               </dd>
             </div>
             <div className="flex justify-between gap-3">

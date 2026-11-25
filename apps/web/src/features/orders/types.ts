@@ -117,6 +117,8 @@ export interface PlaceOrderInput {
     screenshot?: File;
   };
   lines: readonly { variantId: string; quantity: number }[];
+  /** Discount code the shopper applied (checked again by the API). */
+  discountCode?: string;
   /** Total the shopper saw — if the server total differs, they must re-confirm. */
   expectedTotal: number;
 }
@@ -131,7 +133,7 @@ export type PlaceOrderResult =
     }
   | {
       ok: false;
-      reason: 'stock_changed' | 'price_changed';
+      reason: 'stock_changed' | 'price_changed' | 'discount_invalid';
       /** Fresh data so the client can update the cart. */
       snapshots: VariantSnapshot[];
       /** The store's current delivery rules (when they changed, totals differ). */

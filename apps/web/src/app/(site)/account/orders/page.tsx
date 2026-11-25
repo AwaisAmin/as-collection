@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { ButtonLink } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
 import { requireSession } from '@/features/auth/session';
-import { paymentStatusLabel } from '@/features/orders/components/order-details';
+import { paymentLabel } from '@/features/orders/components/order-details';
 import { OrderStatusBadge } from '@/features/orders/components/order-status-badge';
 import { ordersService } from '@/features/orders/services/orders.service';
 import { formatDate, formatPrice, pluralize } from '@/lib/utils/format';
@@ -56,7 +56,7 @@ export default async function AccountOrdersPage() {
                 <p className="font-body text-[18px] font-bold text-ink">{o.orderNumber}</p>
                 <p className="text-[15px] text-muted">
                   {formatDate(o.createdAt)} · {pluralize(o.itemCount, 'item')} ·{' '}
-                  {paymentStatusLabel[o.paymentStatus]}
+                  {paymentLabel(o.status, o.paymentStatus)}
                 </p>
               </div>
               <div className="flex items-center justify-between gap-4 sm:justify-end">

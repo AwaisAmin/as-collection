@@ -25,8 +25,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { pakistanCities } from '@/config/cities';
 import type { TransferChannel } from '@/config/payments';
 import type { Address } from '@/features/auth/types';
+import { CartChangesNotice } from '@/features/cart/components/cart-changes-notice';
 import { OrderSummary } from '@/features/cart/components/order-summary';
 import { useCart } from '@/features/cart/hooks/use-cart';
+import { useCartServerSync } from '@/features/cart/hooks/use-cart-server-sync';
 import { useCartStore } from '@/features/cart/store/cart-store';
 import { useShippingRulesStore } from '@/features/cart/store/shipping-rules-store';
 import type { CartItem } from '@/features/cart/types';
@@ -35,14 +37,15 @@ import { cn } from '@/lib/utils/cn';
 import { formatPrice } from '@/lib/utils/format';
 import { formatPkMobile } from '@/lib/utils/phone';
 
-import { placeOrder } from '../actions';
+import { checkDiscountCode, placeOrder } from '../actions';
 import {
   type CheckoutField,
   checkoutFieldsSchema,
   fieldErrorsFrom,
   validateScreenshot,
 } from '../schemas';
-import { initialCheckoutState } from '../types';
+import { type CheckoutState, initialCheckoutState } from '../types';
+import { DiscountField } from './discount-field';
 import { PaymentSection } from './payment-section';
 
 function Section({ step, title, children }: { step: number; title: string; children: ReactNode }) {
@@ -102,6 +105,8 @@ export function CheckoutView({ prefill }: { prefill?: CheckoutPrefill }) {
   const [selectedAddressId, setSelectedAddressId] = useState<string>(initialAddress?.id ?? 'new');
   const router = useRouter();
   const { items, totals, hydrated } = useCart();
+  // Fresh prices and stock even when the shopper comes straight here (not via the cart page).
+  const { changes: cartChanges, syncing: cartSyncing } = useCartServerSync(hydrated);
   const syncWithServer = useCartStore((s) => s.syncWithServer);
   const setShippingRules = useShippingRulesStore((s) => s.setRules);
   const clearCart = useCartStore((s) => s.clear);
@@ -117,7 +122,75 @@ export function CheckoutView({ prefill }: { prefill?: CheckoutPrefill }) {
   const alertRef = useRef<HTMLDivElement>(null);
   const base = useId();
 
-  const serverErrors = state.status === 'error' ? state.fieldErrors : {};
+  // Discount code: priced by the API; re-checked whenever the cart changes (a percentage
+  // follows the subtotal, a minimum may stop being met).
+  const [appliedDiscount, setDiscount] = useState<{
+    code: string;
+    amount: number;
+    freeShipping: boolean;
+    total: number;
+    /** The cart it was priced for. */
+    linesKey: string;
+    /** The order result current when it was applied (a later "code invalid" drops it). */
+    appliedFor: CheckoutState;
+  } | null>(null);
+  const [rejection, setDiscountError] = useState<string | null>(null);
+  // The order was refused because the code stopped working: it counts as removed.
+  const codeRefused = state.status === 'error' && state.discountRemoved === true;
+  const discount =
+    appliedDiscount && (!codeRefused || appliedDiscount.appliedFor === state)
+      ? appliedDiscount
+      : null;
+  const discountError =
+    appliedDiscount && !discount
+      ? 'This code can no longer be used, so it was removed.'
+      : rejection;
+  const [checkingDiscount, startDiscountCheck] = useTransition();
+  const lines = items
+    .filter((i) => !i.unavailable)
+    .map((i) => ({ variantId: i.variantId, quantity: i.quantity }));
+  const linesKey = JSON.stringify(lines);
+
+  const applyDiscount = (code: string) =>
+    startDiscountCheck(async () => {
+      const result = await checkDiscountCode(code, lines);
+      if (result.ok) {
+        setDiscount({
+          code: result.code,
+          amount: result.discount,
+          freeShipping: result.freeShipping,
+          total: result.total,
+          linesKey,
+          appliedFor: state,
+        });
+        setDiscountError(null);
+      } else {
+        setDiscount(null);
+        setDiscountError(result.message);
+      }
+    });
+
+  // The cart changed after the code was applied: price it again.
+  const staleCode = discount && discount.linesKey !== linesKey ? discount.code : null;
+  useEffect(() => {
+    if (staleCode && linesKey !== '[]') applyDiscount(staleCode);
+    // applyDiscount is recreated each render; the cart key and code are what matter here.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [staleCode, linesKey]);
+  const discountReady = !discount || discount.linesKey === linesKey;
+  const total = discount && discountReady ? discount.total : totals.total;
+
+  // Server errors (e.g. "not a valid image") hide as soon as that field is changed.
+  const [fixedFields, setFixedFields] = useState<{ for: CheckoutState; fields: CheckoutField[] }>({
+    for: initialCheckoutState,
+    fields: [],
+  });
+  const serverErrors = Object.fromEntries(
+    Object.entries(state.status === 'error' ? state.fieldErrors : {}).filter(
+      ([field]) =>
+        !(fixedFields.for === state && fixedFields.fields.includes(field as CheckoutField)),
+    ),
+  ) as Partial<Record<CheckoutField, string>>;
   const errors = { ...serverErrors, ...clientErrors };
   const purchasable = items.filter((i) => !i.unavailable);
 
@@ -161,6 +234,10 @@ export function CheckoutView({ prefill }: { prefill?: CheckoutPrefill }) {
 
   function clearError(field: CheckoutField) {
     setClientErrors(({ [field]: _removed, ...rest }) => rest);
+    setFixedFields((current) => ({
+      for: state,
+      fields: current.for === state ? [...current.fields, field] : [field],
+    }));
   }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -205,7 +282,8 @@ export function CheckoutView({ prefill }: { prefill?: CheckoutPrefill }) {
     );
     checkoutIdRef.current ??= crypto.randomUUID();
     formData.set('checkoutId', checkoutIdRef.current);
-    formData.set('expectedTotal', String(totals.total));
+    formData.set('expectedTotal', String(total));
+    if (discount) formData.set('discountCode', discount.code);
     if (method !== 'bank_transfer') formData.delete('screenshot');
     startTransition(() => formAction(formData));
   }
@@ -219,6 +297,23 @@ export function CheckoutView({ prefill }: { prefill?: CheckoutPrefill }) {
         </div>
         <Skeleton className="h-96 w-full rounded-card" />
       </div>
+    );
+  }
+
+  if (purchasable.length === 0 && state.status !== 'success' && items.length > 0) {
+    // Everything left in the cart sold out (perhaps while this form was open): say so, rather
+    // than "your cart is empty" with no reason.
+    return (
+      <EmptyState
+        icon={ShoppingBag}
+        title="Your items just sold out"
+        description="Everything in your cart sold out or is no longer available. Your cart shows the details."
+        action={
+          <ButtonLink href="/cart" withArrow>
+            View cart
+          </ButtonLink>
+        }
+      />
     );
   }
 
@@ -259,7 +354,7 @@ export function CheckoutView({ prefill }: { prefill?: CheckoutPrefill }) {
             <span className="font-body text-[15px] text-muted">({totals.itemCount})</span>
           </span>
           <span className="flex items-center gap-2 font-body text-[18px] font-bold">
-            {formatPrice(totals.total)}
+            {formatPrice(total)}
             <span aria-hidden className="text-gold-dark transition-transform group-open:rotate-180">
               ▾
             </span>
@@ -271,8 +366,9 @@ export function CheckoutView({ prefill }: { prefill?: CheckoutPrefill }) {
       </details>
 
       <div className="flex flex-col gap-6">
+        <CartChangesNotice changes={cartChanges} />
         <div ref={alertRef} tabIndex={-1} className="empty:hidden focus-visible:outline-none">
-          {state.status === 'error' && state.message ? (
+          {state.status === 'error' && state.message && !(codeRefused && discount) ? (
             <p
               role="alert"
               className="flex gap-3 rounded-xl border border-gold bg-sand px-4 py-3 text-[16px] font-semibold text-ink"
@@ -500,7 +596,7 @@ export function CheckoutView({ prefill }: { prefill?: CheckoutPrefill }) {
             onMethodChange={setMethod}
             channel={channel}
             onChannelChange={setChannel}
-            total={totals.total}
+            total={total}
             errors={errors}
             clearError={clearError}
           />
@@ -515,16 +611,38 @@ export function CheckoutView({ prefill }: { prefill?: CheckoutPrefill }) {
         <OrderSummary
           totals={totals}
           title="Payment summary"
+          discount={
+            discount && discountReady
+              ? {
+                  code: discount.code,
+                  amount: discount.amount,
+                  freeShipping: discount.freeShipping,
+                  total: discount.total,
+                }
+              : null
+          }
           action={
             <>
+              <div className="mb-4">
+                <DiscountField
+                  applied={discount?.code ?? null}
+                  error={discountError}
+                  checking={checkingDiscount}
+                  onApply={applyDiscount}
+                  onRemove={() => {
+                    setDiscount(null);
+                    setDiscountError(null);
+                  }}
+                />
+              </div>
               <Button
                 type="submit"
                 size="lg"
-                disabled={pending || blocked}
+                disabled={pending || blocked || checkingDiscount || !discountReady || cartSyncing}
                 className="h-13 w-full px-5 text-[18px] sm:px-10 sm:text-[20px]"
               >
                 <Lock aria-hidden size={18} />
-                {pending ? 'Placing order…' : `Place order · ${formatPrice(totals.total)}`}
+                {pending ? 'Placing order…' : `Place order · ${formatPrice(total)}`}
               </Button>
               {blocked ? (
                 <p className="mt-2 text-center text-[14px] font-semibold text-gold-dark">

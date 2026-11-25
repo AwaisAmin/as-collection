@@ -2,7 +2,7 @@
 
 Playwright drives production builds of `apps/web` and `apps/admin` against a real `apps/api`,
 PostgreSQL, Redis and storage, on the seeded catalog. It covers browsing (desktop and mobile), guest
-checkout (place → track → cancel, with stock held and released), phone-code sign-in with the
+checkout (place → track → cancel, with stock held and released; discount codes refused with a reason, applied, saved on the order), phone-code sign-in with the
 account pages, the contact and newsletter forms, and the admin panel: staff sign-in (password +
 first-time authenticator setup → dashboard → sign out) and order handling (a bank-transfer order
 with a payment screenshot is verified, shipped and delivered; stock moves from reserved to sold) and

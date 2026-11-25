@@ -169,6 +169,14 @@ describe('evaluateDiscount', () => {
     ).toMatchObject({ applied: true, discountMinor: 200_000 });
   });
 
+  it('rounds percentage discounts down to whole rupees', () => {
+    // 15 % of Rs 1,290 = Rs 193.50 → Rs 193 (totals are confirmed in rupees).
+    expect(evaluateDiscount(rule(), 'x', 129_000, now)).toMatchObject({
+      applied: true,
+      discountMinor: 19_300,
+    });
+  });
+
   it.each([
     [null, 'NOT_FOUND'],
     [rule({ isActive: false }), 'INACTIVE'],

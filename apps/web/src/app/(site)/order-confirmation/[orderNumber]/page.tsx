@@ -1,4 +1,4 @@
-import { CircleCheck, Clock, PackageSearch } from 'lucide-react';
+import { CircleCheck, CircleX, Clock, PackageSearch } from 'lucide-react';
 import type { Metadata, Route } from 'next';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
@@ -57,6 +57,8 @@ async function Confirmation({
     (order.payment.status === 'awaiting_payment' || order.payment.status === 'payment_failed');
 
   const firstName = order.customer.fullName.split(' ')[0];
+  // The link stays valid after the shopper cancels: say so instead of "placed / keep cash ready".
+  const cancelled = order.status === 'cancelled';
   const isCod = order.payment.method === 'cod';
   const trackHref =
     `/track-order?order=${order.orderNumber}&phone=${order.customer.phone}` as Route;
@@ -65,16 +67,26 @@ async function Confirmation({
     <Container className="py-12 sm:py-16">
       <div className="mx-auto flex max-w-2xl flex-col items-center gap-4 text-center">
         <span className="flex size-20 items-center justify-center rounded-full border-2 border-gold bg-ivory shadow-soft">
-          <CircleCheck aria-hidden className="size-10 text-gold-dark" strokeWidth={1.5} />
+          {cancelled ? (
+            <CircleX aria-hidden className="size-10 text-gold-dark" strokeWidth={1.5} />
+          ) : (
+            <CircleCheck aria-hidden className="size-10 text-gold-dark" strokeWidth={1.5} />
+          )}
         </span>
         <h1 className="font-display text-[34px]/[1.15] sm:text-[42px]/[1.15]">
-          Thank you, {firstName}!
+          {cancelled ? 'Order cancelled' : `Thank you, ${firstName}!`}
         </h1>
-        <p className="text-[19px] text-muted">
-          Your order has been placed. We&apos;ll contact you on{' '}
-          <span className="font-semibold text-ink">{formatPkMobile(order.customer.phone)}</span> to
-          confirm it before dispatch.
-        </p>
+        {cancelled ? (
+          <p className="text-[19px] text-muted">
+            This order was cancelled. Nothing will be delivered and nothing is owed.
+          </p>
+        ) : (
+          <p className="text-[19px] text-muted">
+            Your order has been placed. We&apos;ll contact you on{' '}
+            <span className="font-semibold text-ink">{formatPkMobile(order.customer.phone)}</span>{' '}
+            to confirm it before dispatch.
+          </p>
+        )}
 
         <div className="mt-2 flex flex-wrap items-center justify-center gap-3 rounded-full border border-gold bg-ivory px-5 py-2.5">
           <span className="text-[16px] text-muted">Order number</span>
@@ -84,27 +96,29 @@ async function Confirmation({
           <CopyButton value={order.orderNumber} label="order number" />
         </div>
 
-        <div className="mt-2 flex w-full gap-3 rounded-xl border border-gold/60 bg-sand/70 px-4 py-3 text-left text-[16px]">
-          <Clock aria-hidden size={20} className="mt-0.5 shrink-0 text-gold-dark" />
-          {isCod ? (
-            <p>
-              Please keep <span className="font-bold">{formatPrice(order.totals.total)}</span> ready
-              in cash for the courier. Delivery usually takes 2–5 working days.
-            </p>
-          ) : needsScreenshot ? (
-            <p>
-              Transfer <span className="font-bold">{formatPrice(order.totals.total)}</span> and
-              upload the screenshot below. Unpaid transfer orders are cancelled after 48 hours.
-            </p>
-          ) : (
-            <p>
-              We received your payment screenshot. Your order will be confirmed once we verify the
-              payment — usually within a few hours.
-            </p>
-          )}
-        </div>
+        {cancelled ? null : (
+          <div className="mt-2 flex w-full gap-3 rounded-xl border border-gold/60 bg-sand/70 px-4 py-3 text-left text-[16px]">
+            <Clock aria-hidden size={20} className="mt-0.5 shrink-0 text-gold-dark" />
+            {isCod ? (
+              <p>
+                Please keep <span className="font-bold">{formatPrice(order.totals.total)}</span>{' '}
+                ready in cash for the courier. Delivery usually takes 2–5 working days.
+              </p>
+            ) : needsScreenshot ? (
+              <p>
+                Transfer <span className="font-bold">{formatPrice(order.totals.total)}</span> and
+                upload the screenshot below. Unpaid transfer orders are cancelled after 48 hours.
+              </p>
+            ) : (
+              <p>
+                We received your payment screenshot. Your order will be confirmed once we verify the
+                payment — usually within a few hours.
+              </p>
+            )}
+          </div>
+        )}
 
-        {needsScreenshot ? (
+        {needsScreenshot && !cancelled ? (
           <PaymentProofForm
             orderNumber={order.orderNumber}
             accessKey={key}

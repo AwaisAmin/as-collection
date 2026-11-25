@@ -13,6 +13,8 @@ export type CheckoutState =
       snapshots?: VariantSnapshot[];
       /** Present when the store's delivery fee / free-delivery threshold changed. */
       shipping?: ShippingRules;
+      /** The discount code stopped working: the client drops it. */
+      discountRemoved?: boolean;
       at: number;
     }
   | { status: 'success'; orderNumber: string; accessKey: string };

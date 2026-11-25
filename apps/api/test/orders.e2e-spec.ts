@@ -188,7 +188,8 @@ describe('checkout & orders (e2e)', () => {
 
     it('applies and explains coupons', async () => {
       const applied = await quote([{ variantId: mainId, quantity: 1 }], COUPON.toLowerCase());
-      expect(applied).toMatchObject({ discountMinor: 19_350, discount: { applied: true } });
+      // 15 % of Rs 1,290 = Rs 193.50, rounded down to whole rupees.
+      expect(applied).toMatchObject({ discountMinor: 19_300, discount: { applied: true } });
       const unknown = await quote([{ variantId: mainId, quantity: 1 }], 'E2E-NOPE');
       expect(unknown.discount).toMatchObject({ applied: false, reason: 'NOT_FOUND' });
       const tooSmall = await quote([{ variantId: mainId, quantity: 1 }], BIG_ORDER_COUPON);

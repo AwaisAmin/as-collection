@@ -10,10 +10,19 @@ interface OrderSummaryProps {
   /** Primary action (checkout / place order). */
   action?: ReactNode;
   title?: string;
+  /** An applied discount code (checkout): shown as its own line, totals as the API priced them. */
+  discount?: { code: string; amount: number; freeShipping: boolean; total: number } | null;
 }
 
 /** Subtotal, savings, delivery and total — shared by the cart page and checkout. */
-export function OrderSummary({ totals, action, title = 'Order summary' }: OrderSummaryProps) {
+export function OrderSummary({
+  totals,
+  action,
+  title = 'Order summary',
+  discount,
+}: OrderSummaryProps) {
+  const shipping = discount?.freeShipping ? 0 : totals.shipping;
+  const total = discount ? discount.total : totals.total;
   return (
     <section
       aria-labelledby="order-summary-title"
@@ -34,15 +43,21 @@ export function OrderSummary({ totals, action, title = 'Order summary' }: OrderS
             <dd className="font-semibold text-gold-dark">−{formatPrice(totals.savings)}</dd>
           </div>
         ) : null}
+        {discount && discount.amount > 0 ? (
+          <div className="flex justify-between gap-4">
+            <dt className="text-muted">Discount ({discount.code})</dt>
+            <dd className="font-semibold text-gold-dark">−{formatPrice(discount.amount)}</dd>
+          </div>
+        ) : null}
         <div className="flex justify-between gap-4">
           <dt className="text-muted">Delivery</dt>
           <dd className="font-semibold text-ink">
-            {totals.shipping === 0 ? 'Free' : formatPrice(totals.shipping)}
+            {shipping === 0 ? 'Free' : formatPrice(shipping)}
           </dd>
         </div>
         <div className="mt-2 flex items-baseline justify-between gap-4 border-t border-gold/50 pt-4">
           <dt className="font-display text-[20px] text-ink">Total</dt>
-          <dd className="font-body text-[26px] font-bold text-ink">{formatPrice(totals.total)}</dd>
+          <dd className="font-body text-[26px] font-bold text-ink">{formatPrice(total)}</dd>
         </div>
       </dl>
 

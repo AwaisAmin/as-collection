@@ -10,7 +10,7 @@ import { Container } from '@/components/ui/container';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getStoreSettings } from '@/features/content/services/store-content';
-import { paymentStatusLabel } from '@/features/orders/components/order-details';
+import { paymentLabel } from '@/features/orders/components/order-details';
 import { OrderStatusBadge } from '@/features/orders/components/order-status-badge';
 import { OrderTimeline } from '@/features/orders/components/order-timeline';
 import { ordersService } from '@/features/orders/services/orders.service';
@@ -177,7 +177,7 @@ async function Tracker({ searchParams }: Pick<PageProps<'/track-order'>, 'search
               </div>
               <div className="flex justify-between">
                 <dt className="text-muted">Payment</dt>
-                <dd>{paymentStatusLabel[order.paymentStatus]}</dd>
+                <dd>{paymentLabel(order.status, order.paymentStatus)}</dd>
               </div>
               <div className="flex justify-between">
                 <dt className="text-muted">Delivering to</dt>

@@ -19,8 +19,19 @@ export interface RequestContext {
 
 export type OrderActionResult = { ok: true; order: Order } | { ok: false; error: string };
 
+/** A discount code checked against the cart (amounts in rupees). */
+export type DiscountCheck =
+  | { ok: true; code: string; discount: number; freeShipping: boolean; total: number }
+  | { ok: false; code: string; message: string };
+
 /** Port: checkout and the customer's orders. */
 export interface OrdersService {
+  /** Prices the cart with a discount code (nothing is reserved). */
+  checkDiscount(
+    lines: readonly { variantId: string; quantity: number }[],
+    code: string,
+    ctx: RequestContext,
+  ): Promise<DiscountCheck>;
   /** Re-prices and reserves stock server-side; uploads the transfer screenshot when given. */
   placeOrder(input: PlaceOrderInput, ctx: RequestContext): Promise<PlaceOrderResult>;
   /** The full order for its owner (confirmation-page access key, or the signed-in session). */

@@ -133,7 +133,11 @@ export function evaluateDiscount(
   }
 
   let discountMinor = 0;
-  if (rule.type === 'PERCENTAGE') discountMinor = Math.floor((subtotalMinor * rule.value) / 10_000);
+  // Whole rupees, rounded down: the shop shows and confirms totals in rupees, so a paisa
+  // remainder (15 % of Rs 1,290 = Rs 193.50) would never match the total the shopper saw.
+  if (rule.type === 'PERCENTAGE') {
+    discountMinor = Math.floor((subtotalMinor * rule.value) / 10_000 / 100) * 100;
+  }
   if (rule.type === 'FIXED_AMOUNT') discountMinor = rule.value;
   if (rule.maxDiscountMinor !== null)
     discountMinor = Math.min(discountMinor, rule.maxDiscountMinor);

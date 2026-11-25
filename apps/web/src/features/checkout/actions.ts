@@ -4,7 +4,7 @@ import { z } from 'zod';
 
 import { authService } from '@/features/auth/services/auth.service';
 import { getCurrentUser, getSessionToken } from '@/features/auth/session';
-import { ordersService } from '@/features/orders/services/orders.service';
+import { type DiscountCheck, ordersService } from '@/features/orders/services/orders.service';
 import { clientInfo } from '@/lib/api/client-ip';
 import { ApiError } from '@/lib/api/http-client';
 import { reportError } from '@/lib/errors/report-error';
@@ -30,6 +30,45 @@ function fail(
   extra: Partial<Extract<CheckoutState, { status: 'error' }>> = {},
 ): CheckoutState {
   return { status: 'error', fieldErrors, message, at: Date.now(), ...extra };
+}
+
+const discountCodeSchema = z
+  .string()
+  .trim()
+  .regex(/^[A-Za-z0-9_-]{2,40}$/)
+  .transform((v) => v.toUpperCase());
+
+/** "Apply" on the discount code field: prices the cart with the code (nothing is reserved). */
+export async function checkDiscountCode(
+  rawCode: string,
+  rawLines: unknown,
+): Promise<DiscountCheck> {
+  const code = discountCodeSchema.safeParse(rawCode);
+  if (!code.success) {
+    return {
+      ok: false,
+      code: rawCode,
+      message: 'Enter the code as written (letters and numbers).',
+    };
+  }
+  const lines = checkoutLinesSchema.safeParse(rawLines);
+  if (!lines.success) return { ok: false, code: code.data, message: 'Your cart is empty.' };
+  try {
+    return await ordersService.checkDiscount(lines.data, code.data, {
+      token: await getSessionToken(),
+      ...(await clientInfo()),
+    });
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 429) {
+      return { ok: false, code: code.data, message: 'Too many tries. Please wait a minute.' };
+    }
+    reportError(error, { action: 'checkout.discount' });
+    return {
+      ok: false,
+      code: code.data,
+      message: 'We couldn’t check the code right now. Please try again.',
+    };
+  }
 }
 
 export async function placeOrder(_prev: CheckoutState, formData: FormData): Promise<CheckoutState> {
@@ -76,6 +115,12 @@ export async function placeOrder(_prev: CheckoutState, formData: FormData): Prom
     checkoutId: text('checkoutId'),
     expectedTotal: text('expectedTotal'),
   });
+  const discountCode = text('discountCode')
+    ? discountCodeSchema.safeParse(text('discountCode'))
+    : null;
+  if (discountCode && !discountCode.success) {
+    return fail({}, 'Your discount code could not be read. Remove it and try again.');
+  }
   let lines: z.output<typeof checkoutLinesSchema>;
   try {
     lines = checkoutLinesSchema.parse(JSON.parse(text('lines') || '[]'));
@@ -107,6 +152,7 @@ export async function placeOrder(_prev: CheckoutState, formData: FormData): Prom
           screenshot,
         },
         lines,
+        ...(discountCode?.success ? { discountCode: discountCode.data } : {}),
       },
       { token, ...(await clientInfo()) },
     );
@@ -116,8 +162,14 @@ export async function placeOrder(_prev: CheckoutState, formData: FormData): Prom
         {},
         result.reason === 'stock_changed'
           ? 'Some items in your cart just sold out or have less stock. We updated your cart — please review it and place your order again.'
-          : 'Prices in your cart changed. We updated your cart — please review the new total and place your order again.',
-        { snapshots: result.snapshots, ...(result.shipping ? { shipping: result.shipping } : {}) },
+          : result.reason === 'discount_invalid'
+            ? 'Your discount code can no longer be used, so we removed it. Please review the new total and place your order again.'
+            : 'Prices in your cart changed. We updated your cart — please review the new total and place your order again.',
+        {
+          snapshots: result.snapshots,
+          ...(result.shipping ? { shipping: result.shipping } : {}),
+          ...(result.reason === 'discount_invalid' ? { discountRemoved: true } : {}),
+        },
       );
     }
 
