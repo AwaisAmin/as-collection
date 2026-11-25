@@ -11,12 +11,15 @@ export interface TabLink {
   count?: number | null;
 }
 
-/** Link tabs (each tab is a URL), scrollable on phones. */
+/**
+ * Link tabs (each tab is a URL), scrollable sideways on phones. Never vertically: with classic
+ * (Windows) scrollbars a 1px overflow showed an up/down scrollbar beside the tabs.
+ */
 export function TabsNav({ label, tabs }: { label: string; tabs: readonly TabLink[] }) {
   return (
     <nav
       aria-label={label}
-      className="border-line relative -mx-4 overflow-x-auto border-b px-4 lg:mx-0 lg:px-0"
+      className="border-line relative -mx-4 overflow-x-auto overflow-y-hidden border-b px-4 lg:mx-0 lg:px-0"
     >
       <ul className="flex gap-1">
         {tabs.map((tab) => (
@@ -25,7 +28,7 @@ export function TabsNav({ label, tabs }: { label: string; tabs: readonly TabLink
               href={tab.href as Route}
               aria-current={tab.active ? 'page' : undefined}
               className={cn(
-                '-mb-px flex items-center gap-2 border-b-2 px-3 py-2.5 text-[14px] whitespace-nowrap',
+                'flex items-center gap-2 border-b-2 px-3 py-2.5 text-[14px] whitespace-nowrap',
                 tab.active
                   ? 'border-ink font-medium text-text'
                   : 'border-transparent text-muted hover:text-text',

@@ -89,9 +89,16 @@ const card = (page: Page, title: string) =>
   shown(page.getByRole('region', { name: title, exact: true }));
 
 async function openList(page: Page, tab: string): Promise<void> {
-  await shown(page.getByRole('navigation', { name: 'Review lists' }))
-    .getByRole('link', { name: new RegExp(`^${tab}`) })
-    .click();
+  const link = shown(page.getByRole('navigation', { name: 'Review lists' })).getByRole('link', {
+    name: new RegExp(`^${tab}`),
+  });
+  await link.click();
+  // Type only once the tab's page is in (text typed into the previous page would be lost).
+  await expect(
+    shown(page.getByRole('navigation', { name: 'Review lists' })).getByRole('link', {
+      name: new RegExp(`^${tab}`),
+    }),
+  ).toHaveAttribute('aria-current', 'page');
   await shown(page.getByRole('searchbox', { name: 'Search' })).fill(`E2E ${run}`);
   await shown(page.getByRole('button', { name: 'Apply' })).click();
   await expect(page).toHaveURL(new RegExp(`q=E2E`));

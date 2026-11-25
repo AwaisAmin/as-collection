@@ -62,6 +62,8 @@ export function ProductFilters({
         </Select>
       </label>
       <Checkbox
+        // Starts over when the URL's value changes (defaultChecked is read only once).
+        key={String(query.low)}
         name="low"
         value="1"
         defaultChecked={query.low}

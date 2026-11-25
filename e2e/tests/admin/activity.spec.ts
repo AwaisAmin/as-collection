@@ -76,4 +76,13 @@ test('see who changed what, filter it and follow a record', async ({ page }) => 
   // An area whose key has an underscore (the inbox) can be filtered too.
   await page.goto('/activity?area=contact_message');
   await expect(shown(page.getByText('Nothing matches'))).toBeVisible();
+
+  // Opened again from a staff page, the filters show the new URL's choices (not the last ones).
+  const nav = page.getByRole('navigation', { name: 'Admin sections' });
+  await nav.getByRole('link', { name: 'Staff' }).first().click();
+  await shown(page.getByRole('link', { name: 'Audit Owner' })).click();
+  await shown(page.getByRole('link', { name: 'Their activity' })).click();
+  await expect(page).toHaveURL(/actor=/);
+  await expect(shown(page.getByLabel('Who'))).not.toHaveValue('');
+  await expect(shown(page.getByLabel('Area'))).toHaveValue('');
 });
