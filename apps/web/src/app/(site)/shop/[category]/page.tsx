@@ -4,9 +4,11 @@ import { Suspense } from 'react';
 
 import { Container } from '@/components/ui/container';
 import { categories, getCategory } from '@/config/catalog';
+import { getStoreSettings } from '@/features/content/services/store-content';
 import { CatalogBrowser } from '@/features/shop/components/catalog/catalog-browser';
 import { CatalogBrowserSkeleton } from '@/features/shop/components/catalog/catalog-browser-skeleton';
 import { CategoryBanner, CategoryBannerSkeleton } from '@/features/shop/components/category-banner';
+import { formatPrice } from '@/lib/utils/format';
 
 export function generateStaticParams() {
   return categories.map(({ slug }) => ({ category: slug }));
@@ -17,9 +19,11 @@ export async function generateMetadata({
 }: PageProps<'/shop/[category]'>): Promise<Metadata> {
   const category = getCategory((await params).category);
   if (!category) return { title: 'Page not found', robots: { index: false } };
+  // The free-delivery amount follows the store setting (it read a fixed "2500").
+  const { shipping, profile } = await getStoreSettings();
   return {
     title: category.name,
-    description: `Shop ${category.name.toLowerCase()} at AS Collection Hub — free shipping on orders above 2500 and cash on delivery.`,
+    description: `Shop ${category.name.toLowerCase()} at ${profile.name} — free delivery on orders above ${formatPrice(shipping.freeShippingThreshold)} and cash on delivery.`,
     alternates: { canonical: category.href },
   };
 }
