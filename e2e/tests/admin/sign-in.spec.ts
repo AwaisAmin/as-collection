@@ -53,3 +53,12 @@ test('rejects a wrong password without revealing whether the account exists', as
   await expect(page.getByRole('alert').filter({ hasText: /[a-z]/i })).toBeVisible();
   await expect(page.getByLabel('Work email')).toHaveValue(email);
 });
+
+test('an ended session sends to sign-in and remembers the page', async ({ page, baseURL }) => {
+  // A cookie the API no longer accepts (signed out elsewhere, access turned off, idle).
+  await page
+    .context()
+    .addCookies([{ name: 'as_admin', value: 'ended-session', url: baseURL ?? '' }]);
+  await page.goto('/stock?q=STCH');
+  await expect(page).toHaveURL(/\/login\?next=%2Fstock%3Fq%3DSTCH$/);
+});

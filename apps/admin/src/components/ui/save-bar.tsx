@@ -62,7 +62,15 @@ export function SaveBar({
     <div className="border-line bg-surface/95 fixed inset-x-0 bottom-0 z-30 border-t backdrop-blur lg:left-60">
       <div className="flex flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between lg:px-8">
         <div className="min-w-0 text-[14px]" role="status" aria-live="polite">
-          {state.error && !state.stale && state.at ? (
+          {state.stale && state.at ? (
+            // The full explanation sits above the form; the bar is where the person is looking.
+            <span className="text-danger">
+              Not saved: someone else saved meanwhile.{' '}
+              <a href="" className="font-medium underline">
+                Reload
+              </a>
+            </span>
+          ) : state.error && state.at ? (
             <details className="text-danger">
               <summary className="cursor-pointer">{state.error}</summary>
               {list.length ? (

@@ -6,12 +6,19 @@ import { type NextRequest, NextResponse } from 'next/server';
  */
 const SESSION_COOKIES = ['as_admin', '__Host-as_admin'];
 
+/** The page being opened, read by `requireStaff` (lib/session.ts) when the session has ended. */
+const PATH_HEADER = 'x-admin-path';
+
 export function proxy(request: NextRequest) {
-  if (SESSION_COOKIES.some((name) => request.cookies.has(name))) return NextResponse.next();
+  const next = request.nextUrl.pathname + request.nextUrl.search;
+  if (SESSION_COOKIES.some((name) => request.cookies.has(name))) {
+    const headers = new Headers(request.headers);
+    headers.set(PATH_HEADER, next);
+    return NextResponse.next({ request: { headers } });
+  }
   const url = request.nextUrl.clone();
   url.pathname = '/login';
   url.search = '';
-  const next = request.nextUrl.pathname + request.nextUrl.search;
   if (next !== '/') url.searchParams.set('next', next);
   return NextResponse.redirect(url);
 }

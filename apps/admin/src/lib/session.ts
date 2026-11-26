@@ -1,10 +1,12 @@
 import 'server-only';
 
 import type { Route } from 'next';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { connection } from 'next/server';
 import { cache } from 'react';
+
+import { safeNextPath } from '@/features/auth/safe-next';
 
 import { ApiError, apiRequest } from './api/http-client';
 
@@ -55,7 +57,11 @@ export const getStaff = cache(async (): Promise<StaffSession | null> => {
 export async function requireStaff(): Promise<StaffSession & { token: string }> {
   const session = await getStaff();
   const token = await getSessionToken();
-  if (!session || !token) redirect('/login' as Route);
+  if (!session || !token) {
+    // Session ended (idle, signed out elsewhere, access turned off): come back here afterwards.
+    const next = safeNextPath((await headers()).get('x-admin-path'));
+    redirect((next === '/' ? '/login' : `/login?next=${encodeURIComponent(next)}`) as Route);
+  }
   if (session.staff.mustChangePassword) redirect('/change-password' as Route);
   return { ...session, token };
 }
