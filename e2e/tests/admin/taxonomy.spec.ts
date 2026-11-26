@@ -117,6 +117,20 @@ test('build, reorder, move and delete categories', async ({ page }) => {
   await expect(shown(page.getByText('Category created.'))).toBeVisible();
   await expect(shown(page.getByText(`${CATEGORY} › ${SUB}`))).toBeVisible();
 
+  // The shop has pages for both straight away: the parent links to the sub, the sub's
+  // breadcrumbs go through the parent (categories are no longer a fixed list in the shop).
+  const shopPage = async (slug: string) => {
+    const response = await page.request.get(`http://localhost:3100/shop/${slug}`);
+    expect(response.status()).toBe(200);
+    return response.text();
+  };
+  const parentHtml = await shopPage(`e2e-cat-${run}`);
+  expect(parentHtml).toContain(CATEGORY);
+  expect(parentHtml).toContain(`href="/shop/e2e-sub-${run}"`);
+  const subHtml = await shopPage(`e2e-sub-${run}`);
+  expect(subHtml).toContain(SUB);
+  expect(subHtml).toContain(`href="/shop/e2e-cat-${run}"`);
+
   // Reorder: the new category moves up one place.
   await page.goto('/categories');
   await expect(shown(page.getByRole('link', { name: CATEGORY, exact: true }))).toBeVisible();

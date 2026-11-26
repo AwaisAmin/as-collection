@@ -2,8 +2,8 @@ import type { TypedSectionDto } from '@as/contracts';
 import type { Route } from 'next';
 
 import { Container } from '@/components/ui/container';
-import { categories } from '@/config/catalog';
 import { occasions } from '@/config/occasions';
+import { getAllCategories } from '@/features/catalog/services/categories';
 import type { StoreSettings } from '@/features/content/types';
 import { RecentlyViewed } from '@/features/shop/components/recently-viewed';
 
@@ -25,12 +25,23 @@ const pick = <T extends { slug: string }>(all: readonly T[], slugs: readonly str
   slugs.flatMap((slug) => all.filter((item) => item.slug === slug));
 
 /** One page section → its component, configured by the section's settings. */
-function Section({ section, settings }: { section: TypedSectionDto; settings: StoreSettings }) {
+async function Section({
+  section,
+  settings,
+}: {
+  section: TypedSectionDto;
+  settings: StoreSettings;
+}) {
   switch (section.type) {
     case 'hero':
       return <Hero />;
     case 'category-grid':
-      return <CategorySection categories={pick(categories, section.settings.categorySlugs)} />;
+      // The admin's categories (with their pictures), in the order the section lists them.
+      return (
+        <CategorySection
+          categories={pick(await getAllCategories(), section.settings.categorySlugs)}
+        />
+      );
     case 'trust-bar':
       return <TrustBar features={toTrustFeatures(settings.trustFeatures)} />;
     case 'product-carousel':

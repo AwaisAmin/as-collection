@@ -58,7 +58,7 @@ export const shopMegaMenu = {
   columns: categories.map((c): MegaMenuColumn => ({
     label: c.name,
     href: c.href,
-    links: categoryLinks[c.slug].map(({ label, q }) => ({
+    links: (categoryLinks[c.slug] ?? []).map(({ label, q }) => ({
       label,
       href: `${c.href}?q=${encodeURIComponent(q)}` as Route,
     })),

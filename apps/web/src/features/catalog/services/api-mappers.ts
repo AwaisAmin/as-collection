@@ -9,7 +9,6 @@ import type {
   VariantSnapshotDto,
 } from '@as/contracts';
 
-import { type CategorySlug, categorySlugs, isCategorySlug } from '@/config/catalog';
 import { isOccasion, occasionSlugs } from '@/config/occasions';
 
 import type { CatalogQuery } from '../schemas';
@@ -54,19 +53,12 @@ export function toImage(
   return { src: toImageSrc(dto.url, siteOrigin), alt: dto.alt || fallbackAlt };
 }
 
-/** The storefront's three departments; deeper categories roll up to their department. */
-function toCategory(...slugs: (string | undefined)[]): CategorySlug {
-  return (
-    slugs.find((s): s is CategorySlug => s !== undefined && isCategorySlug(s)) ?? categorySlugs[0]
-  );
-}
-
 export function toSummary(dto: ProductSummaryDto, siteOrigin: string): ProductSummary {
   return {
     id: dto.id,
     slug: dto.slug,
     name: dto.name,
-    category: toCategory(dto.category.slug),
+    category: dto.category.slug,
     image: toImage(dto.image, siteOrigin, dto.name),
     ...(dto.hoverImage ? { hoverImage: toImage(dto.hoverImage, siteOrigin, dto.name) } : {}),
     price: toRupees(dto.priceMinor),
@@ -98,7 +90,11 @@ export function toProduct(dto: ProductDetailDto, siteOrigin: string): Product {
     id: dto.id,
     slug: dto.slug,
     name: dto.name,
-    category: toCategory(dto.breadcrumbs[0]?.slug, dto.category.slug),
+    category: dto.category.slug,
+    categoryPath: [
+      ...dto.breadcrumbs.filter((b) => b.slug !== dto.category.slug),
+      dto.category,
+    ].map((c) => ({ slug: c.slug, name: c.name })),
     shortDescription: dto.shortDescription ?? '',
     description: paragraphs(dto.description),
     images: dto.images.length

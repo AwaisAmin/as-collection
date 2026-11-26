@@ -8,7 +8,7 @@ first-time authenticator setup → dashboard → sign out) and order handling (a
 with a payment screenshot is verified, shipped and delivered; stock moves from reserved to sold) and
 products (create with an uploaded photo and two sizes, publish, edit a variant, delete), stock
 (receive, refused removal, stock count, history, alert level) and the image library (upload,
-describe, delete), categories (create with a picture and filter, subcategory, reorder, move, delete)
+describe, delete), categories (create with a picture and filter, subcategory — both get shop pages linked to each other — reorder, move, delete)
 brands (add, hide, delete), attributes (values, swatch, reorder, settings, delete) and collections
 (automatic with preview, hand-picked with products and a schedule, reorder, delete) and discount
 codes (create, applied by the real checkout quote, changed, switched off, deleted) and the home page

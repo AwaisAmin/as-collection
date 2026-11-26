@@ -8,8 +8,8 @@ import { ButtonLink } from '@/components/ui/button';
 import { Container } from '@/components/ui/container';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Skeleton } from '@/components/ui/skeleton';
-import { categories } from '@/config/catalog';
 import { parseCatalogQuery } from '@/features/catalog/schemas';
+import { getCategoryTree } from '@/features/catalog/services/categories';
 import { CatalogBrowser } from '@/features/shop/components/catalog/catalog-browser';
 import { CatalogBrowserSkeleton } from '@/features/shop/components/catalog/catalog-browser-skeleton';
 
@@ -76,7 +76,7 @@ async function SearchResults({ searchParams }: Pick<PageProps<'/search'>, 'searc
           description="Search for lawn, chiffon, kurta, lipstick, foundation and more — or browse a category."
           action={
             <div className="flex flex-wrap justify-center gap-3">
-              {categories.map((c) => (
+              {(await getCategoryTree()).map((c) => (
                 <ButtonLink key={c.slug} href={c.href} size="sm" withArrow>
                   {c.name}
                 </ButtonLink>

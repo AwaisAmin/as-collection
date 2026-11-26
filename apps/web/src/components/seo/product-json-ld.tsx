@@ -1,10 +1,16 @@
-import { getCategory } from '@/config/catalog';
 import { siteConfig } from '@/config/site';
 import { productHref } from '@/features/catalog/lib/routes';
 import type { Product } from '@/features/catalog/types';
 
 /** schema.org Product with offers + rating → rich results (price, stock, stars) in Google. */
-export function ProductJsonLd({ product }: { product: Product }) {
+/** `categories`: the visible category path, top level first. */
+export function ProductJsonLd({
+  product,
+  categories,
+}: {
+  product: Product;
+  categories: readonly string[];
+}) {
   const url = new URL(productHref(product.slug), siteConfig.url).toString();
   const prices = product.variants.map((v) => v.price);
   const inStock = product.variants.some((v) => v.stock > 0);
@@ -16,7 +22,7 @@ export function ProductJsonLd({ product }: { product: Product }) {
     name: product.name,
     description: product.shortDescription,
     sku: product.variants[0]?.sku,
-    category: getCategory(product.category)?.name,
+    category: categories.join(' > ') || undefined,
     image: product.images.map((img) => new URL(img.src, siteConfig.url).toString()),
     brand: { '@type': 'Brand', name: siteConfig.name },
     url,

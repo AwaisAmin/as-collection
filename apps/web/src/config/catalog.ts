@@ -1,9 +1,19 @@
 import type { Route } from 'next';
 
-import type { ImageKey } from './assets';
+import { images } from './assets';
 
+/*
+ * Categories are managed in the admin and loaded from the API (features/catalog/services/
+ * categories.ts). The three below are the built-in defaults: used while the API is unreachable,
+ * and as the source of the photos and copy for these departments when the admin left them empty.
+ */
+
+/** The built-in departments (any admin-created slug is valid too). */
 export const categorySlugs = ['unstitched', 'stitched', 'makeup'] as const;
-export type CategorySlug = (typeof categorySlugs)[number];
+export type CategorySlug = string;
+
+/** A category slug as the admin writes it (lowercase words joined by dashes). */
+export const CATEGORY_SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 export interface Category {
   slug: CategorySlug;
@@ -12,8 +22,9 @@ export interface Category {
   /** Lines used for the stacked card title on the home page. */
   titleLines: readonly string[];
   href: Route;
-  image: ImageKey;
-  /** Category page hero. Images in /public/images/banners (swap files, keep names). */
+  /** Card photo. */
+  image: { src: string; alt: string };
+  /** Category page hero. */
   banner: {
     eyebrow: string;
     description: string;
@@ -23,13 +34,14 @@ export interface Category {
   };
 }
 
+/** Built-in defaults (see above). */
 export const categories: readonly Category[] = [
   {
     slug: 'unstitched',
     name: 'Unstitched Dresses',
     titleLines: ['Unstitched', 'Dresses'],
     href: '/shop/unstitched',
-    image: 'unstitched',
+    image: images.unstitched,
     banner: {
       eyebrow: 'Fabric & embroidery',
       description:
@@ -46,7 +58,7 @@ export const categories: readonly Category[] = [
     name: 'Stitched Dresses',
     titleLines: ['Stitched', 'Dresses'],
     href: '/shop/stitched',
-    image: 'stitched',
+    image: images.stitched,
     banner: {
       eyebrow: 'Ready to wear',
       description: 'Kurtas, frocks and maxis in true-to-size fits, embroidered to impress.',
@@ -62,7 +74,7 @@ export const categories: readonly Category[] = [
     name: 'Makeup',
     titleLines: ['Makeup'],
     href: '/shop/makeup',
-    image: 'makeup',
+    image: images.makeup,
     banner: {
       eyebrow: 'Beauty essentials',
       description: 'Long-wear makeup in shades made for Pakistani skin tones — everyday to bridal.',
@@ -75,10 +87,19 @@ export const categories: readonly Category[] = [
   },
 ];
 
-export function isCategorySlug(value: string): value is CategorySlug {
-  return (categorySlugs as readonly string[]).includes(value);
+export function isCategorySlug(value: string): boolean {
+  return CATEGORY_SLUG_PATTERN.test(value) && value.length <= 120;
 }
 
+/** A built-in default category by slug. */
 export function getCategory(slug: string): Category | undefined {
   return categories.find((c) => c.slug === slug);
+}
+
+/** "Bridal Wear Collection" → ["Bridal Wear", "Collection"] for the stacked card title. */
+export function titleLinesFor(name: string): readonly string[] {
+  const words = name.trim().split(/\s+/);
+  if (words.length < 2) return [name.trim()];
+  const half = Math.ceil(words.length / 2);
+  return [words.slice(0, half).join(' '), words.slice(half).join(' ')];
 }

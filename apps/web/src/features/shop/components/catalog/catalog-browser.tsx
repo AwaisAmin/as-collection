@@ -1,10 +1,14 @@
+import { ShoppingBag } from 'lucide-react';
 import { redirect } from 'next/navigation';
 
+import { ButtonLink } from '@/components/ui/button';
+import { EmptyState } from '@/components/ui/empty-state';
 import { Pagination } from '@/components/ui/pagination';
 import type { CategorySlug } from '@/config/catalog';
-import { catalogHref } from '@/features/catalog/lib/catalog-url';
+import { catalogHref, countActiveFilters } from '@/features/catalog/lib/catalog-url';
 import { parseCatalogQuery } from '@/features/catalog/schemas';
 import { catalogService } from '@/features/catalog/services/catalog.service';
+import { categoryOptions, getCategoryTree } from '@/features/catalog/services/categories';
 
 import { ShopProductGrid } from '../shop-product-grid';
 import { ActiveFilters } from './active-filters';
@@ -37,9 +41,10 @@ export async function CatalogBrowser({
   const query = parseCatalogQuery(await searchParams, category ? { category } : {});
   const includeCategory = categoryMode === 'param';
 
-  const [results, facets] = await Promise.all([
+  const [results, facets, tree] = await Promise.all([
     catalogService.listProducts(query),
     catalogService.getFacets({ category: query.category, q: query.q }),
+    categoryMode === 'none' ? Promise.resolve([]) : getCategoryTree(),
   ]);
 
   // A page past the end (an old link, a hand-typed ?page=99) goes to the last page instead of
@@ -50,7 +55,13 @@ export async function CatalogBrowser({
 
   const from = results.total === 0 ? 0 : (results.page - 1) * results.pageSize + 1;
   const to = Math.min(results.page * results.pageSize, results.total);
-  const panel = { query, facets, basePath, categoryMode };
+  const panel = {
+    query,
+    facets,
+    basePath,
+    categoryMode,
+    categories: categoryOptions(tree, query.category),
+  };
 
   return (
     <CatalogNavigationProvider>
@@ -86,7 +97,26 @@ export async function CatalogBrowser({
 
           <h2 className="sr-only">Products</h2>
           <PendingRegion>
-            <ShopProductGrid products={results.items} />
+            <ShopProductGrid
+              products={results.items}
+              {...(category && !query.q && countActiveFilters(query) === 0
+                ? {
+                    // A category with nothing in it yet: no filter to remove.
+                    empty: (
+                      <EmptyState
+                        icon={ShoppingBag}
+                        title="Nothing here yet"
+                        description="New pieces are on the way. Have a look at the rest of the shop meanwhile."
+                        action={
+                          <ButtonLink href="/shop" withArrow>
+                            View all products
+                          </ButtonLink>
+                        }
+                      />
+                    ),
+                  }
+                : {})}
+            />
           </PendingRegion>
 
           <Pagination

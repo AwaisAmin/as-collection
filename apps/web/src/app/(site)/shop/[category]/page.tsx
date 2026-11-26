@@ -3,13 +3,15 @@ import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 
 import { Container } from '@/components/ui/container';
-import { categories, getCategory } from '@/config/catalog';
+import { categories } from '@/config/catalog';
+import { getCategoryPage } from '@/features/catalog/services/categories';
 import { getStoreSettings } from '@/features/content/services/store-content';
 import { CatalogBrowser } from '@/features/shop/components/catalog/catalog-browser';
 import { CatalogBrowserSkeleton } from '@/features/shop/components/catalog/catalog-browser-skeleton';
 import { CategoryBanner, CategoryBannerSkeleton } from '@/features/shop/components/category-banner';
 import { formatPrice } from '@/lib/utils/format';
 
+/** The built-in departments are prebuilt; categories added in the admin render on first visit. */
 export function generateStaticParams() {
   return categories.map(({ slug }) => ({ category: slug }));
 }
@@ -17,13 +19,15 @@ export function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: PageProps<'/shop/[category]'>): Promise<Metadata> {
-  const category = getCategory((await params).category);
+  const category = await getCategoryPage((await params).category);
   if (!category) return { title: 'Page not found', robots: { index: false } };
-  // The free-delivery amount follows the store setting (it read a fixed "2500").
+  // The admin's search texts win; otherwise the free-delivery amount follows the store setting.
   const { shipping, profile } = await getStoreSettings();
   return {
-    title: category.name,
-    description: `Shop ${category.name.toLowerCase()} at ${profile.name} — free delivery on orders above ${formatPrice(shipping.freeShippingThreshold)} and cash on delivery.`,
+    title: category.seo.title ?? category.name,
+    description:
+      category.seo.description ??
+      `Shop ${category.name.toLowerCase()} at ${profile.name} — free delivery on orders above ${formatPrice(shipping.freeShippingThreshold)} and cash on delivery.`,
     alternates: { canonical: category.href },
   };
 }
@@ -40,7 +44,7 @@ export default function CategoryPage({ params, searchParams }: PageProps<'/shop/
 }
 
 async function CategoryContent({ params, searchParams }: PageProps<'/shop/[category]'>) {
-  const category = getCategory((await params).category);
+  const category = await getCategoryPage((await params).category);
   if (!category) notFound();
 
   return (

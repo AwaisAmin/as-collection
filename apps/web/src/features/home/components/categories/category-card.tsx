@@ -4,7 +4,6 @@ import Link from 'next/link';
 
 import { buttonVariants } from '@/components/ui/button';
 import { OrnamentDivider } from '@/components/ui/ornament-divider';
-import { images } from '@/config/assets';
 import type { Category } from '@/config/catalog';
 import { cn } from '@/lib/utils/cn';
 
@@ -18,7 +17,7 @@ interface CategoryCardProps {
  * presentational, avoiding nested/duplicate interactive elements.
  */
 export function CategoryCard({ category, className }: CategoryCardProps) {
-  const image = images[category.image];
+  const { image } = category;
 
   return (
     <Link

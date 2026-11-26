@@ -1,9 +1,9 @@
 import type { MetadataRoute } from 'next';
 
-import { categories } from '@/config/catalog';
 import { siteConfig } from '@/config/site';
 import { productHref } from '@/features/catalog/lib/routes';
 import { catalogService } from '@/features/catalog/services/catalog.service';
+import { getAllCategories } from '@/features/catalog/services/categories';
 
 const staticPaths = [
   '/',
@@ -18,7 +18,10 @@ const staticPaths = [
 const abs = (path: string) => new URL(path, siteConfig.url).toString();
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const slugs = await catalogService.listProductSlugs();
+  const [slugs, categories] = await Promise.all([
+    catalogService.listProductSlugs(),
+    getAllCategories(),
+  ]);
   const products = await Promise.all(slugs.map((slug) => catalogService.getProductBySlug(slug)));
 
   return [

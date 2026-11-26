@@ -23,11 +23,15 @@ describe('parseCatalogQuery', () => {
   });
 
   it('falls back instead of throwing on bad (user-edited) URLs', () => {
-    const q = parseCatalogQuery({ sort: 'cheapest', page: '-3', min: 'abc', category: 'shoes' });
+    const q = parseCatalogQuery({ sort: 'cheapest', page: '-3', min: 'abc', category: 'Shoes!' });
     expect(q.sort).toBe('featured');
     expect(q.page).toBe(1);
     expect(q.min).toBeUndefined();
     expect(q.category).toBeUndefined();
+  });
+
+  it('accepts any category slug the admin could create', () => {
+    expect(parseCatalogQuery({ category: 'bridal-wear' }).category).toBe('bridal-wear');
   });
 
   it('lets route params override search params', () => {

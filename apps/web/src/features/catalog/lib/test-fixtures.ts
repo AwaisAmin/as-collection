@@ -35,6 +35,7 @@ export const kurta: Product = {
   slug: 'maroon-ruby-embroidered-kurta',
   name: 'Maroon Ruby Embroidered Kurta',
   category: 'stitched',
+  categoryPath: [{ slug: 'stitched', name: 'Stitched Dresses' }],
   options: [{ name: 'Size', values: ['S', 'M', 'L', 'XL'].map((value) => ({ value })) }],
   variants: [
     variant('STCH-001-S', { Size: 'S' }, 7490, 3, 8990),
@@ -51,6 +52,7 @@ export const lipstick: Product = {
   slug: 'velvet-matte-lipstick',
   name: 'Velvet Matte Lipstick',
   category: 'makeup',
+  categoryPath: [{ slug: 'makeup', name: 'Makeup' }],
   options: [
     {
       name: 'Shade',

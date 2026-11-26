@@ -3,8 +3,8 @@ import { ButtonLink } from '@/components/ui/button';
 import { Container } from '@/components/ui/container';
 import { SectionHeading } from '@/components/ui/section-heading';
 import { type TabItem, Tabs } from '@/components/ui/tabs';
-import { categories } from '@/config/catalog';
 import { catalogService } from '@/features/catalog/services/catalog.service';
+import { getAllCategories, getCategoryTree } from '@/features/catalog/services/categories';
 import { ShopProductGrid } from '@/features/shop/components/shop-product-grid';
 
 /** Top products per category behind pill tabs. All panels render on the server (cached). */
@@ -22,9 +22,10 @@ export async function BestSellers({
   categorySlugs,
   limit = 4,
 }: BestSellersProps = {}) {
+  const all = await getAllCategories();
   const tabs = categorySlugs
-    ? categorySlugs.flatMap((slug) => categories.filter((c) => c.slug === slug))
-    : categories;
+    ? categorySlugs.flatMap((slug) => all.filter((c) => c.slug === slug))
+    : await getCategoryTree();
   const perCategory = await Promise.all(
     tabs.map(async (category) => ({
       category,

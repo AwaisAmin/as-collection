@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Route } from 'next';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 
@@ -9,8 +9,8 @@ import { OrnamentDivider } from '@/components/ui/ornament-divider';
 import { RatingStars } from '@/components/ui/rating-stars';
 import { SectionHeading } from '@/components/ui/section-heading';
 import { Skeleton } from '@/components/ui/skeleton';
-import { getCategory } from '@/config/catalog';
 import { catalogService } from '@/features/catalog/services/catalog.service';
+import { getAllCategories } from '@/features/catalog/services/categories';
 import { getStoreSettings } from '@/features/content/services/store-content';
 import { DeliveryPerks } from '@/features/product/components/delivery-perks';
 import { ProductDetailsTabs } from '@/features/product/components/product-details-tabs';
@@ -62,12 +62,18 @@ async function ProductContent({ params }: Pick<PageProps<'/products/[slug]'>, 'p
   const settings = await getStoreSettings();
   if (!product) notFound();
 
-  const category = getCategory(product.category);
+  // The product's own category (the admin's), with its parents for the breadcrumbs — only those
+  // shown in the shop (a hidden category has no page to link to).
+  const visible = new Set((await getAllCategories()).map((c) => c.slug));
+  const path = product.categoryPath
+    .filter((c) => visible.has(c.slug))
+    .map((c) => ({ name: c.name, href: `/shop/${c.slug}` as Route }));
+  const category = path.at(-1);
   const related = await catalogService.getRelatedProducts(product, 4);
 
   return (
     <>
-      <ProductJsonLd product={product} />
+      <ProductJsonLd product={product} categories={path.map((c) => c.name)} />
 
       <Container className="pt-6 pb-14">
         <Breadcrumbs
@@ -75,7 +81,7 @@ async function ProductContent({ params }: Pick<PageProps<'/products/[slug]'>, 'p
           items={[
             { label: 'Home', href: '/' },
             { label: 'Shop', href: '/shop' },
-            ...(category ? [{ label: category.name, href: category.href }] : []),
+            ...path.map((c) => ({ label: c.name, href: c.href })),
             { label: product.name },
           ]}
         />

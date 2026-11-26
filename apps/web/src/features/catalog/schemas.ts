@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { categorySlugs } from '@/config/catalog';
+import { CATEGORY_SLUG_PATTERN } from '@/config/catalog';
 import { isOccasion } from '@/config/occasions';
 
 export const sortOptions = [
@@ -42,7 +42,7 @@ const optionalInt = z.coerce.number().int().nonnegative().optional().catch(undef
  * Single source of truth for filters, sorting and pagination.
  */
 export const catalogQuerySchema = z.object({
-  category: z.enum(categorySlugs).optional().catch(undefined),
+  category: z.string().max(120).regex(CATEGORY_SLUG_PATTERN).optional().catch(undefined),
   q: z.string().trim().max(100).optional().catch(undefined),
   sort: z.enum(sortValues).default('featured').catch('featured'),
   min: optionalInt,

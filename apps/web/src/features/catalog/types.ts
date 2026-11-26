@@ -49,7 +49,10 @@ export interface Product {
   id: string;
   slug: string;
   name: string;
+  /** The product's own (deepest) category. */
   category: CategorySlug;
+  /** Top-level category first, the product's own last (breadcrumbs). */
+  categoryPath: readonly { slug: string; name: string }[];
   shortDescription: string;
   /** Paragraphs. */
   description: readonly string[];

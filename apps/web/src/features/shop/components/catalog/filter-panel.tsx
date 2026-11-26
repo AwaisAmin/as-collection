@@ -4,7 +4,6 @@ import { Check, ChevronDown } from 'lucide-react';
 import { type FormEvent, type ReactNode, useId, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
-import { categories } from '@/config/catalog';
 import { occasionName } from '@/config/occasions';
 import {
   catalogHref,
@@ -25,6 +24,8 @@ export interface FilterPanelProps {
   basePath: string;
   /** Search page: category is a query param. Shop page: category links go to /shop/[slug]. */
   categoryMode?: 'path' | 'param' | 'none';
+  /** The admin's categories to offer (top level, plus the branch being browsed). */
+  categories?: readonly { slug: string; name: string; depth: number }[];
   className?: string;
 }
 
@@ -64,6 +65,7 @@ export function FilterPanel({
   facets,
   basePath,
   categoryMode = 'none',
+  categories = [],
   className,
 }: FilterPanelProps) {
   const { navigate } = useCatalogNavigation();
@@ -106,7 +108,7 @@ export function FilterPanel({
       {categoryMode !== 'none' ? (
         <FilterSection title="Category">
           <ul className="flex flex-col gap-1">
-            {[{ slug: undefined, name: 'All products' }, ...categories].map((c) => {
+            {[{ slug: undefined, name: 'All products', depth: 0 }, ...categories].map((c) => {
               const current = query.category === c.slug;
               const onSelect = () =>
                 categoryMode === 'path'
@@ -117,7 +119,7 @@ export function FilterPanel({
                     )
                   : go({ category: c.slug });
               return (
-                <li key={c.name}>
+                <li key={c.slug ?? 'all'} style={{ paddingLeft: `${String(c.depth * 14)}px` }}>
                   <button
                     type="button"
                     onClick={onSelect}
