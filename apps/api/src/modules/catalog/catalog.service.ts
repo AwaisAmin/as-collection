@@ -40,6 +40,12 @@ import {
 /** Cache namespace for every catalog read. Admin writes call `invalidate()` (B7). */
 export const CATALOG_CACHE = 'catalog';
 
+/**
+ * Cache namespace for public review reads (reviews module). Defined here because reviews only
+ * show for visible products: hiding, deleting or re-pricing a product makes them stale too.
+ */
+export const REVIEWS_CACHE = 'reviews';
+
 interface CategoryRecord {
   id: string;
   slug: string;
@@ -84,9 +90,13 @@ export class CatalogService {
   }
 
   /** Every catalog cache entry becomes stale at once (call after any catalog write). */
-  invalidate(): Promise<void> {
+  async invalidate(): Promise<void> {
     this.storefront.revalidate('catalog');
-    return this.cache.invalidate(CATALOG_CACHE);
+    await Promise.all([
+      this.cache.invalidate(CATALOG_CACHE),
+      // Store-wide reviews (home testimonials, store rating) list only visible products.
+      this.cache.invalidate(REVIEWS_CACHE),
+    ]);
   }
 
   // ─── Categories ───

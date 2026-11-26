@@ -98,7 +98,12 @@ describe('admin orders & jobs (e2e)', () => {
         .get(api(`/orders/${number}`))
         .set('X-Order-Access-Key', accessKey)
         .expect(200)
-    ).body as { status: string; paymentStatus: string; timeline: { note: string | null }[] };
+    ).body as {
+      status: string;
+      paymentStatus: string;
+      timeline: { note: string | null }[];
+      paymentProofs: { status: string; rejectionReason: string | null }[];
+    };
 
   async function cleanup() {
     const orders = await prisma.order.findMany({
@@ -258,6 +263,10 @@ describe('admin orders & jobs (e2e)', () => {
     expect(rejected.timeline.at(-1)?.note).toBe(
       'We could not verify your payment screenshot: The amount does not match the order total. Please upload a new one or contact us.',
     );
+    expect(rejected.paymentProofs[0]).toMatchObject({
+      status: 'REJECTED',
+      rejectionReason: 'The amount does not match the order total',
+    });
 
     await upload();
     detail = (

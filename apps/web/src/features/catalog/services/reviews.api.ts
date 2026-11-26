@@ -14,7 +14,7 @@ import type { ReviewInput, ReviewSort } from '../schemas';
 import type { FeaturedReview, Paginated, Review, ReviewSummary } from '../types';
 import { toFeaturedReview, toReview, toReviewSummary } from './api-mappers';
 import type { ReviewsService } from './reviews.service';
-import { REVIEWS_PAGE_SIZE, REVIEWS_TAG, reviewsTag } from './tags';
+import { CATALOG_TAG, REVIEWS_PAGE_SIZE, REVIEWS_TAG, reviewsTag } from './tags';
 
 /* Adapter: the NestJS reviews API (approved reviews only; submissions are moderated). */
 
@@ -49,7 +49,8 @@ async function getSummary(productSlug: string): Promise<ReviewSummary> {
 async function getFeaturedReviews(limit = 8): Promise<FeaturedReview[]> {
   'use cache';
   cacheLife('minutes');
-  cacheTag(REVIEWS_TAG);
+  // A product hidden or deleted in the admin must drop out of these too.
+  cacheTag(REVIEWS_TAG, CATALOG_TAG);
   const items = await apiRequest<FeaturedReviewDto[]>('/catalog/reviews/featured', {
     query: { limit: Math.min(limit, 12) },
   });
@@ -59,7 +60,8 @@ async function getFeaturedReviews(limit = 8): Promise<FeaturedReview[]> {
 async function getStoreSummary(): Promise<ReviewSummary> {
   'use cache';
   cacheLife('minutes');
-  cacheTag(REVIEWS_TAG);
+  // A product hidden or deleted in the admin must drop out of these too.
+  cacheTag(REVIEWS_TAG, CATALOG_TAG);
   return toReviewSummary(await apiRequest<ReviewSummaryDto>('/catalog/reviews/summary'));
 }
 

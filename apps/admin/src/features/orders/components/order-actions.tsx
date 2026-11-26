@@ -17,10 +17,13 @@ export function OrderActions({
   number,
   actions,
   delivery,
+  paid,
 }: {
   number: string;
   actions: readonly StaffOrderAction[];
   delivery: { courier: string | null; trackingNumber: string | null };
+  /** The customer's money is already in: cancelling means paying it back. */
+  paid: boolean;
 }) {
   return (
     <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
@@ -33,7 +36,11 @@ export function OrderActions({
             trigger={meta.label}
             triggerVariant={meta.danger ? 'secondary' : 'primary'}
             title={`${meta.label} · ${number}`}
-            description={meta.description}
+            description={
+              key === 'cancel' && paid
+                ? `${meta.description} The customer has already paid: send the money back, then use “Record refund”.`
+                : meta.description
+            }
             submitLabel={meta.label}
             submitVariant={meta.danger ? 'danger' : 'primary'}
             action={orderTransition.bind(null, number, key)}

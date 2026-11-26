@@ -57,7 +57,14 @@ const order: OrderDto = {
   discountCode: 'EID',
   delivery: { courier: 'TCS', trackingNumber: '123456' },
   paymentProofs: [
-    { id: 'p1', method: 'JAZZCASH', status: 'ACCEPTED', reference: 'TX-9', uploadedAt: '' },
+    {
+      id: 'p1',
+      method: 'JAZZCASH',
+      status: 'ACCEPTED',
+      reference: 'TX-9',
+      rejectionReason: null,
+      uploadedAt: '',
+    },
   ],
   timeline: [
     { type: 'order.placed', status: 'PENDING', note: 'Order placed.', at: '2026-11-20T10:00:00Z' },
@@ -113,6 +120,31 @@ describe('order mappers', () => {
       price: 1200,
       lineTotal: 2400,
     });
+  });
+
+  it('passes on why the latest screenshot was not accepted', () => {
+    const rejected = toOrder(
+      {
+        ...order,
+        paymentStatus: 'FAILED',
+        paymentProofs: [
+          {
+            id: 'p2',
+            method: 'JAZZCASH',
+            status: 'REJECTED',
+            reference: null,
+            rejectionReason: 'The amount does not match',
+            uploadedAt: '',
+          },
+        ],
+      },
+      SITE,
+    );
+    expect(rejected.payment).toMatchObject({
+      proofStatus: 'rejected',
+      proofRejectionReason: 'The amount does not match',
+    });
+    expect(toOrder(order, SITE).payment).not.toHaveProperty('proofRejectionReason');
   });
 
   it('reads cart snapshots and delivery rules from a refused checkout', () => {

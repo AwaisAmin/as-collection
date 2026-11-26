@@ -11,6 +11,7 @@ import { PrismaService } from '../../database/prisma.service.js';
 import type { Prisma } from '../../generated/prisma/client.js';
 import { CacheService } from '../../redis/cache.service.js';
 import { StorefrontRevalidator } from '../../storefront/storefront-revalidator.js';
+import { REVIEWS_CACHE } from '../catalog/catalog.service.js';
 import { visibleProduct } from '../catalog/product-query.js';
 import {
   reviewOrderBy,
@@ -20,9 +21,6 @@ import {
   toReviewDto,
 } from './reviews.mapper.js';
 import type { ListReviewsQuery, SubmitReviewBody } from './reviews.schemas.js';
-
-/** Cache namespace for public review reads. Moderation (B7) calls `invalidate()`. */
-export const REVIEWS_CACHE = 'reviews';
 
 /** Submissions per IP (and per signed-in customer) per day. */
 export const REVIEW_LIMIT = { max: 5, windowMs: 86_400_000 } as const;

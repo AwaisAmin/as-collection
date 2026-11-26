@@ -101,7 +101,12 @@ export default async function OrderPage({ params }: PageProps<'/orders/[number]'
               This order is paid by transfer: accept the payment below to confirm it.
             </p>
           ) : null}
-          <OrderActions number={order.number} actions={actions} delivery={delivery} />
+          <OrderActions
+            number={order.number}
+            actions={actions}
+            delivery={delivery}
+            paid={order.paymentStatus === 'PAID'}
+          />
         </Card>
       ) : null}
 

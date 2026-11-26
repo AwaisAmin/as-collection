@@ -55,7 +55,7 @@ export const orderDetailSelect = {
   },
   paymentProofs: {
     orderBy: { createdAt: 'desc' },
-    select: { id: true, method: true, status: true, reference: true, createdAt: true },
+    select: { id: true, method: true, status: true, reference: true, note: true, createdAt: true },
   },
 } satisfies Prisma.OrderSelect;
 
@@ -140,6 +140,8 @@ export function toOrderDto(row: OrderDetailRow): OrderDto {
       method: p.method,
       status: p.status,
       reference: p.reference,
+      // The staff note on an accepted proof is internal; a rejection reason is meant for them.
+      rejectionReason: p.status === 'REJECTED' ? p.note : null,
       uploadedAt: p.createdAt.toISOString(),
     })),
     timeline: timelineOf(row),

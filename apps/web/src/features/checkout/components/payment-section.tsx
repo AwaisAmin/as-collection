@@ -3,7 +3,6 @@
 import { Banknote, Landmark } from 'lucide-react';
 import { useId } from 'react';
 
-import { CopyButton } from '@/components/ui/copy-button';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import {
@@ -14,10 +13,10 @@ import {
 import { useStoreSettings } from '@/features/content/components/store-content-provider';
 import type { PaymentMethod } from '@/features/orders/types';
 import { cn } from '@/lib/utils/cn';
-import { formatPrice } from '@/lib/utils/format';
 
 import type { CheckoutField } from '../schemas';
 import { ScreenshotUpload } from './screenshot-upload';
+import { TransferAccountCard } from './transfer-account-card';
 
 interface PaymentSectionProps {
   method: PaymentMethod | null;
@@ -56,7 +55,6 @@ export function PaymentSection({
   const base = useId();
   // The store's accounts (admin settings); a channel it hasn't set up keeps the bundled entry.
   const transferAccounts = { ...defaultAccounts, ...useStoreSettings().transferAccounts };
-  const account = transferAccounts[channel];
 
   return (
     <div className="flex flex-col gap-5">
@@ -143,23 +141,7 @@ export function PaymentSection({
             </div>
           </fieldset>
 
-          <div className="rounded-xl border border-gold bg-ivory p-4">
-            <p className="mb-3 text-[16px] text-text">
-              Send <span className="font-bold">{formatPrice(total)}</span> to this {account.label}{' '}
-              account:
-            </p>
-            <dl className="flex flex-col gap-2 font-body text-[16px]">
-              {account.fields.map((f) => (
-                <div key={f.label} className="flex flex-wrap items-center justify-between gap-2">
-                  <dt className="text-muted">{f.label}</dt>
-                  <dd className="flex items-center gap-2 font-bold text-ink">
-                    <span className="break-all">{f.value}</span>
-                    <CopyButton value={f.value} label={f.label} />
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          </div>
+          <TransferAccountCard channel={channel} total={total} />
 
           <FormField
             id={`${base}-ref`}

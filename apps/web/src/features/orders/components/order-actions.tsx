@@ -7,7 +7,9 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Dialog } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import type { TransferChannel } from '@/config/payments';
 import { ScreenshotUpload } from '@/features/checkout/components/screenshot-upload';
+import { TransferAccountCard } from '@/features/checkout/components/transfer-account-card';
 
 import { cancelOrderAction, type OrderFormState, uploadPaymentProofAction } from '../actions';
 
@@ -27,7 +29,17 @@ export function PaymentProofForm({
   orderNumber,
   accessKey,
   rejected,
-}: OrderRef & { rejected: boolean }) {
+  rejectionReason,
+  channel,
+  total,
+}: OrderRef & {
+  rejected: boolean;
+  /** Staff's reason for not accepting the last screenshot. */
+  rejectionReason?: string | undefined;
+  /** Where the money goes (shown again: the shopper may come back days later). */
+  channel?: TransferChannel | undefined;
+  total: number;
+}) {
   const [state, action, pending] = useActionState(uploadPaymentProofAction, idle);
   const base = useId();
 
@@ -51,8 +63,14 @@ export function PaymentProofForm({
               ? 'We couldn’t verify the last screenshot. Upload a clear one showing the amount and transaction ID.'
               : 'We’ll confirm your order as soon as we verify the transfer.'}
           </p>
+          {rejected && rejectionReason ? (
+            <p className="mt-2 text-[16px]">
+              <span className="font-semibold">Reason:</span> {rejectionReason}
+            </p>
+          ) : null}
         </div>
       </div>
+      {channel ? <TransferAccountCard channel={channel} total={total} /> : null}
       <input type="hidden" name="orderNumber" value={orderNumber} />
       {accessKey ? <input type="hidden" name="key" value={accessKey} /> : null}
       <ScreenshotUpload id={`${base}-screenshot`} name="screenshot" />

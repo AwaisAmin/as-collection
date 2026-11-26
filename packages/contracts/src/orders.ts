@@ -121,6 +121,8 @@ export interface OrderDto {
     method: PaymentMethod;
     status: PaymentProofStatus;
     reference: string | null;
+    /** Staff's reason, shown to the customer when the screenshot was not accepted. */
+    rejectionReason: string | null;
     uploadedAt: string;
   }[];
   timeline: OrderEventDto[];

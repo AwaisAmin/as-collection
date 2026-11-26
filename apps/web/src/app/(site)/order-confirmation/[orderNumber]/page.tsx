@@ -1,7 +1,7 @@
 import { CircleCheck, CircleX, Clock, PackageSearch } from 'lucide-react';
 import type { Metadata, Route } from 'next';
 import { notFound } from 'next/navigation';
-import { Suspense } from 'react';
+import { type ReactNode, Suspense } from 'react';
 
 import { ButtonLink } from '@/components/ui/button';
 import { Container } from '@/components/ui/container';
@@ -12,6 +12,7 @@ import { CancelOrderButton, PaymentProofForm } from '@/features/orders/component
 import { OrderDetails } from '@/features/orders/components/order-details';
 import { ORDER_NUMBER_PATTERN } from '@/features/orders/lib/order-number';
 import { ordersService } from '@/features/orders/services/orders.service';
+import type { Order } from '@/features/orders/types';
 import { formatPrice } from '@/lib/utils/format';
 import { formatPkMobile } from '@/lib/utils/phone';
 
@@ -59,7 +60,6 @@ async function Confirmation({
   const firstName = order.customer.fullName.split(' ')[0];
   // The link stays valid after the shopper cancels: say so instead of "placed / keep cash ready".
   const cancelled = order.status === 'cancelled';
-  const isCod = order.payment.method === 'cod';
   const trackHref =
     `/track-order?order=${order.orderNumber}&phone=${order.customer.phone}` as Route;
 
@@ -79,6 +79,11 @@ async function Confirmation({
         {cancelled ? (
           <p className="text-[19px] text-muted">
             This order was cancelled. Nothing will be delivered and nothing is owed.
+            {order.payment.status === 'paid'
+              ? ' We will send your payment back and let you know once it is refunded.'
+              : order.payment.status === 'refunded'
+                ? ' Your payment has been refunded.'
+                : null}
           </p>
         ) : (
           <p className="text-[19px] text-muted">
@@ -99,22 +104,7 @@ async function Confirmation({
         {cancelled ? null : (
           <div className="mt-2 flex w-full gap-3 rounded-xl border border-gold/60 bg-sand/70 px-4 py-3 text-left text-[16px]">
             <Clock aria-hidden size={20} className="mt-0.5 shrink-0 text-gold-dark" />
-            {isCod ? (
-              <p>
-                Please keep <span className="font-bold">{formatPrice(order.totals.total)}</span>{' '}
-                ready in cash for the courier. Delivery usually takes 2–5 working days.
-              </p>
-            ) : needsScreenshot ? (
-              <p>
-                Transfer <span className="font-bold">{formatPrice(order.totals.total)}</span> and
-                upload the screenshot below. Unpaid transfer orders are cancelled after 48 hours.
-              </p>
-            ) : (
-              <p>
-                We received your payment screenshot. Your order will be confirmed once we verify the
-                payment — usually within a few hours.
-              </p>
-            )}
+            <p>{paymentNote(order, needsScreenshot)}</p>
           </div>
         )}
 
@@ -123,6 +113,9 @@ async function Confirmation({
             orderNumber={order.orderNumber}
             accessKey={key}
             rejected={order.payment.status === 'payment_failed'}
+            rejectionReason={order.payment.proofRejectionReason}
+            channel={order.payment.channel}
+            total={order.totals.total}
           />
         ) : null}
       </div>
@@ -149,4 +142,31 @@ async function Confirmation({
       </p>
     </Container>
   );
+}
+
+/** The line under the order number: what (if anything) the shopper still has to do about paying. */
+function paymentNote(order: Order, needsScreenshot: boolean): ReactNode {
+  const total = <span className="font-bold">{formatPrice(order.totals.total)}</span>;
+  switch (order.payment.status) {
+    case 'refunded':
+      return 'Your payment for this order has been refunded.';
+    case 'paid':
+      return 'Payment received — thank you! Your order is confirmed; use “Track your order” to follow it.';
+    case 'pay_on_delivery':
+      return (
+        <>
+          Please keep {total} ready in cash for the courier. Delivery usually takes 2–5 working
+          days.
+        </>
+      );
+    default:
+      return needsScreenshot ? (
+        <>
+          Transfer {total} and upload the screenshot below. Unpaid transfer orders are cancelled
+          after 48 hours.
+        </>
+      ) : (
+        'We received your payment screenshot. Your order will be confirmed once we verify the payment — usually within a few hours.'
+      );
+  }
 }

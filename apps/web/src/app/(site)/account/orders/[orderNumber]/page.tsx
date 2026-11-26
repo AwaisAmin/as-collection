@@ -66,6 +66,9 @@ export default async function AccountOrderPage({
         <PaymentProofForm
           orderNumber={order.orderNumber}
           rejected={order.payment.status === 'payment_failed'}
+          rejectionReason={order.payment.proofRejectionReason}
+          channel={order.payment.channel}
+          total={order.totals.total}
         />
       ) : null}
       <OrderDetails order={order} />

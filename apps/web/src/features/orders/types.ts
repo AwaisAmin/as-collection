@@ -66,6 +66,8 @@ export interface Order {
     screenshot?: { name: string; size: number; type: string };
     /** Latest screenshot's review state (API). */
     proofStatus?: 'pending' | 'accepted' | 'rejected';
+    /** Why the latest screenshot was not accepted (staff's words). */
+    proofRejectionReason?: string;
   };
   lines: readonly OrderLine[];
   totals: OrderTotals;

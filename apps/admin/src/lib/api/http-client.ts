@@ -64,6 +64,8 @@ export function buildQuery(query: Record<string, QueryValue> = {}): string {
   return text ? `?${text}` : '';
 }
 
+const sentence = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
+
 const isProblem = (value: unknown): value is ProblemDetails =>
   typeof value === 'object' && value !== null && 'code' in value && 'status' in value;
 
@@ -117,7 +119,15 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
 
   if (!response.ok) {
     if (isProblem(payload)) {
-      throw new ApiError(payload.detail || payload.title, response.status, payload.code, payload);
+      const problem = payload.errors
+        ? {
+            ...payload,
+            // Field messages are written to follow the field name ("must be after the start");
+            // under a form field they read as a sentence.
+            errors: payload.errors.map((e) => ({ ...e, message: sentence(e.message) })),
+          }
+        : payload;
+      throw new ApiError(payload.detail || payload.title, response.status, payload.code, problem);
     }
     throw new ApiError(response.statusText || 'Request failed', response.status);
   }

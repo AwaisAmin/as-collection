@@ -118,6 +118,9 @@ export function toOrder(dto: OrderDto, siteOrigin: string): Order {
       ...(latestProof
         ? { proofStatus: latestProof.status.toLowerCase() as 'pending' | 'accepted' | 'rejected' }
         : {}),
+      ...(latestProof?.rejectionReason
+        ? { proofRejectionReason: latestProof.rejectionReason }
+        : {}),
     },
     lines,
     totals: {
